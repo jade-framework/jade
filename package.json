@@ -1,0 +1,11 @@
+{
+  "name": "jade",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Jade Framework",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.714.0",
+    "uuid": "^8.2.0"
+  }
+}
