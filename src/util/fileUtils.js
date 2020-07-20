@@ -2,33 +2,45 @@ const fs = require("fs");
 const path = require("path");
 const { promisify } = require("util");
 
-const getJadePath = (path) => `${path}/.jade`;
+const getJadePath = (_path) => path.join(_path, ".jade");
+const mkdir = promisify(fs.mkdir);
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
 
-const exists = async (path) =>
+const exists = async (_path) =>
   new Promise((res) => {
-    fs.access(path, (err) => res(!err));
+    fs.access(_path, (err) => res(!err));
   });
 
-const readConfig = async (path) => {
-  const jadePath = getJadePath(path);
-  const config = await fs.readFile(`${jadePath}/config.json`);
+const readConfig = async (_path) => {
+  const jadePath = getJadePath(_path);
+  const config = await readFile(path.join(jadePath, "config.json"));
   return JSON.parse(config);
 };
 
-const writeConfig = async (path, config) => {
-  const jadePath = getJadePath(path);
+const writeConfig = async (_path, config) => {
+  const jadePath = getJadePath(_path);
   const configJSON = JSON.stringify(config, null, 2);
-  await fs.writeFile(`${jadePath}/config.json`, configJSON);
+  await writeFile(path.join(jadePath, "config.json"), configJSON);
 };
 
-const createDirectory = async (name, path) => {
-  const dir = `${path}/${name}`;
+const createDirectory = async (name, _path) => {
+  const dir = path.join(_path, name);
 
   const dirExists = await exists(dir);
-  console.log(dirExists);
-  // if (!dirExists) {
-  //   await mkdir(dir);
-  // }
+  if (!dirExists) {
+    await mkdir(dir);
+  }
 };
 
-createDirectory("src", "/home/edmondtam/LS/capstone/cp/jade");
+async function test(_path) {
+  await createDirectory(".jade", _path);
+  await writeConfig(_path, { hi: "there" });
+  await readConfig(_path);
+}
+
+module.exports = {
+  readConfig,
+  writeConfig,
+  createDirectory,
+};

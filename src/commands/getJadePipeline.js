@@ -1,4 +1,4 @@
-const { getPipeline } = require("../aws/");
+const { getPipeline } = require("../aws");
 
 const params = {
   name: "MyFirstPipeline",
