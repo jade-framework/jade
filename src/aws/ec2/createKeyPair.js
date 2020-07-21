@@ -1,6 +1,6 @@
-const path = require("path");
 const { asyncCreateKeyPair } = require("./index");
 const {
+  join,
   createJSONFile,
   getJadePath,
   writeFile,
@@ -19,7 +19,7 @@ const keyPairParams = {
 
 module.exports = async function createKeyPair() {
   const jadePath = getJadePath(hostDirectory);
-  const privateKeyFilename = path.join(jadePath, keyPairFilename);
+  const privateKeyFilename = join(jadePath, keyPairFilename);
   try {
     const keyPairResponse = await asyncCreateKeyPair(keyPairParams);
     const { KeyMaterial, ...otherData } = keyPairResponse;

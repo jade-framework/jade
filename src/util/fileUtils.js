@@ -1,33 +1,33 @@
 const fs = require("fs");
-const path = require("path");
+const { join } = require("path");
 const { promisify } = require("util");
 const { hostDirectory } = require("../constants/allConstants");
 
-const getJadePath = (_path) => path.join(_path, ".jade");
+const getJadePath = (path) => join(path, ".jade");
 const mkdir = promisify(fs.mkdir);
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 const chmod = promisify(fs.chmod);
 
-const exists = async (_path) =>
+const exists = async (path) =>
   new Promise((res) => {
-    fs.access(_path, (err) => res(!err));
+    fs.access(path, (err) => res(!err));
   });
 
-const readConfig = async (_path) => {
-  const jadePath = getJadePath(_path);
-  const config = await readFile(path.join(jadePath, "config.json"));
+const readConfig = async (path) => {
+  const jadePath = getJadePath(path);
+  const config = await readFile(join(jadePath, "config.json"));
   return JSON.parse(config);
 };
 
-const writeConfig = async (_path, config) => {
-  const jadePath = getJadePath(_path);
+const writeConfig = async (path, config) => {
+  const jadePath = getJadePath(path);
   const configJSON = JSON.stringify(config, null, 2);
-  await writeFile(path.join(jadePath, "config.json"), configJSON);
+  await writeFile(join(jadePath, "config.json"), configJSON);
 };
 
-const createDirectory = async (name, _path) => {
-  const dir = path.join(_path, name);
+const createDirectory = async (name, path) => {
+  const dir = join(path, name);
 
   const dirExists = await exists(dir);
   if (!dirExists) {
@@ -35,25 +35,26 @@ const createDirectory = async (name, _path) => {
   }
 };
 
-const createJSONFile = async (fileName, _path, json) => {
+const createJSONFile = async (fileName, path, json) => {
   const configStr = JSON.stringify(json, null, 2);
-  await writeFile(path.join(_path, `${fileName}.json`), configStr);
+  await writeFile(join(path, `${fileName}.json`), configStr);
 };
 
-const readJSONFile = async (fileName, _path) => {
-  const data = await readFile(path.join(_path, `${fileName}.json`));
+const readJSONFile = async (fileName, path) => {
+  const data = await readFile(join(path, `${fileName}.json`));
   return JSON.parse(data);
 };
 
-async function test(_path) {
-  await createDirectory(".jade", _path);
-  await writeConfig(_path, { hi: "there" });
-  await readConfig(_path);
+async function test(path) {
+  await createDirectory(".jade", path);
+  await writeConfig(path, { hi: "there" });
+  await readConfig(path);
 }
 
 test(hostDirectory);
 
 module.exports = {
+  join,
   getJadePath,
   readFile,
   writeFile,

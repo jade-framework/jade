@@ -1,7 +1,10 @@
 const { createEC2Instance } = require("../aws/ec2/createEC2Instance");
-const fs = require("fs");
-const path = require("path");
-const { getJadePath, readJSONFile } = require("../util/fileUtils");
+const {
+  join,
+  getJadePath,
+  readJSONFile,
+  readFile,
+} = require("../util/fileUtils");
 const { hostDirectory, keyPairFilename } = require("../constants/allConstants");
 
 const Client = require("ssh2").Client;
@@ -9,9 +12,9 @@ const conn = new Client();
 
 const jadePath = getJadePath(hostDirectory);
 
-const privateKey = fs.readFileSync(path.join(jadePath, keyPairFilename));
-
 async function installBuildFiles() {
+  const privateKey = await readFile(join(jadePath, keyPairFilename));
+
   try {
     const ec2Data = await readJSONFile("ec2Instance", jadePath);
     const publicIp = ec2Data.Instances[0].PublicIpAddress;
@@ -28,7 +31,8 @@ async function installBuildFiles() {
             .on("data", (data) => {
               console.log("OUTPUT: " + data);
             });
-          stream.end("ls -l\nexit\n");
+          // stream.end("ls -al\nexit\n");
+          stream.end("ls -al\n");
         });
       })
       .connect({

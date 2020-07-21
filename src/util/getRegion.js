@@ -1,9 +1,9 @@
 const os = require("os");
 const { readFileSync } = require("fs");
-const path = require("path");
+const { join } = require("../util/fileUtils");
 
-// note that the user must have an aws config file
-const awsConfig = path.join(os.homedir(), ".aws", "config");
+// TODO: change this reference to os.homedir() and handle error
+const awsConfig = join(os.homedir(), ".aws", "config");
 
 const getRegionFromConfigStr = (configStr) => {
   const defaultProfile = configStr.split("[").find((el) => el.match("default"));
