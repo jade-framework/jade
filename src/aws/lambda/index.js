@@ -2,8 +2,8 @@ const awsLambda = require('aws-sdk/clients/lambda');
 const awsIAM = require('aws-sdk/clients/iam');
 
 const createLambdaRole = () => {
+  console.log('Creating Lambda role...');
   const iam = new awsIAM({ apiVersion: '2010-05-08' });
-
   const ROLE = 'ROLE_LAMBDA';
 
   const myPolicy = {
@@ -50,7 +50,7 @@ const createLambda = (
   zipFileName,
   functionName,
   handler,
-  description
+  description = 'Sample description'
 ) => {
   const lambda = new awsLambda({ apiVersion: '2015-03-31' });
 

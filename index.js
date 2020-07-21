@@ -11,13 +11,25 @@ const {
   updateS3BucketPolicy,
 } = require('./src/aws/s3');
 const { createCloudfrontDistribution } = require('./src/aws/cloudfront');
+const { createLambda, createLambdaRole } = require('./src/aws/lambda');
+const { zipit } = require('./src/util/zipit');
 
-const bucketName = `test-${uuid.v4()}`;
+// const bucketName = `test-${uuid.v4()}`;
+const bucketName = `test-7efd1622-b92f-4771-8b1a-b7fa476491ec`;
 const fileToUpload = 'index.html';
 
 (async () => {
-  await createS3Bucket(bucketName);
-  uploadFileToS3Bucket(fileToUpload, bucketName);
-  updateS3BucketPolicy(bucketName);
-  createCloudfrontDistribution(bucketName);
+  // await createS3Bucket(bucketName);
+  // updateS3BucketPolicy(bucketName);
+  // await zipit('helloWorld.js', 'src/aws/lambda');
+  // uploadFileToS3Bucket(fileToUpload, bucketName);
+  // uploadFileToS3Bucket('helloWorld.js.zip', bucketName);
+  createLambda(
+    bucketName,
+    'hello-world',
+    'helloWorld',
+    'helloWorld.helloHandler',
+    'A sample lambda function that logs and returns text'
+  );
+  // createCloudfrontDistribution(bucketName);
 })();
