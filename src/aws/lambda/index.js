@@ -62,11 +62,11 @@ const createLambda = (
       S3Bucket: bucketName,
       S3Key: zipFileName,
     },
-    FunctionName: functionName /* 'slotTurn' */,
-    Handler: handler /* 'slotSpin.Slothandler' */,
+    FunctionName: functionName,
+    Handler: handler,
     Role: 'arn:aws:iam::434812305662:role/ROLE_LAMBDA',
-    Runtime: 'nodejs12.x' /* required */,
-    Description: description /*'Slot machine game results generator'*/,
+    Runtime: 'nodejs12.x',
+    Description: description,
   };
 
   console.log(params);
