@@ -1,0 +1,26 @@
+{
+  "version": "5.0.0",
+  "artifacts": {
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    },
+    "CdkProjectStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "CdkProjectStack.template.json"
+      }
+    }
+  },
+  "runtime": {
+    "libraries": {
+      "@aws-cdk/core": "1.52.0",
+      "@aws-cdk/cx-api": "1.52.0",
+      "@aws-cdk/cloud-assembly-schema": "1.52.0",
+      "jsii-runtime": "node.js/v14.1.0"
+    }
+  }
+}
