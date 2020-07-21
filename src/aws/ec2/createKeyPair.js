@@ -6,7 +6,10 @@ const {
   writeFile,
   chmod,
 } = require("../../util/fileUtils");
-const { hostDirectory } = require("../../constants/allConstants");
+const {
+  hostDirectory,
+  keyPairFilename,
+} = require("../../constants/allConstants");
 const fs = require("fs");
 
 // default data
@@ -16,7 +19,7 @@ const keyPairParams = {
 
 module.exports = async function createKeyPair() {
   const jadePath = getJadePath(hostDirectory);
-  const privateKeyFilename = path.join(jadePath, "jade-key-pair.pem");
+  const privateKeyFilename = path.join(jadePath, keyPairFilename);
   try {
     const keyPairResponse = await asyncCreateKeyPair(keyPairParams);
     const { KeyMaterial, ...otherData } = keyPairResponse;
