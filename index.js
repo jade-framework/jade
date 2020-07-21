@@ -15,20 +15,20 @@ const { createLambda, createLambdaRole } = require('./src/aws/lambda');
 const { zipit } = require('./src/util/zipit');
 
 // const bucketName = `test-${uuid.v4()}`;
-const bucketName = `test-7efd1622-b92f-4771-8b1a-b7fa476491ec`;
+const bucketName = `test-b80a4ff0-582b-406d-8b9c-fdd7db0c793b`;
 const fileToUpload = 'index.html';
 
 (async () => {
   // await createS3Bucket(bucketName);
   // updateS3BucketPolicy(bucketName);
-  // await zipit('helloWorld.js', 'src/aws/lambda');
+  // await zipit('helloWorld.js', 'helloWorld.js');
   // uploadFileToS3Bucket(fileToUpload, bucketName);
-  // uploadFileToS3Bucket('helloWorld.js.zip', bucketName);
+  await uploadFileToS3Bucket('helloWorld.js.zip', bucketName);
   createLambda(
     bucketName,
-    'hello-world',
+    'helloWorld.js.zip',
     'helloWorld',
-    'helloWorld.helloHandler',
+    'helloWorld.helloWorld',
     'A sample lambda function that logs and returns text'
   );
   // createCloudfrontDistribution(bucketName);

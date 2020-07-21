@@ -1,3 +1,4 @@
+const AWS = require('aws-sdk/global');
 const awsLambda = require('aws-sdk/clients/lambda');
 const awsIAM = require('aws-sdk/clients/iam');
 
@@ -52,6 +53,8 @@ const createLambda = (
   handler,
   description = 'Sample description'
 ) => {
+  AWS.config.update({ region: 'us-east-1' });
+
   const lambda = new awsLambda({ apiVersion: '2015-03-31' });
 
   const params = {
@@ -61,13 +64,16 @@ const createLambda = (
     },
     FunctionName: functionName /* 'slotTurn' */,
     Handler: handler /* 'slotSpin.Slothandler' */,
-    Role: 'ROLE_LAMBDA',
-    Runtime: 'nodejs8.10' /* required */,
+    Role: 'arn:aws:iam::434812305662:role/ROLE_LAMBDA',
+    Runtime: 'nodejs12.x' /* required */,
     Description: description /*'Slot machine game results generator'*/,
   };
+
+  console.log(params);
+
   lambda.createFunction(params, function (err, data) {
     if (err) console.log(err);
-    else console.log('success');
+    else console.log(data);
   });
 };
 
