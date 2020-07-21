@@ -12,7 +12,25 @@ const conn = new Client();
 
 const jadePath = getJadePath(hostDirectory);
 
-async function installBuildFiles() {
+const linuxCommands = [
+  "sudo yum update -y",
+  "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash",
+];
+
+const nodeCommands = [
+  ". ~/.nvm/nvm.sh",
+  "nvm install node",
+  "npm install -g yarn",
+];
+
+const gitCommands = [
+  "sudo yum install git -y",
+  "git clone https://github.com/JeremyCrichton/gatsby-test",
+];
+
+const buildCommands = ["cd gatsby-test", "yarn install", "yarn build"];
+
+async function installEC2JadeEnvironment() {
   const privateKey = await readFile(join(jadePath, keyPairFilename));
 
   try {
@@ -32,7 +50,15 @@ async function installBuildFiles() {
               console.log("OUTPUT: " + data);
             });
           // stream.end("ls -al\nexit\n");
-          stream.end("ls -al\n");
+          stream.end(
+            [
+              ...linuxCommands,
+              ...nodeCommands,
+              ...gitCommands,
+              ...buildCommands,
+              "exit\n",
+            ].join("\n")
+          );
         });
       })
       .connect({
@@ -46,4 +72,4 @@ async function installBuildFiles() {
   }
 }
 
-installBuildFiles();
+installEC2JadeEnvironment();
