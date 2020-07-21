@@ -30,12 +30,16 @@ const gitCommands = [
 
 const buildCommands = ["cd gatsby-test", "yarn install", "yarn build"];
 
-async function installEC2JadeEnvironment() {
+const deployCommands = ["aws s3 sync public s3://bucket-sounds-cool-to-me"];
+
+module.exports = async function installEC2JadeEnvironment() {
   const privateKey = await readFile(join(jadePath, keyPairFilename));
 
   try {
+    console.log("Reading EC2 data...");
     const ec2Data = await readJSONFile("ec2Instance", jadePath);
     const publicIp = ec2Data.Instances[0].PublicIpAddress;
+    console.log("Beginning connection to EC2 server...");
     conn
       .on("ready", () => {
         console.log("Client ready");
@@ -56,6 +60,7 @@ async function installEC2JadeEnvironment() {
               ...nodeCommands,
               ...gitCommands,
               ...buildCommands,
+              ...deployCommands,
               "exit\n",
             ].join("\n")
           );
@@ -67,9 +72,8 @@ async function installEC2JadeEnvironment() {
         username: "ec2-user",
         privateKey,
       });
+    console.log("EC2 server setup.");
   } catch (err) {
     console.log(err);
   }
-}
-
-installEC2JadeEnvironment();
+};

@@ -45,10 +45,18 @@ module.exports = async function createEC2Instance() {
     const keyPair = await readJSONFile("keyPair", jadePath);
     const securityGroup = await readJSONFile("securityGroup", jadePath);
 
+    console.log("Reading IAM instance profile...");
+    const instanceProfile = await readJSONFile("ec2InstanceProfile", jadePath);
+    const instanceProfileArn = instanceProfile.InstanceProfile.Arn;
+    console.log(instanceProfileArn);
+
     console.log("Creating EC2 instance...");
     const runInstancesResponse = await asyncRunInstances({
       ...runInstancesParams,
       KeyName: keyPair.KeyName,
+      IamInstanceProfile: {
+        Arn: instanceProfileArn,
+      },
       SecurityGroupIds: [securityGroup.GroupId],
     });
 
