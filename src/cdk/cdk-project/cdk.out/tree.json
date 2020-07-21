@@ -435,7 +435,7 @@
                               "Owner": "kpatel27",
                               "Repo": "deployment-test",
                               "Branch": "master",
-                              "OAuthToken": "4c5b84798fbb6c05c25c75dfb74f0b8eb89f95c2",
+                              "OAuthToken": "71b3b5d8bbfd58bf6137506891629604a7419775",
                               "PollForSourceChanges": false
                             },
                             "runOrder": 1
@@ -510,7 +510,7 @@
                           "aws:cdk:cloudformation:props": {
                             "authentication": "GITHUB_HMAC",
                             "authenticationConfiguration": {
-                              "secretToken": "4c5b84798fbb6c05c25c75dfb74f0b8eb89f95c2"
+                              "secretToken": "71b3b5d8bbfd58bf6137506891629604a7419775"
                             },
                             "filters": [
                               {
