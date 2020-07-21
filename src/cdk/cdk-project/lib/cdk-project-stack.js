@@ -55,7 +55,7 @@ class CdkProjectStack extends cdk.Stack {
       actionName: "Retrieve_Source",
       owner: "kpatel27",
       repo: "deployment-test",
-      oauthToken: "{GITHUB TOKEN}",
+      oauthToken: "GITHUB TOKEN",
       output: sourceOutput,
       branch: "master",
       trigger: codepipelineActions.GitHubTrigger.WEBHOOK,
