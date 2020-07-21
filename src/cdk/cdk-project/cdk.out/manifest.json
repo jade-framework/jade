@@ -12,14 +12,292 @@
       "environment": "aws://unknown-account/unknown-region",
       "properties": {
         "templateFile": "CdkProjectStack.template.json"
+      },
+      "metadata": {
+        "/CdkProjectStack/testing-jade-20/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testingjade20DE058166",
+            "trace": [
+              "new Bucket (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-s3/lib/bucket.js:389:26)",
+              "new CdkProjectStack (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/lib/cdk-project-stack.js:21:24)",
+              "Object.<anonymous> (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/bin/cdk-project.js:7:1)",
+              "Module._compile (internal/modules/cjs/loader.js:1176:30)",
+              "Object.Module._extensions..js (internal/modules/cjs/loader.js:1196:10)",
+              "Module.load (internal/modules/cjs/loader.js:1040:32)",
+              "Function.Module._load (internal/modules/cjs/loader.js:929:14)",
+              "Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)",
+              "internal/main/run_main_module.js:17:47"
+            ]
+          }
+        ],
+        "/CdkProjectStack/testing-jade-20/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testingjade20Policy6E54214D",
+            "trace": [
+              "new BucketPolicy (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-s3/lib/bucket-policy.js:22:25)",
+              "Bucket.addToResourcePolicy (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-s3/lib/bucket.js:126:27)",
+              "Function.addToPrincipalOrResource (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-iam/lib/grant.js:51:49)",
+              "Bucket.grantPublicAccess (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-s3/lib/bucket.js:259:26)",
+              "new Bucket (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-s3/lib/bucket.js:431:18)",
+              "new CdkProjectStack (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/lib/cdk-project-stack.js:21:24)",
+              "Object.<anonymous> (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/bin/cdk-project.js:7:1)",
+              "Module._compile (internal/modules/cjs/loader.js:1176:30)",
+              "Object.Module._extensions..js (internal/modules/cjs/loader.js:1196:10)",
+              "Module.load (internal/modules/cjs/loader.js:1040:32)",
+              "Function.Module._load (internal/modules/cjs/loader.js:929:14)",
+              "Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)",
+              "internal/main/run_main_module.js:17:47"
+            ]
+          }
+        ],
+        "/CdkProjectStack/MyDistribution/CFDistribution": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MyDistributionCFDistributionDE147309",
+            "trace": [
+              "new Distribution (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-cloudfront/lib/distribution.js:33:30)",
+              "new CdkProjectStack (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/lib/cdk-project-stack.js:33:5)",
+              "Object.<anonymous> (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/bin/cdk-project.js:7:1)",
+              "Module._compile (internal/modules/cjs/loader.js:1176:30)",
+              "Object.Module._extensions..js (internal/modules/cjs/loader.js:1196:10)",
+              "Module.load (internal/modules/cjs/loader.js:1040:32)",
+              "Function.Module._load (internal/modules/cjs/loader.js:929:14)",
+              "Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)",
+              "internal/main/run_main_module.js:17:47"
+            ]
+          }
+        ],
+        "/CdkProjectStack/testPipeline/ArtifactsBucketEncryptionKey/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testPipelineArtifactsBucketEncryptionKey1EAAE004",
+            "trace": [
+              "new Key (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-kms/lib/key.js:157:26)",
+              "new Pipeline (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.js:81:35)",
+              "new CdkProjectStack (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/lib/cdk-project-stack.js:48:22)",
+              "Object.<anonymous> (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/bin/cdk-project.js:7:1)",
+              "Module._compile (internal/modules/cjs/loader.js:1176:30)",
+              "Object.Module._extensions..js (internal/modules/cjs/loader.js:1196:10)",
+              "Module.load (internal/modules/cjs/loader.js:1040:32)",
+              "Function.Module._load (internal/modules/cjs/loader.js:929:14)",
+              "Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)",
+              "internal/main/run_main_module.js:17:47"
+            ]
+          }
+        ],
+        "/CdkProjectStack/testPipeline/ArtifactsBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testPipelineArtifactsBucket0FEAF26D",
+            "trace": [
+              "new Bucket (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-s3/lib/bucket.js:389:26)",
+              "new Pipeline (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.js:86:27)",
+              "new CdkProjectStack (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/lib/cdk-project-stack.js:48:22)",
+              "Object.<anonymous> (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/bin/cdk-project.js:7:1)",
+              "Module._compile (internal/modules/cjs/loader.js:1176:30)",
+              "Object.Module._extensions..js (internal/modules/cjs/loader.js:1196:10)",
+              "Module.load (internal/modules/cjs/loader.js:1040:32)",
+              "Function.Module._load (internal/modules/cjs/loader.js:929:14)",
+              "Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)",
+              "internal/main/run_main_module.js:17:47"
+            ]
+          }
+        ],
+        "/CdkProjectStack/testPipeline/ArtifactsBucketEncryptionKeyAlias/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testPipelineArtifactsBucketEncryptionKeyAliasEEC0E99D",
+            "trace": [
+              "new Alias (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-kms/lib/alias.js:71:26)",
+              "new Pipeline (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.js:94:13)",
+              "new CdkProjectStack (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/lib/cdk-project-stack.js:48:22)",
+              "Object.<anonymous> (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/bin/cdk-project.js:7:1)",
+              "Module._compile (internal/modules/cjs/loader.js:1176:30)",
+              "Object.Module._extensions..js (internal/modules/cjs/loader.js:1196:10)",
+              "Module.load (internal/modules/cjs/loader.js:1040:32)",
+              "Function.Module._load (internal/modules/cjs/loader.js:929:14)",
+              "Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)",
+              "internal/main/run_main_module.js:17:47"
+            ]
+          }
+        ],
+        "/CdkProjectStack/testPipeline/Role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testPipelineRoleEEE15BFD",
+            "trace": [
+              "new Role (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-iam/lib/role.js:42:22)",
+              "new Pipeline (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.js:102:35)",
+              "new CdkProjectStack (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/lib/cdk-project-stack.js:48:22)",
+              "Object.<anonymous> (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/bin/cdk-project.js:7:1)",
+              "Module._compile (internal/modules/cjs/loader.js:1176:30)",
+              "Object.Module._extensions..js (internal/modules/cjs/loader.js:1196:10)",
+              "Module.load (internal/modules/cjs/loader.js:1040:32)",
+              "Function.Module._load (internal/modules/cjs/loader.js:929:14)",
+              "Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)",
+              "internal/main/run_main_module.js:17:47"
+            ]
+          }
+        ],
+        "/CdkProjectStack/testPipeline/Role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testPipelineRoleDefaultPolicy78F8B89F",
+            "trace": [
+              "new Policy (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-iam/lib/policy.js:31:26)",
+              "Role.addToPrincipalPolicy (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-iam/lib/role.js:164:34)",
+              "Function.addToPrincipal (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-iam/lib/grant.js:69:65)",
+              "Function.addToPrincipalOrResource (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-iam/lib/grant.js:39:30)",
+              "Bucket.grant (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-s3/lib/bucket.js:296:29)",
+              "Bucket.grantReadWrite (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-s3/lib/bucket.js:230:21)",
+              "new Pipeline (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.js:115:29)",
+              "new CdkProjectStack (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/lib/cdk-project-stack.js:48:22)",
+              "Object.<anonymous> (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/bin/cdk-project.js:7:1)",
+              "Module._compile (internal/modules/cjs/loader.js:1176:30)",
+              "Object.Module._extensions..js (internal/modules/cjs/loader.js:1196:10)",
+              "Module.load (internal/modules/cjs/loader.js:1040:32)",
+              "Function.Module._load (internal/modules/cjs/loader.js:929:14)",
+              "Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)",
+              "internal/main/run_main_module.js:17:47"
+            ]
+          }
+        ],
+        "/CdkProjectStack/testPipeline/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testPipelineC2676E44",
+            "trace": [
+              "new Pipeline (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.js:105:30)",
+              "new CdkProjectStack (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/lib/cdk-project-stack.js:48:22)",
+              "Object.<anonymous> (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/bin/cdk-project.js:7:1)",
+              "Module._compile (internal/modules/cjs/loader.js:1176:30)",
+              "Object.Module._extensions..js (internal/modules/cjs/loader.js:1196:10)",
+              "Module.load (internal/modules/cjs/loader.js:1040:32)",
+              "Function.Module._load (internal/modules/cjs/loader.js:929:14)",
+              "Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)",
+              "internal/main/run_main_module.js:17:47"
+            ]
+          }
+        ],
+        "/CdkProjectStack/testPipeline/Source/Retrieve_Source/WebhookResource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testPipelineSourceRetrieveSourceWebhookResource1E27FCE9",
+            "trace": [
+              "GitHubSourceAction.bound (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline-actions/lib/github/source-action.js:45:13)",
+              "GitHubSourceAction.bind (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline-actions/lib/action.js:47:21)",
+              "Pipeline._attachActionToPipeline (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.js:214:37)",
+              "Stage.attachActionToPipeline (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/stage.js:110:31)",
+              "Stage.addAction (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/stage.js:69:33)",
+              "new Stage (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/stage.js:26:18)",
+              "Pipeline.addStage (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.js:162:23)",
+              "new CdkProjectStack (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/lib/cdk-project-stack.js:64:14)",
+              "Object.<anonymous> (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/bin/cdk-project.js:7:1)",
+              "Module._compile (internal/modules/cjs/loader.js:1176:30)",
+              "Object.Module._extensions..js (internal/modules/cjs/loader.js:1196:10)",
+              "Module.load (internal/modules/cjs/loader.js:1040:32)",
+              "Function.Module._load (internal/modules/cjs/loader.js:929:14)",
+              "Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)",
+              "internal/main/run_main_module.js:17:47"
+            ]
+          }
+        ],
+        "/CdkProjectStack/testPipeline/Deploy/S3Deploy/CodePipelineActionRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testPipelineDeployS3DeployCodePipelineActionRoleE8ED2045",
+            "trace": [
+              "new Role (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-iam/lib/role.js:42:22)",
+              "Pipeline.getRoleForAction (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.js:370:26)",
+              "Pipeline._attachActionToPipeline (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.js:210:33)",
+              "Stage.attachActionToPipeline (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/stage.js:110:31)",
+              "Stage.addAction (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/stage.js:69:33)",
+              "new Stage (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/stage.js:26:18)",
+              "Pipeline.addStage (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.js:162:23)",
+              "new CdkProjectStack (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/lib/cdk-project-stack.js:76:34)",
+              "Object.<anonymous> (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/bin/cdk-project.js:7:1)",
+              "Module._compile (internal/modules/cjs/loader.js:1176:30)",
+              "Object.Module._extensions..js (internal/modules/cjs/loader.js:1196:10)",
+              "Module.load (internal/modules/cjs/loader.js:1040:32)",
+              "Function.Module._load (internal/modules/cjs/loader.js:929:14)",
+              "Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)",
+              "internal/main/run_main_module.js:17:47"
+            ]
+          }
+        ],
+        "/CdkProjectStack/testPipeline/Deploy/S3Deploy/CodePipelineActionRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testPipelineDeployS3DeployCodePipelineActionRoleDefaultPolicy6396608E",
+            "trace": [
+              "new Policy (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-iam/lib/policy.js:31:26)",
+              "Role.addToPrincipalPolicy (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-iam/lib/role.js:164:34)",
+              "Function.addToPrincipal (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-iam/lib/grant.js:69:65)",
+              "Function.addToPrincipalOrResource (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-iam/lib/grant.js:39:30)",
+              "Bucket.grant (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-s3/lib/bucket.js:296:29)",
+              "Bucket.grantWrite (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-s3/lib/bucket.js:194:21)",
+              "S3DeployAction.bound (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline-actions/lib/s3/deploy-action.js:64:27)",
+              "S3DeployAction.bind (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline-actions/lib/action.js:47:21)",
+              "Pipeline._attachActionToPipeline (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.js:214:37)",
+              "Stage.attachActionToPipeline (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/stage.js:110:31)",
+              "Stage.addAction (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/stage.js:69:33)",
+              "new Stage (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/stage.js:26:18)",
+              "Pipeline.addStage (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.js:162:23)",
+              "new CdkProjectStack (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/lib/cdk-project-stack.js:76:34)",
+              "Object.<anonymous> (/Users/krunalpatel/Desktop/code/jade/src/cdk/cdk-project/bin/cdk-project.js:7:1)",
+              "Module._compile (internal/modules/cjs/loader.js:1176:30)",
+              "Object.Module._extensions..js (internal/modules/cjs/loader.js:1196:10)",
+              "Module.load (internal/modules/cjs/loader.js:1040:32)",
+              "Function.Module._load (internal/modules/cjs/loader.js:929:14)",
+              "Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)",
+              "internal/main/run_main_module.js:17:47"
+            ]
+          }
+        ]
       }
     }
   },
   "runtime": {
     "libraries": {
-      "@aws-cdk/core": "1.52.0",
-      "@aws-cdk/cx-api": "1.52.0",
-      "@aws-cdk/cloud-assembly-schema": "1.52.0",
+      "@aws-cdk/core": "1.53.0",
+      "@aws-cdk/cx-api": "1.53.0",
+      "@aws-cdk/cloud-assembly-schema": "1.53.0",
+      "@aws-cdk/aws-s3": "1.53.0",
+      "@aws-cdk/aws-events": "1.53.0",
+      "@aws-cdk/aws-iam": "1.53.0",
+      "@aws-cdk/region-info": "1.53.0",
+      "@aws-cdk/aws-kms": "1.53.0",
+      "@aws-cdk/aws-s3-deployment": "1.53.0",
+      "@aws-cdk/aws-lambda": "1.53.0",
+      "@aws-cdk/aws-cloudwatch": "1.53.0",
+      "@aws-cdk/aws-codeguruprofiler": "1.53.0",
+      "@aws-cdk/aws-ec2": "1.53.0",
+      "@aws-cdk/aws-ssm": "1.53.0",
+      "@aws-cdk/aws-logs": "1.53.0",
+      "@aws-cdk/aws-sqs": "1.53.0",
+      "@aws-cdk/aws-s3-assets": "1.53.0",
+      "@aws-cdk/assets": "1.53.0",
+      "@aws-cdk/aws-cloudfront": "1.53.0",
+      "@aws-cdk/aws-certificatemanager": "1.53.0",
+      "@aws-cdk/aws-codepipeline": "1.53.0",
+      "@aws-cdk/aws-codepipeline-actions": "1.53.0",
+      "@aws-cdk/aws-cloudformation": "1.53.0",
+      "@aws-cdk/aws-codebuild": "1.53.0",
+      "@aws-cdk/aws-ecr-assets": "1.53.0",
+      "@aws-cdk/aws-ecr": "1.53.0",
+      "@aws-cdk/custom-resources": "1.53.0",
+      "@aws-cdk/aws-events-targets": "1.53.0",
+      "@aws-cdk/aws-ecs": "1.53.0",
+      "@aws-cdk/aws-applicationautoscaling": "1.53.0",
+      "@aws-cdk/aws-autoscaling-common": "1.53.0",
+      "@aws-cdk/aws-elasticloadbalancingv2": "1.53.0",
+      "@aws-cdk/aws-servicediscovery": "1.53.0",
+      "@aws-cdk/aws-autoscaling": "1.53.0",
+      "@aws-cdk/aws-autoscaling-hooktargets": "1.53.0",
+      "@aws-cdk/aws-sns": "1.53.0",
+      "@aws-cdk/aws-sns-subscriptions": "1.53.0",
       "jsii-runtime": "node.js/v14.1.0"
     }
   }
