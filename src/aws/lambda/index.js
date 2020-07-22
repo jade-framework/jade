@@ -51,7 +51,8 @@ const createLambda = (
   zipFileName,
   functionName,
   handler,
-  description = 'Sample description'
+  description = 'Sample description',
+  role = 'arn:aws:iam::434812305662:role/lambda-s3-role'
 ) => {
   AWS.config.update({ region: 'us-east-1' });
 
@@ -64,7 +65,7 @@ const createLambda = (
     },
     FunctionName: functionName,
     Handler: handler,
-    Role: 'arn:aws:iam::434812305662:role/ROLE_LAMBDA',
+    Role: role,
     Runtime: 'nodejs12.x',
     Description: description,
   };

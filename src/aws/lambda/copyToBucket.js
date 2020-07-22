@@ -2,9 +2,10 @@
  * An AWS Lambda function that copies a file from src to dest bucket on upload to src
  */
 const S3 = require('aws-sdk/clients/s3');
+const util = require('util');
 
 // get reference to S3 client
-const s3 = new AWS.S3();
+const s3 = new S3();
 
 exports.handler = async (event, context, callback) => {
   // Read options from the event parameter.
@@ -38,7 +39,6 @@ exports.handler = async (event, context, callback) => {
     const destparams = {
       Bucket: dstBucket,
       Key: dstKey,
-      Body: srcFile,
       // ContentType: 'image',
     };
 

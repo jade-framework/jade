@@ -2,7 +2,6 @@ const { zipit } = require('../../util/zipit');
 const { createLambda } = require('./index');
 const { uploadFileToS3Bucket } = require('../s3');
 
-// await uploadFileToS3Bucket('helloWorld.js.zip', bucketName);
 // zipit('copyToBucket.js', 'copyToBucket.js');
 // uploadFileToS3Bucket(
 //   'copyToBucket.js.zip',
