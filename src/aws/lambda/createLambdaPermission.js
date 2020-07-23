@@ -1,11 +1,11 @@
 const { asyncAddPermission } = require('../awsAsyncFunctions');
 
-const createLambdaPermission = async lambdaArn => {
+const createLambdaPermission = async (sourceAccount, lambdaArn) => {
   const params = {
     Action: 'lambda:InvokeFunction',
     FunctionName: lambdaArn,
     Principal: 's3.amazonaws.com',
-    SourceAccount: '434812305662',
+    SourceAccount: sourceAccount,
     StatementId: `example-S3-permission`,
   };
 

@@ -9,12 +9,8 @@ const createLambdaFunction = async (
   functionName,
   handler,
   description = 'Sample description',
-  role = 'arn:aws:iam::434812305662:role/lambda-s3-role'
+  role
 ) => {
-  // AWS.config.update({ region: 'us-east-1' });
-
-  // const lambda = new awsLambda({ apiVersion: '2015-03-31' });
-
   const params = {
     Code: {
       S3Bucket: bucketName,
@@ -34,11 +30,6 @@ const createLambdaFunction = async (
   } catch (error) {
     console.log('Error creating lambda function', error);
   }
-
-  // lambda.createFunction(params, function (err, data) {
-  //   if (err) console.log(err);
-  //   else console.log(data);
-  // });
 };
 
 module.exports = { createLambdaFunction };

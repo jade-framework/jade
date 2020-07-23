@@ -2,3 +2,4 @@ node_modules
 .jade
 *.zip
 .DS_Store
+.env

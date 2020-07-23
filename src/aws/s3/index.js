@@ -18,6 +18,7 @@
 // };
 
 const { createBucket } = require('./createBucket');
+const { createBuckets } = require('./createBuckets');
 const {
   setBucketNotificationConfig,
 } = require('./setBucketNotificationConfig');
@@ -26,6 +27,7 @@ const { uploadToBucket } = require('./uploadToBucket');
 
 module.exports = {
   createBucket,
+  createBuckets,
   setBucketNotificationConfig,
   updateBucketPolicy,
   uploadToBucket,
