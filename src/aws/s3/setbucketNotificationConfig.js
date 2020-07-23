@@ -1,39 +1,14 @@
 /**
  * Sets an event notification on an S3 bucket to trigger a Lambda
- * - Note: Lambda permission must be created first
+ * - Note: Lambda permission must be created first with createLambdaPermission.js
  *
  * @param {string} bucketName - The name of the S3 bucket to attach the event
  * @param {String} lambdaArn - The ARN of the lambda to be triggered by the event on the bucket
  */
 
-const S3 = require('aws-sdk/clients/s3');
-const Lambda = require('aws-sdk/clients/lambda');
-const AWS = require('aws-sdk/global');
+const { asyncPutBucketNotificationConfiguration } = require('./index');
 
-function createLambdaPermission(lambdaArn) {
-  AWS.config.update({ region: 'us-east-1' });
-
-  const lambda = new Lambda();
-
-  const params = {
-    Action: 'lambda:InvokeFunction',
-    FunctionName: lambdaArn,
-    Principal: 's3.amazonaws.com',
-    SourceAccount: '434812305662',
-    StatementId: `example-S3-permission`,
-  };
-
-  lambda.addPermission(params, function (err, data) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log(data);
-    }
-  });
-}
-
-const setBucketNotificationConfig = (bucketName, lambdaArn) => {
-  const s3 = new S3({ apiVersion: '2006-03-01' });
+const setBucketNotificationConfig = async (bucketName, lambdaArn) => {
   const params = {
     Bucket: bucketName,
     NotificationConfiguration: {
@@ -47,15 +22,24 @@ const setBucketNotificationConfig = (bucketName, lambdaArn) => {
     },
   };
 
-  s3.putBucketNotificationConfiguration(params, function (err, data) {
-    if (err) console.log(err, err.stack);
-    else console.log(data);
-  });
+  try {
+    const response = await asyncPutBucketNotificationConfiguration(params);
+    console.log(
+      'Successfully set bucket notification configuration.',
+      response
+    );
+  } catch (error) {
+    console.log(
+      'Error setting bucket notification configuration',
+      error,
+      error.stack
+    );
+  }
 };
 
-createLambdaPermission(
-  'arn:aws:lambda:us-east-1:434812305662:function:copyToBucket'
-);
+/**
+ * Testing
+ */
 
 setBucketNotificationConfig(
   'test-7efd1622-b92f-4771-8b1a-b7fa476491ec',
