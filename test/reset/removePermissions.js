@@ -19,7 +19,7 @@ module.exports = function () {
   iam.removeRoleFromInstanceProfile(
     { InstanceProfileName: ec2InstanceProfile, RoleName: ec2IamRoleName },
     (err, data) => {
-      if (err) throw err;
+      if (err) console.log(err);
       console.log(data);
     }
   );
@@ -27,9 +27,9 @@ module.exports = function () {
   iam.detachRolePolicy(
     { RoleName: ec2IamRoleName, PolicyArn: s3FullAccessPolicyArn },
     (err, data) => {
-      if (err) throw err;
+      if (err) console.log(err);
       iam.deleteRole({ RoleName: ec2IamRoleName }, (err, data) => {
-        if (err) throw err;
+        if (err) console.log(err);
         console.log(data);
       });
     }
@@ -38,18 +38,18 @@ module.exports = function () {
   iam.deleteInstanceProfile(
     { InstanceProfileName: ec2InstanceProfile },
     (err, data) => {
-      if (err) throw err;
+      if (err) console.log(err);
       console.log(data);
     }
   );
 
   ec2.deleteKeyPair({ KeyName: jadeKeyPair }, (err, data) => {
-    if (err) throw err;
+    if (err) console.log(err);
     console.log(data);
   });
 
   ec2.deleteSecurityGroup({ GroupName: securityGroupName }, (err, data) => {
-    if (err) throw err;
+    if (err) console.log(err);
     console.log(data);
   });
 };

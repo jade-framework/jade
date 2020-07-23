@@ -14,6 +14,7 @@ const Client = require("ssh2").Client;
 
 const jadePath = getJadePath(hostDirectory);
 
+// TODO: divide these into "installation" and "runtime" commands
 const linuxCommands = [
   "sudo yum update -y",
   "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash",
@@ -33,6 +34,11 @@ const gitCommands = [
 ];
 
 const buildCommands = ["cd gatsby-test", "yarn install", "yarn build"];
+
+const webhookCommands = [
+  "sudo amazon-linux-extras install nginx1 -y",
+  "sudo systemctl start nginx",
+];
 
 const deployCommands = ["aws s3 sync public s3://bucket-sounds-cool-to-me"];
 
@@ -62,6 +68,7 @@ const sshConnection = async (host) => {
           ...nodeCommands,
           ...gitCommands,
           ...buildCommands,
+          ...webhookCommands,
           ...deployCommands,
           "exit\n",
         ].join("\n")
@@ -74,7 +81,7 @@ const sshConnection = async (host) => {
   await sleep(5000);
 
   while (!connected && attempts < 10) {
-    console.log("Attempting to connect to EC2 instance again...");
+    console.log("Waiting for EC2 instance to accept SSH requests...");
     attempts++;
     conn.connect(host);
     await sleep(5000);

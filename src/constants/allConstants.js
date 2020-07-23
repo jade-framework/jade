@@ -1,6 +1,7 @@
+const hostDirectory = process.cwd();
+
 const amazonMachineImageId = "ami-04122be15033aa7ec";
 const instanceType = "t2.micro";
-const hostDirectory = process.cwd();
 const keyPair = "keyPair";
 const privateKeyFilename = "jade-key-pair.pem";
 const jadeKeyPair = "jade-key-pair";
