@@ -10,8 +10,8 @@ const getRegionFromConfigStr = (configStr) => {
   const regionLine = defaultProfile
     .split("\n")
     .find((el) => el.match("region"));
-  const [, region] = regionLine.split("= ");
-  return region;
+  const [, region] = regionLine.split("=");
+  return region.trim();
 };
 
 const getRegion = () => {

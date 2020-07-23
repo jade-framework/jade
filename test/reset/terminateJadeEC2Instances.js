@@ -7,7 +7,7 @@ const region = getRegion();
 
 const ec2 = new EC2({ apiVersion, region });
 
-module.exports = function () {
+module.exports = async function () {
   const toBeDeleted = [];
   ec2.describeInstances((err, data) => {
     if (err) throw err;
@@ -20,12 +20,12 @@ module.exports = function () {
         }
       }
     }
-  });
 
-  if (toBeDeleted.length > 0) {
-    ec2.terminateInstances({ InstanceIds: toBeDeleted }, (err, data) => {
-      if (err) throw err;
-      console.log(data);
-    });
-  }
+    if (toBeDeleted.length > 0) {
+      ec2.terminateInstances({ InstanceIds: toBeDeleted }, (err, data) => {
+        if (err) throw err;
+        console.log(data);
+      });
+    }
+  });
 };
