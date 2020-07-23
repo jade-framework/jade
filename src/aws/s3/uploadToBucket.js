@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const { asyncUploadToBucket } = require('./index');
+const { asyncUploadToBucket } = require('../awsAsyncFunctions');
 
 const uploadToBucket = async (fileName, bucketName) => {
   const fileStream = fs.createReadStream(fileName);

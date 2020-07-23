@@ -1,6 +1,6 @@
-const { asyncCreateS3Bucket } = require('./index');
+const { asyncCreateS3Bucket } = require('../awsAsyncFunctions');
 
-const createS3Bucket = async bucketName => {
+const createBucket = async bucketName => {
   console.log('Creating S3 Bucket...');
 
   try {
@@ -11,4 +11,4 @@ const createS3Bucket = async bucketName => {
   }
 };
 
-module.exports = { createS3Bucket };
+module.exports = { createBucket };

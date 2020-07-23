@@ -1,13 +1,11 @@
 const {
   asyncCreateLambdaRole,
-  attachRolePolicy,
   asyncAttachRolePolicy,
-} = require('./index');
+} = require('../awsAsyncFunctions');
 
-const createLambdaRole = async () => {
+const createLambdaRole = async roleName => {
   console.log('Creating Lambda role...');
 
-  const ROLE = 'ROLE_LAMBDA';
   const myPolicy = {
     Version: '2012-10-17',
     Statement: [
@@ -23,38 +21,31 @@ const createLambdaRole = async () => {
 
   const createParams = {
     AssumeRolePolicyDocument: JSON.stringify(myPolicy),
-    RoleName: ROLE,
+    RoleName: roleName,
   };
 
-  const lambdaPolicyParams = {
+  const lambdaPolicyParam1 = {
     PolicyArn: 'arn:aws:iam::aws:policy/service-role/AWSLambdaRole',
-    RoleName: ROLE,
+    RoleName: roleName,
+  };
+
+  const lambdaPolicyParam2 = {
+    PolicyArn: 'arn:aws:iam::aws:policy/AWSLambdaExecute',
+    RoleName: roleName,
   };
 
   try {
     const createResponse = await asyncCreateLambdaRole(createParams);
     console.log('Successfully created Lambda role.', createResponse);
 
-    const attachResponse = await asyncAttachRolePolicy(lambdaPolicyParams);
+    const attachResponse = await asyncAttachRolePolicy(lambdaPolicyParam1);
     console.log('Successfully attached policy.', attachResponse);
+    const attachResponse2 = await asyncAttachRolePolicy(lambdaPolicyParam2);
+    console.log('Successfully attached policy.', attachResponse2);
+    return createResponse;
   } catch (error) {
     console.log('Could not create role.', error);
   }
-
-  // iam.createRole(createParams, function (err, data) {
-  //   if (err) {
-  //     console.log(err, err.stack);
-  //   } else {
-  //     console.log('Role ARN is', data.Role.Arn);
-  //     iam.attachRolePolicy(lambdaPolicyParams, function (err, data) {
-  //       if (err) {
-  //         console.log(err, err.stack);
-  //       } else {
-  //         console.log('AWSLambdaRole policy attached');
-  //       }
-  //     });
-  //   }
-  // });
 };
 
 exports.createLambdaRole = createLambdaRole;
