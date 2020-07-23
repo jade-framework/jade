@@ -3,7 +3,7 @@ const path = require('path');
 
 const { asyncUploadToBucket } = require('./index');
 
-const uploadFileToBucket = async (fileName, bucketName) => {
+const uploadToBucket = async (fileName, bucketName) => {
   const fileStream = fs.createReadStream(fileName);
   const uploadKeyName = path.basename(fileName);
   fileStream.on('error', function (err) {
@@ -29,4 +29,4 @@ const uploadFileToBucket = async (fileName, bucketName) => {
   }
 };
 
-exports.uploadFileToBucket = uploadFileToBucket;
+module.exports = { uploadToBucket };

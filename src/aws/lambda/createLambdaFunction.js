@@ -30,6 +30,7 @@ const createLambdaFunction = async (
   try {
     const response = await asyncCreateLambdaFunction(params);
     console.log('Successfully created lambda function.', response);
+    return response;
   } catch (error) {
     console.log('Error creating lambda function', error);
   }
@@ -40,4 +41,4 @@ const createLambdaFunction = async (
   // });
 };
 
-exports.createLambdaFunction = createLambdaFunction;
+module.exports = { createLambdaFunction };

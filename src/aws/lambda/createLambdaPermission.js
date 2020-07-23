@@ -17,9 +17,4 @@ const createLambdaPermission = async lambdaArn => {
   }
 };
 
-/**
- * TESTING
- */
-createLambdaPermission(
-  'arn:aws:lambda:us-east-1:434812305662:function:copyToBucket'
-);
+module.exports = { createLambdaPermission };

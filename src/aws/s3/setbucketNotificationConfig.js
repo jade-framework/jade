@@ -37,11 +37,6 @@ const setBucketNotificationConfig = async (bucketName, lambdaArn) => {
   }
 };
 
-/**
- * Testing
- */
-
-setBucketNotificationConfig(
-  'test-7efd1622-b92f-4771-8b1a-b7fa476491ec',
-  'arn:aws:lambda:us-east-1:434812305662:function:copyToBucket'
-);
+module.exports = {
+  setBucketNotificationConfig,
+};
