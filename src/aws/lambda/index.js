@@ -10,11 +10,13 @@ const lambda = new Lambda();
 const iam = new awsIAM({ apiVersion: '2010-05-08' });
 
 const asyncAddPermission = promisify(lambda.addPermission.bind(lambda));
-const asyncCreateLambdaRole = promisify(iam.attachRolePolicy.bind(iam));
 const asyncCreateLambdaFunction = promisify(lambda.createFunction.bind(lambda));
+const asyncCreateLambdaRole = promisify(iam.attachRolePolicy.bind(iam));
+const asyncAttachRolePolicy = promisify(iam.attachRolePolicy.bind(iam));
 
 module.exports = {
   asyncAddPermission,
-  asyncCreateLambdaRole,
   asyncCreateLambdaFunction,
+  asyncCreateLambdaRole,
+  asyncAttachRolePolicy,
 };
