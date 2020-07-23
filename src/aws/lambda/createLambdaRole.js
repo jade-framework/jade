@@ -1,8 +1,7 @@
 const {
   asyncCreateLambdaRole,
-  attachRolePolicy,
   asyncAttachRolePolicy,
-} = require('./index');
+} = require('../awsAsyncFunctions');
 
 const createLambdaRole = async () => {
   console.log('Creating Lambda role...');
@@ -40,21 +39,6 @@ const createLambdaRole = async () => {
   } catch (error) {
     console.log('Could not create role.', error);
   }
-
-  // iam.createRole(createParams, function (err, data) {
-  //   if (err) {
-  //     console.log(err, err.stack);
-  //   } else {
-  //     console.log('Role ARN is', data.Role.Arn);
-  //     iam.attachRolePolicy(lambdaPolicyParams, function (err, data) {
-  //       if (err) {
-  //         console.log(err, err.stack);
-  //       } else {
-  //         console.log('AWSLambdaRole policy attached');
-  //       }
-  //     });
-  //   }
-  // });
 };
 
 exports.createLambdaRole = createLambdaRole;

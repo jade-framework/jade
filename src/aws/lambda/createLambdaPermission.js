@@ -1,4 +1,4 @@
-const { asyncAddPermission } = require('./index');
+const { asyncAddPermission } = require('../awsAsyncFunctions');
 
 const createLambdaPermission = async lambdaArn => {
   const params = {

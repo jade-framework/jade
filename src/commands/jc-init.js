@@ -1,29 +1,18 @@
-/**
- * Create 3 S3 buckets, each with a bucket policy to allow public read access
- * Set up a cloudfront distribution connected to bucket #1
- * Upload a Lambda function.zip to bucket # 2
- * Create an IAM role for Lambda
- * Create the Lambda function, pulling the fn from bucket #2
- * Add event to bucket #1 to trigger lambda
- * Upload a file to bucket #1 (should auto-copy to bucket #3)
- */
-
 const uuid = require('uuid');
-const { createS3Bucket } = require('../aws/s3/createS3Bucket');
-const { updateBucketPolicy } = require('../aws/s3/updateBucketPolicy');
-const { uploadToBucket } = require('../aws/s3/uploadToBucket');
-const { createLambdaFunction } = require('../aws/lambda/createLambdaFunction');
 const {
-  createLambdaPermission,
-} = require('../aws/lambda/createLambdaPermission');
-const {
+  createBucket,
+  updateBucketPolicy,
+  uploadToBucket,
   setBucketNotificationConfig,
-} = require('../aws/s3/setbucketNotificationConfig');
+} = require('../aws/s3');
 const {
-  createCloudfrontDistribution,
-} = require('../aws/cloudfront/createCloudfrontDistribution');
+  createLambdaFunction,
+  createLambdaPermission,
+} = require('../aws/lambda');
+const { createCloudfrontDistribution } = require('../aws/cloudfront');
 const { zipit } = require('../util/zipit');
 
+const cwd = process.cwd();
 const bucketName = `test-${uuid.v4()}`;
 const functionName = 'copyToBucket';
 const functionFile = `${functionName}.js.zip`;
@@ -32,11 +21,10 @@ const functionDescription = `Copy a file from src to dest buckets.`;
 const lambdaRole = 'arn:aws:iam::434812305662:role/lambda-s3-role';
 
 (async () => {
-  // zipit(`${functionName}.js`, `../aws/lambda/${functionName}.js`);
-  console.log(`${functionName}.js`, `../aws/lambda/${functionName}.js`);
-  // await createS3Bucket(`${bucketName}`);
-  // await createS3Bucket(`${bucketName}-copy`);
-  // await createS3Bucket(`${bucketName}-lambda`);
+  zipit(`${functionName}.js`, `${cwd}/../aws/lambda/${functionName}.js`);
+  // await createBucket(`${bucketName}`);
+  // await createBucket(`${bucketName}-copy`);
+  // await createBucket(`${bucketName}-lambda`);
   // await updateBucketPolicy(`${bucketName}`);
   // await updateBucketPolicy(`${bucketName}-copy`);
   // await updateBucketPolicy(`${bucketName}-lambda`);
@@ -54,12 +42,3 @@ const lambdaRole = 'arn:aws:iam::434812305662:role/lambda-s3-role';
   // setBucketNotificationConfig(bucketName, lambdaArn);
   // createCloudfrontDistribution(bucketName);
 })();
-
-/*
-  bucketName,
-  zipFileName,
-  functionName,
-  handler,
-  description = 'Sample description',
-  role = 'arn:aws:iam::434812305662:role/lambda-s3-role'
-  */

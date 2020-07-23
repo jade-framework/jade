@@ -1,5 +1,5 @@
 const uuid = require('uuid');
-const { asyncCreateCloudfrontDistribution } = require('./index');
+const { asyncCreateCloudfrontDistribution } = require('../awsAsyncFunctions');
 
 const createCloudfrontDistribution = async bucketName => {
   const callerReference = 'jade-' + uuid.v4();

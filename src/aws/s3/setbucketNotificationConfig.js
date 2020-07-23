@@ -6,7 +6,9 @@
  * @param {String} lambdaArn - The ARN of the lambda to be triggered by the event on the bucket
  */
 
-const { asyncPutBucketNotificationConfiguration } = require('./index');
+const {
+  asyncPutBucketNotificationConfiguration,
+} = require('../awsAsyncFunctions');
 
 const setBucketNotificationConfig = async (bucketName, lambdaArn) => {
   const params = {
