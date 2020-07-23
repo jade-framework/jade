@@ -21,15 +21,15 @@ const fileToUpload = 'index.html';
 (async () => {
   // await createS3Bucket(bucketName);
   // updateS3BucketPolicy(bucketName);
-  // await zipit('helloWorld.js', 'helloWorld.js');
   // uploadFileToS3Bucket(fileToUpload, bucketName);
-  await uploadFileToS3Bucket('helloWorld.js.zip', bucketName);
-  createLambda(
-    bucketName,
-    'helloWorld.js.zip',
-    'helloWorld',
-    'helloWorld.helloWorld',
-    'A sample lambda function that logs and returns text'
-  );
+  // await zipit('helloWorld.js', 'helloWorld.js');
+  // await uploadFileToS3Bucket('helloWorld.js.zip', bucketName);
+  // createLambda(
+  //   bucketName,
+  //   'helloWorld.js.zip',
+  //   'helloWorld',
+  //   'helloWorld.helloWorld',
+  //   'A sample lambda function that logs and returns text'
+  // );
   // createCloudfrontDistribution(bucketName);
 })();
