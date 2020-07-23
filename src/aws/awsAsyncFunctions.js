@@ -18,6 +18,12 @@ const iam = new awsIAM({ apiVersion: '2010-05-08' });
 const asyncCreateCloudfrontDistribution = promisify(
   cloudfront.createDistribution.bind(cloudfront)
 );
+const asyncListDistributions = promisify(
+  cloudfront.listDistributions.bind(cloudfront)
+);
+const asyncDeleteDistribution = promisify(
+  cloudfront.deleteDistribution.bind(cloudfront)
+);
 
 // S3
 const asyncListBuckets = promisify(s3.listBuckets.bind(s3));
@@ -40,6 +46,8 @@ const asyncCreateLambdaRole = promisify(iam.createRole.bind(iam));
 const asyncAttachRolePolicy = promisify(iam.attachRolePolicy.bind(iam));
 
 module.exports = {
+  asyncListDistributions,
+  asyncDeleteDistribution,
   asyncListBuckets,
   asyncListBucketObjects,
   asyncDeleteBucketObjects,
