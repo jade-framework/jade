@@ -10,7 +10,6 @@ const get = promisify(http.get);
 
 async function start() {
   http.get(ec2InstanceMetadata, (res) => {
-    res.setEncoding("utf8");
     let rawData = "";
     res.on("data", (chunk) => {
       rawData += chunk;
