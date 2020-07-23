@@ -8,24 +8,25 @@ const {
 } = require("../../util/fileUtils");
 const {
   hostDirectory,
-  keyPairFilename,
+  privateKeyFilename,
+  keyPair,
+  jadeKeyPair,
 } = require("../../constants/allConstants");
-const fs = require("fs");
 
 // default data
 const keyPairParams = {
-  KeyName: "jade-key-pair",
+  KeyName: jadeKeyPair,
 };
 
 module.exports = async function createKeyPair() {
   const jadePath = getJadePath(hostDirectory);
-  const privateKeyFilename = join(jadePath, keyPairFilename);
+  const privateKeyPath = join(jadePath, privateKeyFilename);
   try {
     const keyPairResponse = await asyncCreateKeyPair(keyPairParams);
     const { KeyMaterial, ...otherData } = keyPairResponse;
-    await writeFile(privateKeyFilename, KeyMaterial);
-    await chmod(privateKeyFilename, 0o400);
-    await createJSONFile("keyPair", jadePath, otherData);
+    await writeFile(privateKeyPath, KeyMaterial);
+    await chmod(privateKeyPath, 0o400);
+    await createJSONFile(keyPair, jadePath, otherData);
   } catch (err) {
     console.log(err);
   }

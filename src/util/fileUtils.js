@@ -45,16 +45,11 @@ const readJSONFile = async (fileName, path) => {
   return JSON.parse(data);
 };
 
-async function test(path) {
-  await createDirectory(".jade", path);
-  await writeConfig(path, { hi: "there" });
-  await readConfig(path);
-}
-
-test(hostDirectory);
+const sleep = async (ms) => new Promise((r) => setTimeout(r, ms));
 
 module.exports = {
   join,
+  exists,
   getJadePath,
   readFile,
   writeFile,
@@ -64,4 +59,5 @@ module.exports = {
   createDirectory,
   createJSONFile,
   readJSONFile,
+  sleep,
 };
