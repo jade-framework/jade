@@ -15,6 +15,10 @@ const asyncAuthorizeSecurityGroupIngress = promisify(
 const asyncCreateKeyPair = promisify(ec2.createKeyPair.bind(ec2));
 const asyncDescribeInstances = promisify(ec2.describeInstances.bind(ec2));
 const asyncRunInstances = promisify(ec2.runInstances.bind(ec2));
+const asyncAssociateIamInstanceProfile = promisify(
+  ec2.associateIamInstanceProfile.bind(ec2)
+);
+const asyncWaitFor = promisify(ec2.waitFor.bind(ec2));
 
 module.exports = {
   asyncCreateSecurityGroup,
@@ -22,4 +26,6 @@ module.exports = {
   asyncCreateKeyPair,
   asyncDescribeInstances,
   asyncRunInstances,
+  asyncAssociateIamInstanceProfile,
+  asyncWaitFor,
 };

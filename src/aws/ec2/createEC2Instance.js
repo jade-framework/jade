@@ -1,8 +1,13 @@
-const path = require("path");
-const { asyncRunInstances } = require("./index");
+const {
+  asyncRunInstances,
+  asyncAssociateIamInstanceProfile,
+  asyncWaitFor,
+} = require("./index");
 
 const {
   createJSONFile,
+  exists,
+  join,
   getJadePath,
   readJSONFile,
 } = require("../../util/fileUtils");
@@ -12,6 +17,8 @@ const { hostDirectory } = require("../../constants/allConstants");
 const {
   amazonMachineImageId,
   instanceType,
+  securityGroup,
+  keyPair,
 } = require("../../constants/allConstants");
 
 const createSecurityGroup = require("./createSecurityGroup");
@@ -38,30 +45,43 @@ const runInstancesParams = {
 module.exports = async function createEC2Instance() {
   const jadePath = getJadePath(hostDirectory);
   try {
-    console.log("Creating Jade security group...");
-    await createSecurityGroup();
-    console.log("Creating Jade key pair and .pem file...");
-    await createKeyPair();
-    const keyPair = await readJSONFile("keyPair", jadePath);
-    const securityGroup = await readJSONFile("securityGroup", jadePath);
+    if (!(await exists(join(jadePath, `${securityGroup}.json`)))) {
+      console.log("Creating Jade security group...");
+      await createSecurityGroup();
+    }
+    if (!(await exists(join(jadePath, `${keyPair}.json`)))) {
+      console.log("Creating Jade key pair and .pem file...");
+      await createKeyPair();
+    }
+    const securityGroupData = await readJSONFile(securityGroup, jadePath);
+    const keyPairData = await readJSONFile(keyPair, jadePath);
 
     console.log("Reading IAM instance profile...");
     const instanceProfile = await readJSONFile("ec2InstanceProfile", jadePath);
     const instanceProfileArn = instanceProfile.InstanceProfile.Arn;
-    console.log(instanceProfileArn);
 
     console.log("Creating EC2 instance...");
     const runInstancesResponse = await asyncRunInstances({
       ...runInstancesParams,
-      KeyName: keyPair.KeyName,
-      IamInstanceProfile: {
-        Arn: instanceProfileArn,
-      },
-      SecurityGroupIds: [securityGroup.GroupId],
+      KeyName: keyPairData.KeyName,
+      SecurityGroupIds: [securityGroupData.GroupId],
     });
 
     await createJSONFile("ec2Instance", jadePath, runInstancesResponse);
-    console.log("Jade EC2 server successfully setup.");
+    const InstanceId = runInstancesResponse.Instances[0].InstanceId;
+
+    console.log("Waiting for EC2 instance to start running...");
+    await asyncWaitFor("instanceRunning", { InstanceIds: [InstanceId] });
+
+    console.log("Associating IAM instance profile with EC2 instance...");
+    await asyncAssociateIamInstanceProfile({
+      IamInstanceProfile: {
+        Arn: instanceProfileArn,
+      },
+      InstanceId,
+    });
+
+    console.log("Jade EC2 instance successfully setup.");
   } catch (err) {
     console.log(err);
   }
