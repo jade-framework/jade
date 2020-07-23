@@ -1,6 +1,6 @@
 const { asyncPutBucketPolicy } = require('./index');
 
-const updateS3BucketPolicy = async bucketName => {
+const updateBucketPolicy = async bucketName => {
   const readOnlyAnonUserPolicy = {
     Version: '2012-10-17',
     Statement: [
@@ -34,4 +34,6 @@ const updateS3BucketPolicy = async bucketName => {
   }
 };
 
-updateS3BucketPolicy('jc-test-jul-22-2020');
+exports.updateBucketPolicy = updateBucketPolicy;
+
+updateBucketPolicy('jc-test-jul-22-2020');
