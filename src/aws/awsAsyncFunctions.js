@@ -14,9 +14,13 @@ const cloudfront = new CloudFront({ apiVersion: '2019-03-26' });
 const lambda = new Lambda();
 const iam = new awsIAM({ apiVersion: '2010-05-08' });
 
+// CLOUDFRONT
 const asyncCreateCloudfrontDistribution = promisify(
   cloudfront.createDistribution.bind(cloudfront)
 );
+
+// S3
+const asyncListBuckets = promisify(s3.listBuckets.bind(s3));
 const asyncListBucketObjects = promisify(s3.listObjects.bind(s3));
 const asyncDeleteBucketObjects = promisify(s3.deleteObjects.bind(s3));
 const asyncCreateS3Bucket = promisify(s3.createBucket.bind(s3));
@@ -26,12 +30,17 @@ const asyncUploadToBucket = promisify(s3.putObject.bind(s3));
 const asyncPutBucketNotificationConfiguration = promisify(
   s3.putBucketNotificationConfiguration.bind(s3)
 );
+
+// LAMBDA
 const asyncAddPermission = promisify(lambda.addPermission.bind(lambda));
 const asyncCreateLambdaFunction = promisify(lambda.createFunction.bind(lambda));
+
+// IAM
 const asyncCreateLambdaRole = promisify(iam.createRole.bind(iam));
 const asyncAttachRolePolicy = promisify(iam.attachRolePolicy.bind(iam));
 
 module.exports = {
+  asyncListBuckets,
   asyncListBucketObjects,
   asyncDeleteBucketObjects,
   asyncCreateS3Bucket,
