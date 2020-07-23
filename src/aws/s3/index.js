@@ -3,10 +3,13 @@ const S3 = require('aws-sdk/clients/s3');
 
 const s3 = new S3({ apiVersion: '2006-03-01' });
 
+const asyncCreateS3Bucket = promisify(s3.createBucket.bind(s3));
+
 const asyncPutBucketNotificationConfiguration = promisify(
   s3.putBucketNotificationConfiguration.bind(s3)
 );
 
 module.exports = {
+  asyncCreateS3Bucket,
   asyncPutBucketNotificationConfiguration,
 };
