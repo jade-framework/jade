@@ -34,6 +34,4 @@ const updateBucketPolicy = async bucketName => {
   }
 };
 
-exports.updateBucketPolicy = updateBucketPolicy;
-
-updateBucketPolicy('jc-test-jul-22-2020');
+module.exports = { updateBucketPolicy };

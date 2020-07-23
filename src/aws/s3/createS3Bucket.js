@@ -11,6 +11,4 @@ const createS3Bucket = async bucketName => {
   }
 };
 
-exports.createS3Bucket = createS3Bucket;
-
-createS3Bucket('jc-test-jul-22-2020');
+module.exports = { createS3Bucket };
