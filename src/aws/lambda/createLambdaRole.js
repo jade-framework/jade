@@ -56,3 +56,5 @@ const createLambdaRole = async () => {
   //   }
   // });
 };
+
+exports.createLambdaRole = createLambdaRole;
