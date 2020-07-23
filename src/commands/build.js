@@ -5,10 +5,10 @@ const setInstanceIP = require("../aws/ec2/setInstanceIP");
 
 async function build() {
   try {
-    // await configEC2IamRole();
+    await configEC2IamRole();
     await createEC2Instance();
     await setInstanceIP();
-    // await installEC2JadeEnvironment();
+    await installEC2JadeEnvironment();
   } catch (err) {
     console.log(err);
   }

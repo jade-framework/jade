@@ -9,6 +9,7 @@ const {
   ec2IamRoleName,
   ec2InstanceProfile,
   hostDirectory,
+  s3FullAccessPolicyArn,
 } = require("../../constants/allConstants");
 
 const {
@@ -36,7 +37,7 @@ module.exports = async function configEC2IamRole() {
 
     console.log("Attaching S3 role policy...");
     await asyncAttachRolePolicy({
-      PolicyArn: "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+      PolicyArn: s3FullAccessPolicyArn,
       RoleName: ec2IamRoleName,
     });
 

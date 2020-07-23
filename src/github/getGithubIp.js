@@ -1,8 +1,10 @@
 const https = require("https");
+const { promisify } = require("util");
 const { createJSONFile, getJadePath } = require("../util/fileUtils");
 const { hostDirectory } = require("../constants/allConstants");
 
-module.exports = async function getGithubIp() {
+// module.exports =
+function getGithubIp(callback) {
   https
     .get(
       "https://api.github.com/meta",
@@ -15,15 +17,14 @@ module.exports = async function getGithubIp() {
         let data = "";
         res.on("data", (chunk) => (data += chunk));
         res.on("end", () => {
-          createJSONFile(
-            "githubApi",
-            getJadePath(hostDirectory),
-            JSON.parse(data)
-          );
+          callback(null, JSON.parse(data));
         });
       }
     )
     .on("error", (err) => {
-      console.error(err);
+      console.error("Error: " + err);
+      callback(err);
     });
-};
+}
+
+module.exports = promisify(getGithubIp);

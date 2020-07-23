@@ -9,13 +9,16 @@ const {
   getJadePath,
 } = require("../../util/fileUtils");
 
-const { hostDirectory } = require("../../constants/allConstants");
+const {
+  hostDirectory,
+  securityGroupName,
+} = require("../../constants/allConstants");
 
 const getGithubIp = require("../../github/getGithubIp");
 
 // default data
 const securityGroupParams = {
-  GroupName: "jade-security-group",
+  GroupName: securityGroupName,
   Description: "Security Group to configure EC2 instances",
 };
 
@@ -26,7 +29,7 @@ const setIngressHookRules = (policy, addresses) => {
   }));
   const permissions = {
     FromPort: 80,
-    InProtocol: "tcp",
+    IpProtocol: "tcp",
     IpRanges: ipRanges,
     ToPort: 80,
   };
@@ -48,12 +51,12 @@ const setIngressSshRule = (policy) => {
   policy.IpPermissions.push(permission);
 };
 
-// module.exports =
-async function createSecurityGroup() {
+module.exports = async function createSecurityGroup() {
   const jadePath = getJadePath(hostDirectory);
   let ingressRules = { IpPermissions: [] };
 
   try {
+    console.log("Creating security group...");
     const securityGroupResponse = await asyncCreateSecurityGroup(
       securityGroupParams
     );
@@ -63,17 +66,18 @@ async function createSecurityGroup() {
       ...securityGroupResponse,
     });
 
-    await getGithubIp();
+    console.log("Getting Github IP addresses...");
+    const githubIps = await getGithubIp();
+    await createJSONFile("githubApi", jadePath, githubIps);
     const githubIpAddresses = await readJSONFile("githubApi", jadePath);
-    const githubHookIp = githubIpAddresses.hooks;
+    const githubHookIps = githubIpAddresses.hooks;
     setIngressSshRule(ingressRules);
-    setIngressHookRules(ingressRules, githubHookIp);
-
+    setIngressHookRules(ingressRules, githubHookIps);
     ingressRules = { ...ingressRules, GroupId: securityGroupResponse.GroupId };
+
+    console.log("Setting security group ingress rules...");
     await asyncAuthorizeSecurityGroupIngress(ingressRules);
   } catch (err) {
     console.log(err);
   }
-}
-
-createSecurityGroup();
+};

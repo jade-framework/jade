@@ -1,4 +1,7 @@
 const clearJadeFolder = require("./clearJadeFolder");
-const stopJadeEC2Instances = require("./stopJadeEC2Instances");
+const terminateJadeEC2Instances = require("./terminateJadeEC2Instances");
+const removePermissions = require("./removePermissions");
 
 clearJadeFolder();
+terminateJadeEC2Instances();
+removePermissions();
