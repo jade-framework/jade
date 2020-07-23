@@ -1,8 +1,7 @@
-const CloudFront = require('aws-sdk/clients/cloudfront');
 const uuid = require('uuid');
+const { asyncCreateCloudfrontDistribution } = require('./index');
 
-const createCloudfrontDistribution = bucketName => {
-  const cloudfront = new CloudFront({ apiVersion: '2019-03-26' });
+const createCloudfrontDistribution = async bucketName => {
   const callerReference = 'jade-' + uuid.v4();
   const originDomainName = `${bucketName}.s3.amazonaws.com`;
   const originId = `S3-${bucketName}`; // unique ID of origin within the distribution
@@ -69,10 +68,18 @@ const createCloudfrontDistribution = bucketName => {
   };
 
   console.log('Creating Cloudfront distribution...');
-  cloudfront.createDistribution(distParams, (err, data) => {
-    if (err) console.log(err, err.stack);
-    else console.log('Successfully created Cloudfront distribution');
-  });
+  try {
+    const response = await asyncCreateCloudfrontDistribution(distParams);
+    console.log(
+      `Cloudfront distribution created at ${response.Distribution.DomainName}`
+    );
+  } catch (error) {
+    console.log('Error creating Cloudfront distribution', error);
+  }
+  // cloudfront.createDistribution(distParams, (err, data) => {
+  //   if (err) console.log(err, err.stack);
+  //   else console.log('Successfully created Cloudfront distribution');
+  // });
 };
 
 module.exports = {

@@ -19,35 +19,40 @@ const {
 const {
   setBucketNotificationConfig,
 } = require('../aws/s3/setbucketNotificationConfig');
+const {
+  createCloudfrontDistribution,
+} = require('../aws/cloudfront/createCloudfrontDistribution');
+const { zipit } = require('../util/zipit');
 
 const bucketName = `test-${uuid.v4()}`;
+const functionName = 'copyToBucket';
+const functionFile = `${functionName}.js.zip`;
+const functionHandler = `${functionName}.handler`;
+const functionDescription = `Copy a file from src to dest buckets.`;
+const lambdaRole = 'arn:aws:iam::434812305662:role/lambda-s3-role';
 
 (async () => {
+  // zipit(`${functionName}.js`, `../aws/lambda/${functionName}.js`);
+  console.log(`${functionName}.js`, `../aws/lambda/${functionName}.js`);
   // await createS3Bucket(`${bucketName}`);
   // await createS3Bucket(`${bucketName}-copy`);
-  await createS3Bucket(`test-8f1e2ef0-7f09-4dd3-9fb7-14b864086624-copy`);
   // await createS3Bucket(`${bucketName}-lambda`);
-  // updateBucketPolicy(`${bucketName}`);
-  // updateBucketPolicy(`${bucketName}-copy`);
-  // updateBucketPolicy(`${bucketName}-lambda`);
-  // uploadToBucket(
-  //   'copyToBucket.js.zip',
-  //   'test-8f1e2ef0-7f09-4dd3-9fb7-14b864086624'
-  // );
+  // await updateBucketPolicy(`${bucketName}`);
+  // await updateBucketPolicy(`${bucketName}-copy`);
+  // await updateBucketPolicy(`${bucketName}-lambda`);
+  // await uploadToBucket(functionFile, `${bucketName}-lambda`);
   // const lambdaResponse = await createLambdaFunction(
-  //   'test-8f1e2ef0-7f09-4dd3-9fb7-14b864086624',
-  //   'copyToBucket.js.zip',
-  //   'copyToBucket',
-  //   'copyToBucket.handler',
-  //   'Copy to Bucket',
-  //   'arn:aws:iam::434812305662:role/lambda-s3-role'
+  //   `${bucketName}-lambda`,
+  //   functionFile,
+  //   functionName,
+  //   functionHandler,
+  //   functionDescription,
+  //   lambdaRole
   // );
   // const lambdaArn = lambdaResponse.FunctionArn;
   // await createLambdaPermission(lambdaArn);
-  // setBucketNotificationConfig(
-  //   'test-8f1e2ef0-7f09-4dd3-9fb7-14b864086624',
-  //   lambdaArn
-  // );
+  // setBucketNotificationConfig(bucketName, lambdaArn);
+  // createCloudfrontDistribution(bucketName);
 })();
 
 /*
