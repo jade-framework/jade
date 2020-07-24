@@ -1,6 +1,5 @@
 const hostDirectory = process.cwd();
 
-const amazonMachineImageId = "ami-04122be15033aa7ec";
 const instanceType = "t2.micro";
 const keyPair = "keyPair";
 const privateKeyFilename = "jade-key-pair.pem";
@@ -12,7 +11,6 @@ const ec2InstanceProfile = "jade-ec2-instance-profile";
 const s3FullAccessPolicyArn = "arn:aws:iam::aws:policy/AmazonS3FullAccess";
 
 module.exports = {
-  amazonMachineImageId,
   instanceType,
   hostDirectory,
   jadeKeyPair,
