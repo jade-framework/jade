@@ -1,5 +1,3 @@
-// @TODO: Move IAM out of here
-
 const { promisify } = require('util');
 const S3 = require('aws-sdk/clients/s3');
 const CloudFront = require('aws-sdk/clients/cloudfront');
@@ -18,12 +16,15 @@ const iam = new awsIAM({ apiVersion: '2010-05-08' });
 const asyncCreateCloudfrontDistribution = promisify(
   cloudfront.createDistribution.bind(cloudfront)
 );
-const asyncListDistributions = promisify(
-  cloudfront.listDistributions.bind(cloudfront)
-);
-const asyncDeleteDistribution = promisify(
-  cloudfront.deleteDistribution.bind(cloudfront)
-);
+// const asyncListDistributions = promisify(
+//   cloudfront.listDistributions.bind(cloudfront)
+// );
+// const asyncDeleteDistribution = promisify(
+//   cloudfront.deleteDistribution.bind(cloudfront)
+// );
+// const asyncGetDistribution = promisify(
+//   cloudfront.getDistribution.bind(cloudfront)
+// );
 
 // S3
 const asyncListBuckets = promisify(s3.listBuckets.bind(s3));
@@ -46,8 +47,9 @@ const asyncCreateLambdaRole = promisify(iam.createRole.bind(iam));
 const asyncAttachRolePolicy = promisify(iam.attachRolePolicy.bind(iam));
 
 module.exports = {
-  asyncListDistributions,
-  asyncDeleteDistribution,
+  // asyncGetDistribution,
+  // asyncListDistributions,
+  // asyncDeleteDistribution,
   asyncListBuckets,
   asyncListBucketObjects,
   asyncDeleteBucketObjects,

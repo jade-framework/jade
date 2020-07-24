@@ -1,9 +1,7 @@
-const { deleteBucket } = require('../aws/s3/deleteBucket');
+const { deleteAllBuckets } = require('../aws/s3/deleteAllBuckets');
 
 const cleanup = async bucketName => {
-  deleteBucket(bucketName);
-  deleteBucket(`${bucketName}-copy`);
-  deleteBucket(`${bucketName}-lambda`);
+  deleteAllBuckets();
 };
 
-cleanup(process.argv[2]);
+cleanup();
