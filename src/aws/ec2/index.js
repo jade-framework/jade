@@ -19,6 +19,7 @@ const asyncAssociateIamInstanceProfile = promisify(
   ec2.associateIamInstanceProfile.bind(ec2)
 );
 const asyncWaitFor = promisify(ec2.waitFor.bind(ec2));
+const asyncDescribeImages = promisify(ec2.describeImages.bind(ec2));
 
 module.exports = {
   asyncCreateSecurityGroup,
@@ -28,4 +29,5 @@ module.exports = {
   asyncRunInstances,
   asyncAssociateIamInstanceProfile,
   asyncWaitFor,
+  asyncDescribeImages,
 };
