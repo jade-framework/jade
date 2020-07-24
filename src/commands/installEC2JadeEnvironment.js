@@ -4,6 +4,7 @@ const {
   readJSONFile,
   readFile,
   sleep,
+  createJSONFile,
 } = require("../util/fileUtils");
 const {
   hostDirectory,
@@ -94,7 +95,15 @@ const sendFiles = async (conn) => {
                 {},
                 (err) => {
                   if (err) throw err;
-                  console.log("Files uploaded to EC2.");
+                  sftp.fastPut(
+                    join(jadePath, "s3BucketName.json"),
+                    join(serverDir, "s3BucketName.json"),
+                    {},
+                    err => {
+                      if (err) throw err;
+                      console.log("Files uploaded to EC2.");
+                    }
+                  )
                 }
               );
             }
@@ -148,6 +157,8 @@ module.exports = async function installEC2JadeEnvironment(bucketName) {
       username: "ec2-user",
       privateKey,
     };
+
+    await createJSONFile("s3BucketName", jadePath, {bucketName});
 
     console.log("Beginning connection to EC2 server...");
     await sshConnection(host, bucketName);
