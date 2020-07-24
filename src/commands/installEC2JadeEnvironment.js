@@ -99,11 +99,11 @@ const sendFiles = async (conn) => {
                     join(jadePath, "s3BucketName.json"),
                     join(serverDir, "s3BucketName.json"),
                     {},
-                    err => {
+                    (err) => {
                       if (err) throw err;
                       console.log("Files uploaded to EC2.");
                     }
-                  )
+                  );
                 }
               );
             }
@@ -114,21 +114,21 @@ const sendFiles = async (conn) => {
   });
 };
 
-const sshConnection = async (host) => {
+const sshConnection = async (host, bucketName) => {
   const conn = new Client();
   let connected = false;
 
   conn.on("error", (err) => {
     connected = false;
   });
-  conn.on("ready", () => {
+  conn.on("ready", async () => {
     connected = true;
     console.log("Client ready");
     // Handle SFTP
     await sendFiles(conn);
 
     // Handle installation, build and deploy commands
-    sendCommands(conn);
+    sendCommands(conn, bucketName);
   });
 
   conn.connect(host);
@@ -158,7 +158,7 @@ module.exports = async function installEC2JadeEnvironment(bucketName) {
       privateKey,
     };
 
-    await createJSONFile("s3BucketName", jadePath, {bucketName});
+    await createJSONFile("s3BucketName", jadePath, { bucketName });
 
     console.log("Beginning connection to EC2 server...");
     await sshConnection(host, bucketName);
