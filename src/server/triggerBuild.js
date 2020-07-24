@@ -26,8 +26,11 @@ module.exports = async function triggerBuild(webhook) {
         msg: "Repo has not changed, build not triggered.",
       };
     } else {
-      await exec(`yarn --cwd ${repoDir} build`);
-      await exec(`aws s3 sync public s3://${bucketName}`);
+      (async () => {
+        await exec(`yarn --cwd ${repoDir} build`);
+        await exec(`aws s3 sync public s3://${bucketName}`);
+      })();
+
       return {
         statusCode: 200,
         msg: "Webhook successfully processed, Jade build triggered.",

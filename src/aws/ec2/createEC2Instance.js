@@ -15,17 +15,17 @@ const {
 const { hostDirectory } = require("../../constants/allConstants");
 
 const {
-  amazonMachineImageId,
   instanceType,
   securityGroup,
   keyPair,
 } = require("../../constants/allConstants");
 
+const getAmi = require("./getAmi");
+
 const createSecurityGroup = require("./createSecurityGroup");
 const createKeyPair = require("./createKeyPair");
 
 const runInstancesParams = {
-  ImageId: amazonMachineImageId,
   InstanceType: instanceType,
   MaxCount: 1,
   MinCount: 1,
@@ -63,6 +63,7 @@ module.exports = async function createEC2Instance() {
     console.log("Creating EC2 instance...");
     const runInstancesResponse = await asyncRunInstances({
       ...runInstancesParams,
+      ImageId: await getAmi(),
       KeyName: keyPairData.KeyName,
       SecurityGroupIds: [securityGroupData.GroupId],
     });
