@@ -19,10 +19,11 @@ const deleteBucket = async bucketName => {
         Objects: objectKeys,
       },
     };
-    if (objects && objects.length > 0)
+    if (objects && objects.length > 0) {
       await asyncDeleteBucketObjects(deleteParams);
-    await asyncDeleteS3Bucket({ Bucket: bucketName });
-    console.log(`S3 Bucket ${bucketName} deleted`);
+      await asyncDeleteS3Bucket({ Bucket: bucketName });
+      console.log(`S3 Bucket ${bucketName} deleted`);
+    }
   } catch (error) {
     console.log('Error deleting S3 Bucket', error);
   }
@@ -30,4 +31,4 @@ const deleteBucket = async bucketName => {
 
 module.exports = { deleteBucket };
 
-deleteBucket('test-30d6a067-8a00-44ea-8408-45122f179457-copy');
+// deleteBucket('test-d2c312ef-e5b1-4fbf-8475-d27ac6e63437');
