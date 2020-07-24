@@ -8,7 +8,7 @@ const updateBucketPolicy = async bucketName => {
         Sid: 'AddPerm',
         Effect: 'Allow',
         Principal: '*',
-        Action: ['s3:GetObject'],
+        Action: ['s3:GetObject', 's3:PutObject'],
         Resource: [''],
       },
     ],

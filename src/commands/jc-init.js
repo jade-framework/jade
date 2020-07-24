@@ -22,6 +22,7 @@ const functionDescription = `Copy a file from src to dest buckets.`;
 const init = async () => {
   const bucketName = `test-${uuid.v4()}`;
   await createBuckets(bucketName);
+  /*** START INIT EC2 INSTANCE HERE ***/
   await zipit(`${functionName}.js`, `${cwd}/src/aws/lambda/${functionName}.js`);
   await uploadToBucket(functionFile, `${bucketName}-lambda`);
   const lambdaRoleResponse = await createLambdaRole('lambda-s3-role-2');
