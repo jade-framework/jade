@@ -1,50 +1,43 @@
 const http = require("http");
 const triggerBuild = require("./triggerBuild");
 
+const hostname = "0.0.0.0";
 const port = 5000;
-const ec2InstanceMetadata =
-  "http://169.254.169.254/latest/meta-data/local-ipv4";
-
 async function start() {
   try {
-    http.get(ec2InstanceMetadata, (res) => {
-      let hostname = "";
-      res.on("data", (data) => {
-        hostname += data;
+    const server = http.createServer((req, res) => {
+      req.on("error", (err) => {
+        console.error(err);
+        res.statusCode = 400;
+        res.end();
+      });
+      res.on("error", (err) => {
+        console.error(err);
       });
 
-      const server = http.createServer((req, res) => {
-        req.on("error", (err) => {
-          console.error(err);
-          res.statusCode = 400;
-          res.end();
-        });
-        res.on("error", (err) => {
-          console.error(err);
-        });
+      if (req.method === "POST" && req.url === "/webhook") {
+        let body = [];
+        req
+          .on("data", (chunk) => {
+            body.push(chunk);
+          })
+          .on("end", () => {
+            body = JSON.parse(Buffer.concat(body).toString());
+            console.log(body); // convert to logger later
+            (async () => {
+              const { statusCode, msg } = await triggerBuild(body);
+              res.statusCode = statusCode;
+              res.end(msg);
+            })();
+          });
+      } else {
+        res.statusCode = 404;
+        res.end();
+      }
+    });
 
-        if (req.method === "POST" && req.url === "/webhook") {
-          let body = [];
-          req
-            .on("data", (chunk) => {
-              body.push(chunk);
-            })
-            .on("end", () => {
-              body = JSON.parse(Buffer.concat(body).toString());
-              triggerBuild(body);
-              console.log(body);
-              res.statusCode = 200;
-              res.end("Webhook successfully processed.");
-            });
-        } else {
-          res.statusCode = 404;
-          res.end();
-        }
-      });
-
-      server.listen(port, hostname, () => {
-        console.log(`Server running at http://${hostname}:${port}/`);
-      });
+    server.listen(port, hostname, () => {
+      console.log(`Node server listening at http://${hostname}:${port}/`);
     });
   } catch (err) {
     console.log(err);
