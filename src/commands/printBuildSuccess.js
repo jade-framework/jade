@@ -1,3 +1,5 @@
+const { readJSONFile } = require("../util/fileUtils");
+
 async function printBuildSuccess() {
   const ec2Data = await readJSONFile("ec2Instance", jadePath);
   const publicIp = ec2Data.Instances[0].PublicIpAddress;
