@@ -16,7 +16,7 @@ const getInstanceData = async (instanceId) => {
   return describeInstancesResponse.Reservations[0].Instances[0];
 };
 
-module.exports = async function setInstanceIP() {
+async function setInstanceIp() {
   const path = getJadePath(hostDirectory);
   try {
     const ec2Data = await readJSONFile("ec2Instance", path);
@@ -30,4 +30,6 @@ module.exports = async function setInstanceIP() {
   } catch (err) {
     console.log(err);
   }
-};
+}
+
+module.exports = { setInstanceIp };
