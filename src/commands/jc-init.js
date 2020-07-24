@@ -12,7 +12,7 @@ const {
 } = require("../aws/lambda");
 const { createCloudfrontDistribution } = require("../aws/cloudfront");
 const { zipit } = require("../util/zipit");
-const build = require("../commands/build");
+const { build } = require("../commands/build");
 
 const cwd = process.cwd();
 const functionName = "copyToBucket";
