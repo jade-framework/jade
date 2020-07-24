@@ -15,6 +15,7 @@ const region = getRegion();
 const iam = new IAM({ apiVersion, region });
 const ec2 = new EC2({ apiVersion, region });
 
+// TODO: add retries
 module.exports = function () {
   iam.removeRoleFromInstanceProfile(
     { InstanceProfileName: ec2InstanceProfile, RoleName: ec2IamRoleName },
