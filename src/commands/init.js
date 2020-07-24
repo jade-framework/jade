@@ -47,4 +47,4 @@ const init = async () => {
 };
 
 module.exports = { init };
-// init();
+init();

@@ -6,7 +6,6 @@ const deleteAllBuckets = async () => {
 
   try {
     const allBuckets = await asyncListBuckets();
-
     allBuckets.Buckets.forEach(bucket => {
       deleteBucket(bucket.Name);
     });
