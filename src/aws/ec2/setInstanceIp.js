@@ -1,4 +1,4 @@
-const { asyncDescribeInstances } = require("./index");
+const { asyncDescribeInstances } = require("../awsAsyncFunctions");
 
 const {
   getJadePath,
@@ -19,6 +19,7 @@ const getInstanceData = async (instanceId) => {
 async function setInstanceIp() {
   const path = getJadePath(hostDirectory);
   try {
+    console.log("Fetching EC2 instance public IP...");
     const ec2Data = await readJSONFile("ec2Instance", path);
     const instanceId = ec2Data.Instances[0].InstanceId;
     const instanceData = await getInstanceData(instanceId);
@@ -27,6 +28,7 @@ async function setInstanceIp() {
       ...ec2Data,
       Instances: [instanceData],
     });
+    console.log("EC2 public IP fetched.");
   } catch (err) {
     console.log(err);
   }

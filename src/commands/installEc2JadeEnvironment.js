@@ -10,6 +10,7 @@ const {
   hostDirectory,
   privateKeyFilename,
 } = require("../constants/allConstants");
+const { promisify } = require("util");
 
 const Client = require("ssh2").Client;
 
@@ -131,19 +132,21 @@ const sshConnection = async (host, bucketName) => {
     sendCommands(conn, bucketName);
   });
 
-  conn.connect(host);
+  const connect = promisify(conn.connect.bind(conn));
+  await connect(host);
   let attempts = 1;
   await sleep(5000);
 
   while (!connected && attempts < 10) {
     console.log("Waiting for EC2 instance to accept SSH requests...");
     attempts++;
-    conn.connect(host);
+    // conn.connect(host);
+    await connect(host);
     await sleep(5000);
   }
 };
 
-async function installEC2JadeEnvironment(bucketName) {
+async function installEc2JadeEnvironment(bucketName) {
   const privateKey = await readFile(join(jadePath, privateKeyFilename));
 
   try {
@@ -169,4 +172,4 @@ async function installEC2JadeEnvironment(bucketName) {
   }
 }
 
-module.exports = { installEC2JadeEnvironment };
+module.exports = { installEc2JadeEnvironment };
