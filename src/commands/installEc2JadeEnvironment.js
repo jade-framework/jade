@@ -47,6 +47,7 @@ const deployCommands = (bucketName) => {
 };
 
 const sendCommands = (conn, bucketName) => {
+  console.log("Sending EC2 instance commands...");
   conn.shell((err, stream) => {
     if (err) throw err;
     stream
@@ -72,6 +73,7 @@ const sendCommands = (conn, bucketName) => {
 };
 
 const sendFiles = async (conn) => {
+  console.log("Sending server files...");
   const serverDir = "/home/ec2-user/server";
   conn.sftp((err, sftp) => {
     if (err) throw err;
@@ -140,7 +142,6 @@ const sshConnection = async (host, bucketName) => {
   while (!connected && attempts < 10) {
     console.log("Waiting for EC2 instance to accept SSH requests...");
     attempts++;
-    // conn.connect(host);
     await connect(host);
     await sleep(5000);
   }
