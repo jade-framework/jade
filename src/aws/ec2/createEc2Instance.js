@@ -2,28 +2,22 @@ const {
   asyncRunInstances,
   asyncAssociateIamInstanceProfile,
   asyncWaitFor,
-} = require("./index");
+} = require("../awsAsyncFunctions");
 
 const {
   createJSONFile,
-  exists,
-  join,
   getJadePath,
   readJSONFile,
 } = require("../../util/fileUtils");
 
-const { hostDirectory } = require("../../constants/allConstants");
-
 const {
+  hostDirectory,
   instanceType,
   securityGroup,
   keyPair,
 } = require("../../constants/allConstants");
 
-const getAmi = require("./getAmi");
-
-const createSecurityGroup = require("./createSecurityGroup");
-const createKeyPair = require("./createKeyPair");
+const { getAmi } = require("./index");
 
 const runInstancesParams = {
   InstanceType: instanceType,
@@ -42,17 +36,9 @@ const runInstancesParams = {
   ],
 };
 
-async function createEC2Instance() {
+const createEc2Instance = async () => {
   const jadePath = getJadePath(hostDirectory);
   try {
-    if (!(await exists(join(jadePath, `${securityGroup}.json`)))) {
-      console.log("Creating Jade security group...");
-      await createSecurityGroup();
-    }
-    if (!(await exists(join(jadePath, `${keyPair}.json`)))) {
-      console.log("Creating Jade key pair and .pem file...");
-      await createKeyPair();
-    }
     const securityGroupData = await readJSONFile(securityGroup, jadePath);
     const keyPairData = await readJSONFile(keyPair, jadePath);
 
@@ -86,6 +72,6 @@ async function createEC2Instance() {
   } catch (err) {
     console.log(err);
   }
-}
+};
 
-module.exports = { createEC2Instance };
+module.exports = { createEc2Instance };

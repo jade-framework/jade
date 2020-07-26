@@ -5,7 +5,7 @@ const { hostDirectory } = require("../../src/constants/allConstants");
 
 const jadePath = getJadePath(hostDirectory);
 
-module.exports = function () {
+async function clearJadeFolder() {
   fs.readdir(jadePath, (err, files) => {
     if (err) throw err;
     for (const file of files) {
@@ -14,4 +14,6 @@ module.exports = function () {
       });
     }
   });
-};
+}
+
+module.exports = { clearJadeFolder };

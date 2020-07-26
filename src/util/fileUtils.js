@@ -45,15 +45,6 @@ const readJSONFile = async (fileName, path) => {
   return JSON.parse(data);
 };
 
-const createDirectory = async (name, path) => {
-  const dir = join(path, name);
-
-  const dirExists = await exists(dir);
-  if (!dirExists) {
-    await mkdir(dir);
-  }
-};
-
 const sleep = async (ms) => new Promise((r) => setTimeout(r, ms));
 
 module.exports = {
@@ -68,6 +59,5 @@ module.exports = {
   createDirectory,
   createJSONFile,
   readJSONFile,
-  createDirectory,
   sleep,
 };
