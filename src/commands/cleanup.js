@@ -9,12 +9,12 @@ const {
 } = require('../constants/allConstants');
 
 const cleanup = async bucketName => {
-  // deleteAllBuckets();
+  deleteAllBuckets();
   // deleteIamRole(lambdaIamRoleName, [
   //   awsLambdaRolePolicyArn,
   //   awsLambdaExecutePolicyArn,
   // ]);
-  deleteLambdaFunction(lambdaFunctionName);
+  // deleteLambdaFunction(lambdaFunctionName);
 };
 
 cleanup();
