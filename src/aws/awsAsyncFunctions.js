@@ -41,6 +41,7 @@ const asyncPutBucketNotificationConfiguration = promisify(
 // LAMBDA
 const asyncAddPermission = promisify(lambda.addPermission.bind(lambda));
 const asyncCreateLambdaFunction = promisify(lambda.createFunction.bind(lambda));
+const asyncDeleteLambdaFunction = promisify(lambda.deleteFunction.bind(lambda));
 
 // IAM
 const asyncCreateLambdaRole = promisify(iam.createRole.bind(iam));
@@ -63,4 +64,5 @@ module.exports = {
   asyncCreateLambdaFunction,
   asyncCreateLambdaRole,
   asyncAttachRolePolicy,
+  asyncDeleteLambdaFunction,
 };

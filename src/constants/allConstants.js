@@ -15,6 +15,7 @@ const lambdaIamRoleName = 'lambda-s3-role-2';
 const awsLambdaExecutePolicyArn = 'arn:aws:iam::aws:policy/AWSLambdaExecute';
 const awsLambdaRolePolicyArn =
   'arn:aws:iam::aws:policy/service-role/AWSLambdaRole';
+const lambdaFunctionName = 'copyToBucket';
 
 module.exports = {
   amazonMachineImageId,
@@ -31,4 +32,5 @@ module.exports = {
   lambdaIamRoleName,
   awsLambdaExecutePolicyArn,
   awsLambdaRolePolicyArn,
+  lambdaFunctionName,
 };

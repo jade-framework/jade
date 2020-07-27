@@ -15,5 +15,3 @@ const deleteAllBuckets = async () => {
 };
 
 module.exports = { deleteAllBuckets };
-
-deleteAllBuckets();
