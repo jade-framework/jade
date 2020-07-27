@@ -9,10 +9,17 @@ const {
   createLambdaFunction,
   createLambdaPermission,
   createLambdaRole,
+<<<<<<< HEAD
+} = require('../aws/lambda');
+const { createCloudfrontDistribution } = require('../aws/cloudfront');
+const { zipit } = require('../util/zipit');
+const { build } = require('./build');
+=======
 } = require("../aws/lambda");
 const { createCloudfrontDistribution } = require("../aws/cloudfront");
 const { zipit } = require("../util/zipit");
 const { build } = require("../commands/build");
+>>>>>>> master
 
 const cwd = process.cwd();
 const functionName = "copyToBucket";
