@@ -2,7 +2,7 @@ const { deleteBucket } = require('./deleteBucket');
 const { asyncListBuckets } = require('../awsAsyncFunctions');
 
 const deleteAllBuckets = async () => {
-  console.log('Deleting ALL Bucket...');
+  console.log('Deleting ALL Buckets...');
 
   try {
     const allBuckets = await asyncListBuckets();
