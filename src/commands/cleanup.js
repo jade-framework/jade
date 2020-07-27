@@ -10,11 +10,11 @@ const {
 
 const cleanup = async bucketName => {
   deleteAllBuckets();
-  // deleteIamRole(lambdaIamRoleName, [
-  //   awsLambdaRolePolicyArn,
-  //   awsLambdaExecutePolicyArn,
-  // ]);
-  // deleteLambdaFunction(lambdaFunctionName);
+  deleteIamRole(lambdaIamRoleName, [
+    awsLambdaRolePolicyArn,
+    awsLambdaExecutePolicyArn,
+  ]);
+  deleteLambdaFunction(lambdaFunctionName);
 };
 
 cleanup();
