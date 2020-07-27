@@ -19,7 +19,7 @@ const {
   readJSONFile,
 } = require("../../util/fileUtils");
 
-module.exports = async function configEC2IamRole() {
+async function configEc2IamRole() {
   const jadePath = getJadePath(hostDirectory);
   try {
     const rolePolicy = await readJSONFile(
@@ -61,4 +61,6 @@ module.exports = async function configEC2IamRole() {
   } catch (err) {
     console.log(err);
   }
-};
+}
+
+module.exports = { configEc2IamRole };
