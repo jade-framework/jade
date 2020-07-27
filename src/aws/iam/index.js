@@ -1,8 +1,8 @@
-const { promisify } = require("util");
-const IAM = require("aws-sdk/clients/iam");
-const { getRegion } = require("../../util/getRegion");
+const { promisify } = require('util');
+const IAM = require('aws-sdk/clients/iam');
+const { getRegion } = require('../../util/getRegion');
 
-const apiVersion = "latest";
+const apiVersion = 'latest';
 const region = getRegion();
 
 const iam = new IAM({ apiVersion, region });
@@ -14,10 +14,14 @@ const asyncCreateInstanceProfile = promisify(
   iam.createInstanceProfile.bind(iam)
 );
 const asyncAddRoleToProfile = promisify(iam.addRoleToInstanceProfile.bind(iam));
+const asyncDetachRolePolicy = promisify(iam.detachRolePolicy.bind(iam));
+const asyncDeleteRole = promisify(iam.deleteRole.bind(iam));
 
 module.exports = {
   asyncCreateRole,
   asyncAttachRolePolicy,
   asyncCreateInstanceProfile,
   asyncAddRoleToProfile,
+  asyncDetachRolePolicy,
+  asyncDeleteRole,
 };
