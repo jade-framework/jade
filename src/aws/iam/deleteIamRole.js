@@ -1,5 +1,10 @@
 const { asyncDetachRolePolicy, asyncDeleteRole } = require('.');
 
+/**
+ * Delete an AWS IAM role
+ * @param {string} iamRoleName
+ * @param {array} iamPolicyArns
+ */
 const deleteIamRole = async (iamRoleName, iamPolicyArns) => {
   try {
     await iamPolicyArns.forEach(async policy => {
