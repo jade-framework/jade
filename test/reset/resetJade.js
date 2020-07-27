@@ -1,5 +1,5 @@
 const { clearJadeFolder } = require("./clearJadeFolder");
-const { terminateJadeEc2Instances } = require("./terminateJadeEC2Instances");
+const { terminateJadeEc2Instances } = require("./terminateJadeEc2Instances");
 const { removePermissions } = require("./removePermissions");
 
 async function resetJade() {
