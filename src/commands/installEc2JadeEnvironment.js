@@ -112,8 +112,8 @@ async function installEc2JadeEnvironment(bucketName) {
 
     console.log("Beginning connection to EC2 server...");
 
-    await sendSetupCommands(host, bucketName);
     await sendSetupFiles(host);
+    await sendSetupCommands(host, bucketName);
     console.log("EC2 server setup successfully.");
     return;
   } catch (err) {
