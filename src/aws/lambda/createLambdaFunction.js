@@ -1,6 +1,3 @@
-// const AWS = require('aws-sdk/global');
-// const awsLambda = require('aws-sdk/clients/lambda');
-
 const { asyncCreateLambdaFunction } = require('../awsAsyncFunctions');
 
 const createLambdaFunction = async (

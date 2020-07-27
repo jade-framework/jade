@@ -143,7 +143,7 @@ const sshConnection = async (host, bucketName) => {
   }
 };
 
-async function installEC2JadeEnvironment(bucketName) {
+async function installEc2JadeEnvironment(bucketName) {
   const privateKey = await readFile(join(jadePath, privateKeyFilename));
 
   try {
@@ -169,4 +169,4 @@ async function installEC2JadeEnvironment(bucketName) {
   }
 }
 
-module.exports = { installEC2JadeEnvironment };
+module.exports = { installEc2JadeEnvironment };

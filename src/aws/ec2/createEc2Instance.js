@@ -42,7 +42,7 @@ const runInstancesParams = {
   ],
 };
 
-async function createEC2Instance() {
+async function createEc2Instance() {
   const jadePath = getJadePath(hostDirectory);
   try {
     if (!(await exists(join(jadePath, `${securityGroup}.json`)))) {
@@ -88,4 +88,4 @@ async function createEC2Instance() {
   }
 }
 
-module.exports = { createEC2Instance };
+module.exports = { createEc2Instance };
