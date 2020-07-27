@@ -16,7 +16,7 @@ AWS.config.update({ region: "us-east-1" });
 const s3 = new S3({ apiVersion: "2006-03-01" });
 const cloudfront = new CloudFront({ apiVersion: "2019-03-26" });
 const lambda = new Lambda();
-const iam = new awsIAM({ apiVersion: "2010-05-08" });
+const iam = new awsIAM({ apiVersion: "2010-05-08", region });
 const ec2 = new EC2({ apiVersion, region });
 
 // CLOUDFRONT
@@ -52,6 +52,11 @@ const asyncCreateLambdaFunction = promisify(lambda.createFunction.bind(lambda));
 // IAM
 const asyncCreateLambdaRole = promisify(iam.createRole.bind(iam));
 const asyncAttachRolePolicy = promisify(iam.attachRolePolicy.bind(iam));
+const asyncCreateRole = promisify(iam.createRole.bind(iam));
+const asyncCreateInstanceProfile = promisify(
+  iam.createInstanceProfile.bind(iam)
+);
+const asyncAddRoleToProfile = promisify(iam.addRoleToInstanceProfile.bind(iam));
 
 // EC2
 const asyncCreateSecurityGroup = promisify(ec2.createSecurityGroup.bind(ec2));
@@ -87,6 +92,9 @@ module.exports = {
   asyncCreateLambdaFunction,
   asyncCreateLambdaRole,
   asyncAttachRolePolicy,
+  asyncCreateRole,
+  asyncCreateInstanceProfile,
+  asyncAddRoleToProfile,
   asyncCreateSecurityGroup,
   asyncDescribeSecurityGroups,
   asyncAuthorizeSecurityGroupIngress,

@@ -25,6 +25,8 @@ const deleteSecurityGroup = async (securityGroupName) => {
   console.log(err, data);
 };
 
+deleteSecurityGroup();
+
 // TODO: add retries
 async function removePermissions() {
   iam.removeRoleFromInstanceProfile(

@@ -46,29 +46,37 @@ const deployCommands = (bucketName) => {
   return [`aws s3 sync public s3://${bucketName}`];
 };
 
-const sendCommands = (conn, bucketName) => {
+const sendCommands = async (conn, bucketName) => {
   console.log("Sending EC2 instance commands...");
-  conn.shell((err, stream) => {
-    if (err) throw err;
-    stream
-      .on("close", () => {
-        console.log("Stream :: close");
-        conn.end();
-      })
-      .on("data", (data) => {
-        console.log("OUTPUT: " + data);
+  return new Promise((res, rej) => {
+    conn.shell((err, stream) => {
+      if (err) throw err;
+      stream
+        .on("close", () => {
+          console.log("Stream :: close");
+          conn.end();
+        })
+        .on("data", (data) => {
+          console.log(`OUTPUT: ${data}`);
+        });
+      // stream.end(
+      //   [
+      //     // ...linuxCommands,
+      //     // ...nodeCommands,
+      //     // ...gitCommands,
+      //     // ...buildCommands,
+      //     // ...webhookCommands,
+      //     // ...deployCommands(bucketName),
+      //     "exit\n",
+      //   ].join("\n")
+      // );
+      stream.on("end", () => {
+        console.log("hi");
       });
-    stream.end(
-      [
-        ...linuxCommands,
-        ...nodeCommands,
-        ...gitCommands,
-        ...buildCommands,
-        ...webhookCommands,
-        ...deployCommands(bucketName),
-        "exit\n",
-      ].join("\n")
-    );
+      stream.write("ls\n");
+      res();
+      stream.close("exit\n");
+    });
   });
 };
 
@@ -128,21 +136,23 @@ const sshConnection = async (host, bucketName) => {
     connected = true;
     console.log("Client ready");
     // Handle SFTP
-    await sendFiles(conn);
+    // await sendFiles(conn);
 
     // Handle installation, build and deploy commands
-    sendCommands(conn, bucketName);
+    await sendCommands(conn, bucketName);
   });
 
   const connect = promisify(conn.connect.bind(conn));
-  await connect(host);
+  let res = await connect(host);
   let attempts = 1;
   await sleep(5000);
+  console.log(res);
 
   while (!connected && attempts < 10) {
     console.log("Waiting for EC2 instance to accept SSH requests...");
     attempts++;
-    await connect(host);
+    res = await connect(host);
+    console.log(res);
     await sleep(5000);
   }
 };

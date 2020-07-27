@@ -3,7 +3,7 @@ const {
   asyncAttachRolePolicy,
   asyncCreateInstanceProfile,
   asyncAddRoleToProfile,
-} = require("./index");
+} = require("../awsAsyncFunctions");
 
 const {
   ec2IamRoleName,
@@ -19,7 +19,7 @@ const {
   readJSONFile,
 } = require("../../util/fileUtils");
 
-async function configEC2IamRole() {
+async function configEc2IamRole() {
   const jadePath = getJadePath(hostDirectory);
   try {
     const rolePolicy = await readJSONFile(
@@ -63,4 +63,4 @@ async function configEC2IamRole() {
   }
 }
 
-module.exports = { configEC2IamRole };
+module.exports = { configEc2IamRole };

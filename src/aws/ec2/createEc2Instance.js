@@ -17,7 +17,7 @@ const {
   keyPair,
 } = require("../../constants/allConstants");
 
-const { getAmi } = require("./index");
+const { getAmi } = require("./getAmi");
 
 const runInstancesParams = {
   InstanceType: instanceType,

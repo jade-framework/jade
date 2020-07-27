@@ -1,19 +1,15 @@
-const { configEC2IamRole } = require("../aws/iam/configEC2IamRole");
-const { createKeyPair } = require("../aws/ec2/createKeyPair");
-const { createSecurityGroup } = require("../aws/ec2/createSecurityGroup");
-const { createEc2Instance } = require("../aws/ec2/createEc2Instance");
+const { createAndConfigEc2 } = require("../aws/ec2");
+const { configEc2IamRole } = require("../aws/iam");
 const { installEc2JadeEnvironment } = require("./installEc2JadeEnvironment");
-const { setInstanceIp } = require("../aws/ec2/setInstanceIp");
 const { printBuildSuccess } = require("./printBuildSuccess");
 
 async function build(bucketName) {
   try {
-    // await configEC2IamRole();
-    // await createKeyPair();
-    // await createSecurityGroup();
-    // await createEc2Instance();
-    // await setInstanceIp();
-    await installEc2JadeEnvironment(bucketName);
+    // await configEc2IamRole();
+    // await createAndConfigEc2();
+    await installEc2JadeEnvironment(
+      "test-c84392b6-d0e6-4fe0-8aa0-763bc143a28f"
+    );
     await printBuildSuccess();
   } catch (err) {
     console.log(err);
