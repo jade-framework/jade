@@ -5,11 +5,9 @@ const { printBuildSuccess } = require("./printBuildSuccess");
 
 async function build(bucketName) {
   try {
-    // await configEc2IamRole();
-    // await createAndConfigEc2();
-    await installEc2JadeEnvironment(
-      "test-c84392b6-d0e6-4fe0-8aa0-763bc143a28f"
-    );
+    await configEc2IamRole();
+    await createAndConfigEc2();
+    await installEc2JadeEnvironment(bucketName);
     await printBuildSuccess();
   } catch (err) {
     console.log(err);
@@ -17,4 +15,3 @@ async function build(bucketName) {
 }
 
 module.exports = { build };
-build();
