@@ -7,7 +7,7 @@ const region = getRegion();
 
 const ec2 = new EC2({ apiVersion, region });
 
-module.exports = async function () {
+async function terminateJadeEc2Instances() {
   const toBeDeleted = [];
   ec2.describeInstances((err, data) => {
     if (err) throw err;
@@ -28,4 +28,6 @@ module.exports = async function () {
       });
     }
   });
-};
+}
+
+module.exports = { terminateJadeEc2Instances };

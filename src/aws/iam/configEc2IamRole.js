@@ -3,7 +3,7 @@ const {
   asyncAttachRolePolicy,
   asyncCreateInstanceProfile,
   asyncAddRoleToProfile,
-} = require("./index");
+} = require("../awsAsyncFunctions");
 
 const {
   ec2IamRoleName,

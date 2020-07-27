@@ -1,5 +1,6 @@
-const { asyncCreateKeyPair } = require("./index");
+const { asyncCreateKeyPair } = require("../awsAsyncFunctions");
 const {
+  exists,
   join,
   createJSONFile,
   getJadePath,
@@ -18,16 +19,24 @@ const keyPairParams = {
   KeyName: jadeKeyPair,
 };
 
-module.exports = async function createKeyPair() {
+const createKeyPair = async () => {
   const jadePath = getJadePath(hostDirectory);
   const privateKeyPath = join(jadePath, privateKeyFilename);
   try {
-    const keyPairResponse = await asyncCreateKeyPair(keyPairParams);
-    const { KeyMaterial, ...otherData } = keyPairResponse;
-    await writeFile(privateKeyPath, KeyMaterial);
-    await chmod(privateKeyPath, 0o400);
-    await createJSONFile(keyPair, jadePath, otherData);
+    if (!(await exists(join(jadePath, `${keyPair}.json`)))) {
+      console.log("Creating Jade key pair and .pem file...");
+      const keyPairResponse = await asyncCreateKeyPair(keyPairParams);
+      const { KeyMaterial, ...otherData } = keyPairResponse;
+      await writeFile(privateKeyPath, KeyMaterial);
+      await chmod(privateKeyPath, 0o400);
+      await createJSONFile(keyPair, jadePath, otherData);
+      return;
+    } else {
+      console.log("Jade key pair already exists.");
+    }
   } catch (err) {
     console.log(err);
   }
 };
+
+module.exports = { createKeyPair };

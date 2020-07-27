@@ -1,4 +1,4 @@
-const { asyncDetachRolePolicy, asyncDeleteRole } = require('.');
+const { asyncDetachRolePolicy, asyncDeleteRole } = require(".");
 
 /**
  * Delete an AWS IAM role
@@ -7,7 +7,7 @@ const { asyncDetachRolePolicy, asyncDeleteRole } = require('.');
  */
 const deleteIamRole = async (iamRoleName, iamPolicyArns) => {
   try {
-    await iamPolicyArns.forEach(async policy => {
+    await iamPolicyArns.forEach(async (policy) => {
       await asyncDetachRolePolicy({ RoleName: iamRoleName, PolicyArn: policy });
     });
 
@@ -17,4 +17,4 @@ const deleteIamRole = async (iamRoleName, iamPolicyArns) => {
   }
 };
 
-module.exports = deleteIamRole;
+module.exports = { deleteIamRole };

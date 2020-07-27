@@ -1,6 +1,6 @@
-const { asyncDescribeImages } = require("./index");
+const { asyncDescribeImages } = require("../awsAsyncFunctions");
 
-module.exports = async function getAmi() {
+const getAmi = async () => {
   const params = {
     Filters: [
       {
@@ -32,3 +32,5 @@ module.exports = async function getAmi() {
     }
   })[0].imageId;
 };
+
+module.exports = { getAmi };
