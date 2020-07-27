@@ -1,8 +1,3 @@
-const {
-  awsLambdaExecutePolicyArn,
-  awsLambdaRolePolicyArn,
-  lambdaIamRoleName,
-} = require('../../constants/allConstants');
 const { asyncDetachRolePolicy, asyncDeleteRole } = require('.');
 
 const deleteIamRole = async (iamRoleName, iamPolicyArns) => {
@@ -17,7 +12,4 @@ const deleteIamRole = async (iamRoleName, iamPolicyArns) => {
   }
 };
 
-deleteIamRole(lambdaIamRoleName, [
-  awsLambdaExecutePolicyArn,
-  awsLambdaRolePolicyArn,
-]);
+module.exports = deleteIamRole;
