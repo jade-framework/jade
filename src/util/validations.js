@@ -1,7 +1,7 @@
 const { credentials } = require("../aws/awsAsyncFunctions");
 const { jadeErr } = require("./logger.js");
 
-const validateAwsCliConfig = () => {
+const isAwsCliConfigured = () => {
   console.log("Looking for AWS Credentials...");
 
   if (credentials) {
@@ -13,4 +13,27 @@ const validateAwsCliConfig = () => {
   }
 };
 
-module.exports = { validateAwsCliConfig };
+const isValidLambdaName = async (name) => {
+  const regex = /^[a-zA-Z0-9-_]{1,64}$/;
+
+  if (!regex.test(resourceName)) {
+    jadeErr(
+      "Resource name must be between 1 and 64 characters in length. It may only contain alphanumeric characters, - or _"
+    );
+  }
+};
+
+const isValidS3Name = async (name) => {
+  const regex = /(^[a-z\d]{1,2}((-[a-z\d])|([a-z\d]{1,2})){0,30}[a-z\d]$)|(^[‌​a-z\d]((-[a-z\d])|([‌​a-z\d]{1,2})){0,30}[‌​a-z\d-]?[a-z\d]$)/;
+
+  if (!regex.test(resourceName)) {
+    jadeErr(
+      "Resource name must be between 3 and 64 characters in length. It may only contain lowercase characters, numbers, - or ."
+    );
+  }
+};
+
+module.exports = {
+  isAwsCliConfigured,
+  validateResourceName,
+};
