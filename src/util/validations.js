@@ -20,20 +20,26 @@ const foundAwsCredentials = () => {
 const isValidLambdaName = async (name) => {
   const regex = /^[a-zA-Z0-9-_]{1,64}$/;
 
-  if (!regex.test(resourceName)) {
+  if (!regex.test(name)) {
     jadeErr(
-      "Resource name must be between 1 and 64 characters in length. It may only contain alphanumeric characters, - or _"
+      "Resource name must be between 1 and 64 characters long. It may only contain letters, numbers, hyphens(-), or underscores(_)"
     );
+    return false;
+  } else {
+    return true;
   }
 };
 
 const isValidS3Name = async (name) => {
-  const regex = /(^[a-z\d]{1,2}((-[a-z\d])|([a-z\d]{1,2})){0,30}[a-z\d]$)|(^[‌​a-z\d]((-[a-z\d])|([‌​a-z\d]{1,2})){0,30}[‌​a-z\d-]?[a-z\d]$)/;
+  const regex = /(?=^.{3,63}$)(?!^(\d+\.)+\d+$)(^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])$)/;
 
-  if (!regex.test(resourceName)) {
+  if (!regex.test(name)) {
     jadeErr(
-      "Resource name must be between 3 and 64 characters in length. It may only contain lowercase characters, numbers, - or ."
+      "Resource name must be between 3 and 63 characters long. It may only contain lowercase letters, numbers, dots(.), or hyphens(-). Bucket names must begin and end with a letter or number. Bucket names must not be formatted as an IP address."
     );
+    return false;
+  } else {
+    return true;
   }
 };
 
