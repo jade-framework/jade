@@ -18,6 +18,7 @@ const cloudfront = new CloudFront({ apiVersion: "2019-03-26" });
 const lambda = new Lambda();
 const iam = new awsIAM({ apiVersion: "2010-05-08", region });
 const ec2 = new EC2({ apiVersion, region });
+const config = new AWS.Config();
 
 // CLOUDFRONT
 const asyncCreateCloudfrontDistribution = promisify(
@@ -76,6 +77,9 @@ const asyncAssociateIamInstanceProfile = promisify(
 const asyncWaitFor = promisify(ec2.waitFor.bind(ec2));
 const asyncDescribeImages = promisify(ec2.describeImages.bind(ec2));
 
+// Config
+const credentials = config.credentials;
+
 module.exports = {
   // asyncGetDistribution,
   // asyncListDistributions,
@@ -105,4 +109,5 @@ module.exports = {
   asyncAssociateIamInstanceProfile,
   asyncWaitFor,
   asyncDescribeImages,
+  credentials,
 };
