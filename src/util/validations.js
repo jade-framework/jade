@@ -1,7 +1,7 @@
-const { credentials } = require("../aws/awsAsyncFunctions");
+const { credentials } = require("./getCredentials");
 const { jadeErr } = require("./logger.js");
 
-const isAwsCliConfigured = () => {
+const foundAwsCredentials = () => {
   console.log("Looking for AWS Credentials...");
 
   if (credentials) {
@@ -9,6 +9,10 @@ const isAwsCliConfigured = () => {
     return true;
   } else {
     jadeErr("CredentialsError: Could not load credentials from any providers");
+    console.log("For instructions, please visit:");
+    console.log(
+      "https://awscli.amazonaws.com/v2/documentation/api/latest/topic/config-vars.html"
+    );
     return false;
   }
 };
@@ -33,7 +37,4 @@ const isValidS3Name = async (name) => {
   }
 };
 
-module.exports = {
-  isAwsCliConfigured,
-  validateResourceName,
-};
+module.exports = { foundAwsCredentials };
