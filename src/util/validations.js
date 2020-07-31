@@ -1,6 +1,5 @@
 const { credentials } = require("./getCredentials");
 const { jadeErr } = require("./logger.js");
-
 const { exists } = require("../util/fileUtils");
 
 const cwd = process.cwd();
@@ -41,55 +40,48 @@ const isValidLambdaName = async (name) => {
   const regex = /^[a-zA-Z0-9-_]{1,64}$/;
 
   if (!regex.test(name)) {
-    jadeErr(
-      "Resource name must be between 1 and 64 characters long. It may only contain letters, numbers, hyphens(-), or underscores(_)"
-    );
     return false;
   } else {
     return true;
   }
 };
 
-// checks if lambda file already exists in cwd
-const lambdaExistsInCwd = async (name) => {
+// checks lambda does not already exist in cwd
+const lambdaDoesNotExistInCwd = async (name) => {
   const lambdaFileExists = await exists(`${cwd}/${name}.js`);
-  return lambdaFileExists;
+  if (lambdaFileExists) {
+    return false;
+  } else {
+    return true;
+  }
 };
 
 const validateLambdaCreation = async (name) => {
   const validations = [
     {
-      validation: lambdaExistsInCwd,
-      feedbackType: "nameIsTaken",
-      affirmative: true,
+      validation: lambdaDoesNotExistInCwd,
+      invalidMessage: `Name ${name} is already being used in this directory`,
     },
     {
       validation: isValidLambdaName,
-      feedbackType: "invalidSyntax",
-      affirmative: false,
+      invalidMessage: `Name ${name} is invalid. It must be between 1 and 64 characters long. It may only contain letters, numbers, hyphens(-), or underscores(_)`,
     },
   ];
 
-  const status = await validateResource(
-    name,
-    validations,
-    customizeLambdaWarnings
-  );
+  const status = await validateResource(name, validations);
 
   return status;
 };
 
-const validateResource = async (resourceData, validations, customWarnings) => {
-  const warnings = customWarnings(resourceData);
+const validateResource = async (resourceData, validations) => {
   let msg;
 
   for (let i = 0; i < validations.length; i += 1) {
-    const { validation, feedbackType, affirmative } = validations[i];
+    const { validation, invalidMessage } = validations[i];
     const isValid = await validation(resourceData);
-    const check = affirmative ? isValid : !isValid;
 
-    if (check) {
-      msg = warnings[feedbackType];
+    if (isValid) {
+      msg = invalidMessage;
       break;
     }
   }
@@ -98,6 +90,5 @@ const validateResource = async (resourceData, validations, customWarnings) => {
 
 module.exports = {
   foundAwsCredentials,
-  isValidLambdaName,
-  isValidS3Name,
+  validateLambdaCreation,
 };
