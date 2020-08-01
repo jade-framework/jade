@@ -1,7 +1,7 @@
 const { credentials } = require("./getCredentials");
 const { jadeErr } = require("./logger.js");
 const { exists } = require("../util/fileUtils");
-const { asyncHeadBucket } = require("../aws/awsAsyncFunctions");
+const { asyncHeadBucket, asyncGetRole } = require("../aws/awsAsyncFunctions");
 
 const cwd = process.cwd();
 
@@ -44,6 +44,18 @@ const isBucketNameAvailable = async (name) => {
   }
 };
 
+// checks if role exists
+const roleExistsOnAws = async (name) => {
+  const params = { RoleName: name };
+
+  try {
+    await asyncGetRole(params);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
 // checks if lambda name meets AWS requirements
 const isValidLambdaName = (name) => {
   const regex = /^[a-zA-Z0-9-_]{1,64}$/;
@@ -80,6 +92,18 @@ const validateLambdaCreation = async (name) => {
 
   const status = await validateResource(name, validations);
 
+  return status;
+};
+
+// validates role existance on AWS
+const validateRoleAssumption = async (name) => {
+  const validations = [
+    {
+      validation: roleExistsOnAws,
+      invalidMessage: `Role '${name}' does not exist`,
+    },
+  ];
+  const status = await validateResource(name, validations);
   return status;
 };
 
@@ -121,4 +145,5 @@ module.exports = {
   awsCredentialsConfigured,
   validateLambdaCreation,
   validateBucketCreation,
+  validateRoleAssumption,
 };
