@@ -50,6 +50,7 @@ const asyncHeadBucket = promisify(s3.headBucket.bind(s3));
 const asyncAddPermission = promisify(lambda.addPermission.bind(lambda));
 const asyncCreateLambdaFunction = promisify(lambda.createFunction.bind(lambda));
 const asyncDeleteLambdaFunction = promisify(lambda.deleteFunction.bind(lambda));
+const asyncGetFunction = promisify(lambda.getFunction.bind(lambda));
 
 // IAM
 const asyncCreateLambdaRole = promisify(iam.createRole.bind(iam));
@@ -109,4 +110,5 @@ module.exports = {
   asyncDescribeImages,
   asyncHeadBucket,
   asyncGetRole,
+  asyncGetFunction,
 };

@@ -1,7 +1,12 @@
 const { credentials } = require("./getCredentials");
 const { jadeErr } = require("./logger.js");
-const { exists } = require("../util/fileUtils");
-const { asyncHeadBucket, asyncGetRole } = require("../aws/awsAsyncFunctions");
+const { exists, readFile } = require("./fileUtils");
+
+const {
+  asyncHeadBucket,
+  asyncGetRole,
+  asyncGetFunction,
+} = require("../aws/awsAsyncFunctions");
 
 const cwd = process.cwd();
 
@@ -21,7 +26,7 @@ const awsCredentialsConfigured = () => {
   }
 };
 
-// checks if S3 name meets AWS requirements
+// S3 Bucket helper methods
 const isValidBucketName = (name) => {
   const regex = /(?=^.{3,63}$)(?!^(\d+\.)+\d+$)(^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])$)/;
 
@@ -32,7 +37,6 @@ const isValidBucketName = (name) => {
   }
 };
 
-// checks if S3 bucket name is available
 const isBucketNameAvailable = async (name) => {
   const params = { Bucket: name };
 
@@ -44,7 +48,40 @@ const isBucketNameAvailable = async (name) => {
   }
 };
 
-// checks if role exists
+// Lambda helper methods
+const isValidLambdaName = (name) => {
+  const regex = /^[a-zA-Z0-9-_]{1,64}$/;
+
+  if (!regex.test(name)) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
+const lambdaExistsInCwd = async (name) => {
+  const lambdaFileExists = await exists(`${cwd}/src/aws/lambda/${name}.js`);
+  return lambdaFileExists;
+};
+
+const lambdaExistsOnAws = async (name) => {
+  const params = { FunctionName: name };
+
+  try {
+    await asyncGetFunction(params);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+const isValidLambda = async (name) => {
+  const path = `${cwd}/src/aws/lambda/${name}.js`;
+  const lambdaFile = await readFile(path);
+  return lambdaFile.includes("exports.handler");
+};
+
+// Resource helper methods
 const roleExistsOnAws = async (name) => {
   const params = { RoleName: name };
 
@@ -56,37 +93,18 @@ const roleExistsOnAws = async (name) => {
   }
 };
 
-// checks if lambda name meets AWS requirements
-const isValidLambdaName = (name) => {
-  const regex = /^[a-zA-Z0-9-_]{1,64}$/;
-
-  if (!regex.test(name)) {
-    return false;
-  } else {
-    return true;
-  }
-};
-
-// checks lambda does not already exist in cwd
-const lambdaDoesNotExistInCwd = async (name) => {
-  const lambdaFileExists = await exists(`${cwd}/${name}.js`);
-  if (lambdaFileExists) {
-    return false;
-  } else {
-    return true;
-  }
-};
-
-// validates lambda creation
+// Lambda validations
 const validateLambdaCreation = async (name) => {
   const validations = [
     {
-      validation: lambdaDoesNotExistInCwd,
-      invalidMessage: `Name ${name} is already being used in this directory`,
+      validation: lambdaExistsInCwd,
+      invalidBoolean: true,
+      invalidMessage: `Name "${name}" is already being used in this directory`,
     },
     {
       validation: isValidLambdaName,
-      invalidMessage: `Name ${name} is invalid. It must be between 1 and 64 characters long. It may only contain letters, numbers, hyphens(-), or underscores(_)`,
+      invalidBoolean: false,
+      invalidMessage: `Name "${name}" is invalid. It must be between 1 and 64 characters long. It may only contain letters, numbers, hyphens(-), or underscores(_)`,
     },
   ];
 
@@ -95,28 +113,58 @@ const validateLambdaCreation = async (name) => {
   return status;
 };
 
-// validates role existance on AWS
+const validateLambdaDeployment = async (name) => {
+  const validations = [
+    {
+      validation: isValidLambdaName,
+      invalidBoolean: false,
+      invalidMessage: `Name "${name}" is invalid. It must be between 1 and 64 characters long. It may only contain letters, numbers, hyphens(-), or underscores(_)`,
+    },
+    {
+      validation: lambdaExistsInCwd,
+      invalidBoolean: false,
+      invalidMessage: `File "${name}" does not exist in this directory`,
+    },
+    {
+      validation: lambdaExistsOnAws,
+      invalidBoolean: true,
+      invalidMessage: `Lambda "${name}" already exists on AWS`,
+    },
+    {
+      validation: isValidLambda,
+      invalidBoolean: false,
+      invalidMessage: `Lambda "${name}" does not contain exports.handler`,
+    },
+  ];
+  const status = await validateResource(name, validations);
+  return status;
+};
+
+// Role validations
 const validateRoleAssumption = async (name) => {
   const validations = [
     {
       validation: roleExistsOnAws,
-      invalidMessage: `Role '${name}' does not exist`,
+      invalidBoolean: false,
+      invalidMessage: `Role "${name}" does not exist`,
     },
   ];
   const status = await validateResource(name, validations);
   return status;
 };
 
-// validates S3 bucket creation
+// S3 bucket validations
 const validateBucketCreation = async (name) => {
   const validations = [
     {
       validation: isBucketNameAvailable,
-      invalidMessage: `Bucket name ${name} already exists`,
+      invalidBoolean: false,
+      invalidMessage: `Bucket name "${name}" already exists`,
     },
     {
       validation: isValidBucketName,
-      invalidMessage: `Bucket name ${name} is invalid. It must be between 3 and 63 characters long. It may only contain lowercase letters, numbers, dots(.), or hyphens(-). To see the full rules for bucket naming visit: https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html`,
+      invalidBoolean: false,
+      invalidMessage: `Bucket name "${name}" is invalid. It must be between 3 and 63 characters long. It may only contain lowercase letters, numbers, dots(.), or hyphens(-). To see the full rules for bucket naming visit: https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html`,
     },
   ];
 
@@ -125,15 +173,15 @@ const validateBucketCreation = async (name) => {
   return status;
 };
 
-// AWS resource validation helper method
+// Validations helper method
 const validateResource = async (resourceData, validations) => {
   let msg;
 
   for (let i = 0; i < validations.length; i += 1) {
-    const { validation, invalidMessage } = validations[i];
-    const isValid = await validation(resourceData);
+    const { validation, invalidBoolean, invalidMessage } = validations[i];
+    const result = await validation(resourceData);
 
-    if (!isValid) {
+    if (result === invalidBoolean) {
       msg = invalidMessage;
       break;
     }
@@ -146,4 +194,5 @@ module.exports = {
   validateLambdaCreation,
   validateBucketCreation,
   validateRoleAssumption,
+  validateLambdaDeployment,
 };
