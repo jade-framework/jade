@@ -1,11 +1,12 @@
 const { credentials } = require("./getCredentials");
 const { jadeErr } = require("./logger.js");
 const { exists } = require("../util/fileUtils");
+const { asyncHeadBucket } = require("../aws/awsAsyncFunctions");
 
 const cwd = process.cwd();
 
 // checks for AWS credentials
-const foundAwsCredentials = () => {
+const awsCredentialsConfigured = () => {
   console.log("Looking for AWS Credentials...");
 
   if (credentials) {
@@ -13,30 +14,38 @@ const foundAwsCredentials = () => {
     return true;
   } else {
     jadeErr("CredentialsError: Could not load credentials from any providers");
-    console.log("For instructions, please visit:");
     console.log(
-      "https://awscli.amazonaws.com/v2/documentation/api/latest/topic/config-vars.html"
+      "For instructions, please visit: https://awscli.amazonaws.com/v2/documentation/api/latest/topic/config-vars.html"
     );
     return false;
   }
 };
 
 // checks if S3 name meets AWS requirements
-const isValidS3Name = async (name) => {
+const isValidBucketName = (name) => {
   const regex = /(?=^.{3,63}$)(?!^(\d+\.)+\d+$)(^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])$)/;
 
   if (!regex.test(name)) {
-    jadeErr(
-      "Resource name must be between 3 and 63 characters long. It may only contain lowercase letters, numbers, dots(.), or hyphens(-). Bucket names must begin and end with a letter or number. Bucket names must not be formatted as an IP address."
-    );
     return false;
   } else {
     return true;
   }
 };
 
+// checks if S3 bucket name is available
+const isBucketNameAvailable = async (name) => {
+  const params = { Bucket: name };
+
+  try {
+    await asyncHeadBucket(params);
+    return false;
+  } catch (error) {
+    return true;
+  }
+};
+
 // checks if lambda name meets AWS requirements
-const isValidLambdaName = async (name) => {
+const isValidLambdaName = (name) => {
   const regex = /^[a-zA-Z0-9-_]{1,64}$/;
 
   if (!regex.test(name)) {
@@ -56,6 +65,7 @@ const lambdaDoesNotExistInCwd = async (name) => {
   }
 };
 
+// validates lambda creation
 const validateLambdaCreation = async (name) => {
   const validations = [
     {
@@ -73,6 +83,25 @@ const validateLambdaCreation = async (name) => {
   return status;
 };
 
+// validates S3 bucket creation
+const validateBucketCreation = async (name) => {
+  const validations = [
+    {
+      validation: isBucketNameAvailable,
+      invalidMessage: `Bucket name ${name} already exists`,
+    },
+    {
+      validation: isValidBucketName,
+      invalidMessage: `Bucket name ${name} is invalid. It must be between 3 and 63 characters long. It may only contain lowercase letters, numbers, dots(.), or hyphens(-). To see the full rules for bucket naming visit: https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html`,
+    },
+  ];
+
+  const status = await validateResource(name, validations);
+
+  return status;
+};
+
+// AWS resource validation helper method
 const validateResource = async (resourceData, validations) => {
   let msg;
 
@@ -80,7 +109,7 @@ const validateResource = async (resourceData, validations) => {
     const { validation, invalidMessage } = validations[i];
     const isValid = await validation(resourceData);
 
-    if (isValid) {
+    if (!isValid) {
       msg = invalidMessage;
       break;
     }
@@ -89,6 +118,7 @@ const validateResource = async (resourceData, validations) => {
 };
 
 module.exports = {
-  foundAwsCredentials,
+  awsCredentialsConfigured,
   validateLambdaCreation,
+  validateBucketCreation,
 };

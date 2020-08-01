@@ -44,6 +44,7 @@ const asyncUploadToBucket = promisify(s3.putObject.bind(s3));
 const asyncPutBucketNotificationConfiguration = promisify(
   s3.putBucketNotificationConfiguration.bind(s3)
 );
+const asyncHeadBucket = promisify(s3.headBucket.bind(s3));
 
 // LAMBDA
 const asyncAddPermission = promisify(lambda.addPermission.bind(lambda));
@@ -105,4 +106,5 @@ module.exports = {
   asyncAssociateIamInstanceProfile,
   asyncWaitFor,
   asyncDescribeImages,
+  asyncHeadBucket,
 };
