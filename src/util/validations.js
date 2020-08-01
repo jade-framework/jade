@@ -81,6 +81,8 @@ const isValidLambda = async (name) => {
   return lambdaFile.includes("exports.handler");
 };
 
+const 
+
 // Resource helper methods
 const roleExistsOnAws = async (name) => {
   const params = { RoleName: name };
@@ -140,6 +142,18 @@ const validateLambdaDeployment = async (name) => {
   return status;
 };
 
+const validateLambdaDeletion = async (name) => {
+  const validations = [
+    {
+      validation: lambdaExistsOnAws,
+      invalidBoolean: false,
+      invalidMessage: `Lambda "${name}" does not exist on AWS`,
+    },
+  ];
+  const status = await validateResource(name, validations);
+  return status;
+}
+
 // Role validations
 const validateRoleAssumption = async (name) => {
   const validations = [
@@ -195,4 +209,5 @@ module.exports = {
   validateBucketCreation,
   validateRoleAssumption,
   validateLambdaDeployment,
+  validateLambdaDeletion
 };
