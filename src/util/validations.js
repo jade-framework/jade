@@ -239,5 +239,6 @@ module.exports = {
   validateBucketCreation,
   validateRoleAssumption,
   validateLambdaDeployment,
-  validateLambdaDeletion
+  validateLambdaDeletion,
+  validateBucketUpload,
 };
