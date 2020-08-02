@@ -6,6 +6,7 @@ const {
   asyncHeadBucket,
   asyncGetRole,
   asyncGetFunction,
+  asyncListBuckets,
 } = require("../aws/awsAsyncFunctions");
 
 const cwd = process.cwd();
@@ -45,6 +46,21 @@ const isBucketNameAvailable = async (name) => {
     return false;
   } catch (error) {
     return true;
+  }
+};
+
+const bucketExistsWithUser = async (name) => {
+  try {
+    const data = await asyncListBuckets();
+    const buckets = data.Buckets;
+    for (let i = 0; i < buckets.length; i += 1) {
+      if (buckets[i].Name === name) {
+        return true;
+      }
+    }
+    return false;
+  } catch (err) {
+    console.log(err);
   }
 };
 
@@ -186,6 +202,20 @@ const validateBucketCreation = async (name) => {
 
   return status;
 };
+
+const validateBucketUpload = async (name) => {
+  const validations = [
+    {
+      validation: bucketExistsWithUser,
+      invalidBoolean: false,
+      invalidMessage: `Bucket name "${name}" does not exist within list of user buckets`,
+    },
+  ];
+
+  const status = await validateResource(name, validations);
+
+  return status;
+}
 
 // Validations helper method
 const validateResource = async (resourceData, validations) => {
