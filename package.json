@@ -1,13 +1,17 @@
 {
   "name": "jade",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "index.js",
   "author": "Jade Framework",
   "license": "MIT",
   "dependencies": {
     "aws-sdk": "^2.714.0",
     "dotenv": "^8.2.0",
+    "inquirer": "^7.3.3",
     "ssh2": "^0.8.9",
     "uuid": "^8.2.0"
+  },
+  "bin": {
+    "jade": "./bin/cli.js"
   }
 }
