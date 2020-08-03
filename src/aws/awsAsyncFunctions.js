@@ -44,11 +44,13 @@ const asyncUploadToBucket = promisify(s3.putObject.bind(s3));
 const asyncPutBucketNotificationConfiguration = promisify(
   s3.putBucketNotificationConfiguration.bind(s3)
 );
+const asyncHeadBucket = promisify(s3.headBucket.bind(s3));
 
 // LAMBDA
 const asyncAddPermission = promisify(lambda.addPermission.bind(lambda));
 const asyncCreateLambdaFunction = promisify(lambda.createFunction.bind(lambda));
 const asyncDeleteLambdaFunction = promisify(lambda.deleteFunction.bind(lambda));
+const asyncGetFunction = promisify(lambda.getFunction.bind(lambda));
 
 // IAM
 const asyncCreateLambdaRole = promisify(iam.createRole.bind(iam));
@@ -58,6 +60,7 @@ const asyncCreateInstanceProfile = promisify(
   iam.createInstanceProfile.bind(iam)
 );
 const asyncAddRoleToProfile = promisify(iam.addRoleToInstanceProfile.bind(iam));
+const asyncGetRole = promisify(iam.getRole.bind(iam));
 
 // EC2
 const asyncCreateSecurityGroup = promisify(ec2.createSecurityGroup.bind(ec2));
@@ -105,4 +108,7 @@ module.exports = {
   asyncAssociateIamInstanceProfile,
   asyncWaitFor,
   asyncDescribeImages,
+  asyncHeadBucket,
+  asyncGetRole,
+  asyncGetFunction,
 };
