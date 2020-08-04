@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-const uuid = require('uuid');
-const path = require('path');
-=======
 const uuid = require("uuid");
->>>>>>> 4669113ab47c31f950d75b538a0aa29121a2848d
 const {
   createBuckets,
   uploadToBucket,
@@ -13,12 +8,6 @@ const {
   createLambdaFunction,
   createLambdaPermission,
   createLambdaRole,
-<<<<<<< HEAD
-} = require('../aws/lambda');
-const { createCloudfrontDistribution } = require('../aws/cloudfront');
-const { zipit } = require('../util/zipit');
-const { build } = require('../commands/build');
-=======
 } = require("../aws/lambda");
 const {
   createDirectory,
@@ -31,7 +20,6 @@ const { createCloudfrontDistribution } = require("../aws/cloudfront");
 const { zipit } = require("../util/zipit");
 const { build } = require("./build");
 const inquirer = require("inquirer");
->>>>>>> 4669113ab47c31f950d75b538a0aa29121a2848d
 
 const cwd = process.cwd();
 const functionName = 'copyToBucket';
