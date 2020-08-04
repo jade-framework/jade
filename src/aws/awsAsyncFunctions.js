@@ -1,27 +1,33 @@
-const { promisify } = require("util");
-const S3 = require("aws-sdk/clients/s3");
-const CloudFront = require("aws-sdk/clients/cloudfront");
-const AWS = require("aws-sdk/global");
-const Lambda = require("aws-sdk/clients/lambda");
-const awsIAM = require("aws-sdk/clients/iam");
-const EC2 = require("aws-sdk/clients/ec2");
-const { getRegion } = require("../util/getRegion");
+const { promisify } = require('util');
+const S3 = require('aws-sdk/clients/s3');
+const CloudFront = require('aws-sdk/clients/cloudfront');
+const AWS = require('aws-sdk/global');
+const Lambda = require('aws-sdk/clients/lambda');
+const awsIAM = require('aws-sdk/clients/iam');
+const EC2 = require('aws-sdk/clients/ec2');
+const { getRegion } = require('../util/getRegion');
 
 // TODO: refactor to { apiVersion, region }
 const region = getRegion();
-const apiVersion = "latest";
+const apiVersion = 'latest';
 
-AWS.config.update({ region: "us-east-1" });
+AWS.config.update({ region: 'us-east-1' });
 
-const s3 = new S3({ apiVersion: "2006-03-01" });
-const cloudfront = new CloudFront({ apiVersion: "2019-03-26" });
+const s3 = new S3({ apiVersion: '2006-03-01' });
+const cloudfront = new CloudFront({ apiVersion: '2019-03-26' });
 const lambda = new Lambda();
-const iam = new awsIAM({ apiVersion: "2010-05-08", region });
+const iam = new awsIAM({ apiVersion: '2010-05-08', region });
 const ec2 = new EC2({ apiVersion, region });
 
 // CLOUDFRONT
 const asyncCreateCloudfrontDistribution = promisify(
   cloudfront.createDistribution.bind(cloudfront)
+);
+const asyncUpdateCloudfrontDistribution = promisify(
+  cloudfront.updateDistribution.bind(cloudfront)
+);
+const asyncGetCloudfrontDistributionConfig = promisify(
+  cloudfront.getDistributionConfig.bind(cloudfront)
 );
 // const asyncListDistributions = promisify(
 //   cloudfront.listDistributions.bind(cloudfront)
@@ -111,4 +117,6 @@ module.exports = {
   asyncHeadBucket,
   asyncGetRole,
   asyncGetFunction,
+  asyncUpdateCloudfrontDistribution,
+  asyncGetCloudfrontDistributionConfig,
 };
