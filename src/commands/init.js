@@ -1,4 +1,4 @@
-const uuid = require("uuid");
+const uuid = require('uuid');
 const {
   createBuckets,
   uploadToBucket,
@@ -8,18 +8,18 @@ const {
   createLambdaFunction,
   createLambdaPermission,
   createLambdaRole,
-} = require("../aws/lambda");
+} = require('../aws/lambda');
 const {
   createDirectory,
   exists,
   join,
   readConfig,
   writeConfig,
-} = require("../util/fileUtils");
-const { createCloudfrontDistribution } = require("../aws/cloudfront");
-const { zipit } = require("../util/zipit");
-const { build } = require("./build");
-const inquirer = require("inquirer");
+} = require('../util/fileUtils');
+const { createCloudfrontDistribution } = require('../aws/cloudfront');
+const { zipit } = require('../util/zipit');
+const { build } = require('./build');
+const inquirer = require('inquirer');
 
 const cwd = process.cwd();
 const functionName = 'copyToBucket';
@@ -53,17 +53,11 @@ const prompt = inquirer.createPromptModule();
 //   }, 10000); // It takes time for the IAM role to be replicated through all regions and become valid
 // };
 
-const start = async (directory) => {
-  await createDirectory(".jade", directory);
+const start = async directory => {
+  await createDirectory('.jade', directory);
   const bucketName = `jade-${uuid.v4()}`;
   await createBuckets(bucketName);
-<<<<<<< HEAD
-  await zipit(`${functionName}.js`, `${cwd}/src/aws/lambda/${functionName}.js`);
-  await uploadToBucket(functionFile, `${bucketName}-lambda`);
   const lambdaRoleResponse = await createLambdaRole('lambda-s3-role-2');
-=======
-  const lambdaRoleResponse = await createLambdaRole("lambda-s3-role-2");
->>>>>>> 4669113ab47c31f950d75b538a0aa29121a2848d
   setTimeout(async () => {
     const lambdaResponse = await createLambdaFunction(
       `${bucketName}-lambda`,
@@ -85,34 +79,34 @@ const start = async (directory) => {
 const init = async (args, directory) => {
   try {
     let config = {};
-    const jadePath = join(directory, ".jade");
+    const jadePath = join(directory, '.jade');
     if (!(await exists(jadePath))) {
-      await createDirectory(".jade", directory);
+      await createDirectory('.jade', directory);
     }
-    if (!(await exists(join(jadePath, "config.json")))) {
+    if (!(await exists(join(jadePath, 'config.json')))) {
       await writeConfig(directory, config);
     } else {
       config = await readConfig(directory);
     }
     const questions = [
       {
-        message: "What is your project name?\n",
-        name: "projectName",
-        default: config.projectName || "My Jade Project",
+        message: 'What is your project name?\n',
+        name: 'projectName',
+        default: config.projectName || 'My Jade Project',
       },
       {
-        type: "list",
+        type: 'list',
         message: "What's your favorite Git collaboration tool?\n",
-        name: "gitProvider",
-        choices: ["GitHub", "GitLab", "Bitbucket"],
-        default: config.gitProvider || "GitHub",
+        name: 'gitProvider',
+        choices: ['GitHub', 'GitLab', 'Bitbucket'],
+        default: config.gitProvider || 'GitHub',
       },
       {
-        type: "confirm",
-        message: (answers) => {
+        type: 'confirm',
+        message: answers => {
           return `Do you currently have a ${answers.gitProvider} repo?\n`;
         },
-        name: "gitExists",
+        name: 'gitExists',
         default: true,
       },
     ];
@@ -122,14 +116,14 @@ const init = async (args, directory) => {
     if (gitExists) {
       const gitQuestions = [
         {
-          name: "gitUrl",
+          name: 'gitUrl',
           message: `Please enter your ${answers.gitProvider} URL here:\n`,
           // validates: // to be validated
         },
       ];
       const gitAnswers = await prompt(gitQuestions);
       // console.log("exists", gitAnswers);
-      console.log("Thank you! The Jade framework will now be setup.");
+      console.log('Thank you! The Jade framework will now be setup.');
     } else {
       // const gitWalkthrough = await prompt();
       console.log("doesn't exist");
@@ -141,4 +135,4 @@ const init = async (args, directory) => {
 
 module.exports = { init };
 
-init("hello", process.cwd());
+init('hello', process.cwd());
