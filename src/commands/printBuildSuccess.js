@@ -1,6 +1,9 @@
-const { readJSONFile } = require("../util/fileUtils");
+const { getJadePath, readJSONFile } = require("../util/fileUtils");
+const { hostDirectory } = require("../constants/allConstants");
 
 async function printBuildSuccess() {
+  const jadePath = getJadePath(hostDirectory);
+
   const ec2Data = await readJSONFile("ec2Instance", jadePath);
   const publicIp = ec2Data.Instances[0].PublicIpAddress;
 
@@ -9,7 +12,7 @@ async function printBuildSuccess() {
     "To synchronize your Github commits with new builds, follow these instructions:"
   );
   console.log("1. Go to your Github repository");
-  console.log(`2. Click on settings and navigate to "Webhooks"`);
+  console.log(`2. Click on "Settings" and navigate to "Webhooks"`);
   console.log(`3. Click on "Add webhook"`);
   console.log(`4. Key in your password if required`);
   console.log(`5. Under "Payload URL", key in: http://${publicIp}/webhook`);

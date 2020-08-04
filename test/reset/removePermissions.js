@@ -8,6 +8,7 @@ const {
   ec2InstanceProfile,
   s3FullAccessPolicyArn,
 } = require("../../src/constants/allConstants");
+const { promisify } = require("util");
 
 const apiVersion = "latest";
 const region = getRegion();
@@ -15,7 +16,17 @@ const region = getRegion();
 const iam = new IAM({ apiVersion, region });
 const ec2 = new EC2({ apiVersion, region });
 
-module.exports = function () {
+const deleteSecurityGroup = async (securityGroupName) => {
+  const asyncDeleteSecurityGroup = promisify(ec2.deleteSecurityGroup.bind(ec2));
+  const [err, data] = await asyncDeleteSecurityGroup({
+    GroupName: securityGroupName,
+  });
+
+  console.log(err, data);
+};
+
+// TODO: add retries
+async function removePermissions() {
   iam.removeRoleFromInstanceProfile(
     { InstanceProfileName: ec2InstanceProfile, RoleName: ec2IamRoleName },
     (err, data) => {
@@ -48,8 +59,7 @@ module.exports = function () {
     console.log(data);
   });
 
-  ec2.deleteSecurityGroup({ GroupName: securityGroupName }, (err, data) => {
-    if (err) console.log(err);
-    console.log(data);
-  });
-};
+  deleteSecurityGroup(securityGroupName);
+}
+
+module.exports = { removePermissions };
