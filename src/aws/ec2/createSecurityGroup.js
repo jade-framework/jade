@@ -13,10 +13,10 @@ const {
 } = require("../../util/fileUtils");
 
 const {
-  hostDirectory,
+  cwd,
   securityGroup,
   securityGroupName,
-} = require("../../constants/allConstants");
+} = require("../../templates/constants");
 
 const getGithubIp = require("../../github/getGithubIp");
 
@@ -62,7 +62,7 @@ const setIngressSshRule = (policy) => {
 };
 
 const createSecurityGroup = async () => {
-  const jadePath = getJadePath(hostDirectory);
+  const jadePath = getJadePath(cwd);
   let ingressRules = { IpPermissions: [] };
 
   try {

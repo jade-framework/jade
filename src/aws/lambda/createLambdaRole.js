@@ -1,5 +1,5 @@
 const {
-  asyncCreateLambdaRole,
+  asyncCreateRole,
   asyncAttachRolePolicy,
 } = require("../awsAsyncFunctions");
 
@@ -35,7 +35,7 @@ const createLambdaRole = async (roleName) => {
   };
 
   try {
-    const createResponse = await asyncCreateLambdaRole(createParams);
+    const createResponse = await asyncCreateRole(createParams);
     console.log("Successfully created Lambda role.", createResponse);
 
     const attachResponse = await asyncAttachRolePolicy(lambdaPolicyParam1);

@@ -1,10 +1,10 @@
 const { createDirectory, writeConfig } = require("./fileUtils");
 const { getCallerIdentity } = require("../aws");
-const { hostDirectory } = require("../constants/allConstants");
+const { cwd } = require("../templates/constants");
 
 async function setup() {
   const userData = await getCallerIdentity();
-  await createDirectory(".jade", hostDirectory);
+  await createDirectory(".jade", cwd);
   await writeConfig(testDir, { userData });
 }
 

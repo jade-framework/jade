@@ -8,11 +8,11 @@ const {
   chmod,
 } = require("../../util/fileUtils");
 const {
-  hostDirectory,
+  cwd,
   privateKeyFilename,
   keyPair,
   jadeKeyPair,
-} = require("../../constants/allConstants");
+} = require("../../templates/constants");
 
 // default data
 const keyPairParams = {
@@ -20,7 +20,7 @@ const keyPairParams = {
 };
 
 const createKeyPair = async () => {
-  const jadePath = getJadePath(hostDirectory);
+  const jadePath = getJadePath(cwd);
   const privateKeyPath = join(jadePath, privateKeyFilename);
   try {
     if (!(await exists(join(jadePath, `${keyPair}.json`)))) {

@@ -1,4 +1,4 @@
-const hostDirectory = process.cwd();
+const cwd = process.cwd();
 
 const instanceType = "t2.micro";
 const keyPair = "keyPair";
@@ -14,10 +14,11 @@ const awsLambdaExecutePolicyArn = "arn:aws:iam::aws:policy/AWSLambdaExecute";
 const awsLambdaRolePolicyArn =
   "arn:aws:iam::aws:policy/service-role/AWSLambdaRole";
 const lambdaFunctionName = "copyToBucket";
+const jadePrefix = "\x1b[32;1m💎\x1b[32;0m";
 
 module.exports = {
   instanceType,
-  hostDirectory,
+  cwd,
   jadeKeyPair,
   keyPair,
   privateKeyFilename,
@@ -30,4 +31,5 @@ module.exports = {
   awsLambdaExecutePolicyArn,
   awsLambdaRolePolicyArn,
   lambdaFunctionName,
+  jadePrefix,
 };

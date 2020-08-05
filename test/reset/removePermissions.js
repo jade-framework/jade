@@ -7,7 +7,7 @@ const {
   ec2IamRoleName,
   ec2InstanceProfile,
   s3FullAccessPolicyArn,
-} = require("../../src/constants/allConstants");
+} = require("../../src/templates/constants");
 const { promisify } = require("util");
 
 const apiVersion = "latest";
