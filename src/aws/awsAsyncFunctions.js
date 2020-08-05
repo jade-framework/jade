@@ -1,14 +1,14 @@
-const { promisify } = require("util");
-const S3 = require("aws-sdk/clients/s3");
-const CloudFront = require("aws-sdk/clients/cloudfront");
-const AWS = require("aws-sdk/global");
-const Lambda = require("aws-sdk/clients/lambda");
-const awsIAM = require("aws-sdk/clients/iam");
-const EC2 = require("aws-sdk/clients/ec2");
-const { getRegion } = require("../util/getRegion");
+const { promisify } = require('util');
+const S3 = require('aws-sdk/clients/s3');
+const CloudFront = require('aws-sdk/clients/cloudfront');
+const AWS = require('aws-sdk/global');
+const Lambda = require('aws-sdk/clients/lambda');
+const awsIAM = require('aws-sdk/clients/iam');
+const EC2 = require('aws-sdk/clients/ec2');
+const { getRegion } = require('../util/getRegion');
 
 const region = getRegion();
-const apiVersion = "latest";
+const apiVersion = 'latest';
 
 AWS.config.update({ apiVersion, region });
 
@@ -22,6 +22,16 @@ const ec2 = new EC2();
 const asyncCreateCloudfrontDistribution = promisify(
   cloudfront.createDistribution.bind(cloudfront)
 );
+const asyncUpdateCloudfrontDistribution = promisify(
+  cloudfront.updateDistribution.bind(cloudfront)
+);
+const asyncGetCloudfrontDistributionConfig = promisify(
+  cloudfront.getDistributionConfig.bind(cloudfront)
+);
+const asyncCreateCloudfrontInvalidation = promisify(
+  cloudfront.createInvalidation.bind(cloudfront)
+);
+
 // const asyncListDistributions = promisify(
 //   cloudfront.listDistributions.bind(cloudfront)
 // );
@@ -110,4 +120,7 @@ module.exports = {
   asyncHeadBucket,
   asyncGetRole,
   asyncGetFunction,
+  asyncUpdateCloudfrontDistribution,
+  asyncGetCloudfrontDistributionConfig,
+  asyncCreateCloudfrontInvalidation,
 };

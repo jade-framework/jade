@@ -1,9 +1,9 @@
-const uuid = require("uuid");
+const uuid = require('uuid');
 const {
   createBuckets,
   uploadToBucket,
   setBucketNotificationConfig,
-} = require("../aws/s3");
+} = require('../aws/s3');
 const {
   createLambdaFunction,
   createLambdaPermission,
@@ -25,7 +25,7 @@ const { build } = require("./build");
 const { prompt } = require("./prompt");
 
 const cwd = process.cwd();
-const functionName = "copyToBucket";
+const functionName = 'copyToBucket';
 const functionFile = `${functionName}.js.zip`;
 const functionHandler = `${functionName}.handler`;
 const functionDescription = `Copy a file from src to dest buckets.`;
@@ -55,7 +55,6 @@ const gitRepos = ["GitHub", "GitLab", "Bitbucket"];
 //     await build(bucketName);
 //   }, 10000); // It takes time for the IAM role to be replicated through all regions and become valid
 // };
-
 /* start function
 - initialize .jade folder
 - store bucketName in config file
@@ -84,7 +83,15 @@ const initJadeLambdas = async (bucketName) => {
         lambdaRoleResponse.Role.Arn
       );
       const lambdaArn = lambdaResponse.FunctionArn;
-      await createLambdaPermission(process.env.sourceAccount, lambdaArn);
+      const sourceAccount = process.env.sourceAccount;
+      const lambdaPermissionParams = {
+        Action: "lambda:InvokeFunction",
+        FunctionName: lambdaArn,
+        Principal: "s3.amazonaws.com",
+        SourceAccount: sourceAccount,
+        StatementId: `example-S3-permission`,
+      };
+      await createLambdaPermission(lambdaPermissionParams);
       resolve(lambdaArn);
     }, 10000)
   ); // It takes time for the IAM role to be replicated through all regions and become valid
@@ -142,15 +149,16 @@ const gitQuestions = async (initialAns) => {
 const init = async (directory) => {
   try {
     let config = {};
-    const jadePath = join(directory, ".jade");
+    const jadePath = join(directory, '.jade');
     if (!(await exists(jadePath))) {
-      await createDirectory(".jade", directory);
+      await createDirectory('.jade', directory);
     }
-    if (!(await exists(join(jadePath, "config.json")))) {
+    if (!(await exists(join(jadePath, 'config.json')))) {
       await writeConfig(directory, config);
     } else {
       config = await readConfig(directory);
     }
+
     const initialAns = await initialQuestions(config);
 
     if (initialAns.gitExists) {

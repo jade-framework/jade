@@ -11,12 +11,12 @@ exports.handler = async (event, context, callback) => {
   // Read options from the event parameter.
   console.log(
     'Reading options from event:\n',
-    util.inspect(event, { depth: 5 })
+    util.inspect(event, { depth: 5 }),
   );
   const srcBucket = event.Records[0].s3.bucket.name;
   // Object key may have spaces or unicode non-ASCII characters.
   const srcKey = decodeURIComponent(
-    event.Records[0].s3.object.key.replace(/\+/g, ' ')
+    event.Records[0].s3.object.key.replace(/\+/g, ' '),
   );
   const dstBucket = srcBucket + '-copy';
   const dstKey = 'copy-' + srcKey;
@@ -56,6 +56,6 @@ exports.handler = async (event, context, callback) => {
       ' and uploaded to ' +
       dstBucket +
       '/' +
-      dstKey
+      dstKey,
   );
 };
