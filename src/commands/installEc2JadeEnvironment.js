@@ -95,9 +95,8 @@ const sendSetupFiles = async (host, maxRetries = 10, attempts = 0) => {
 };
 
 async function installEc2JadeEnvironment() {
-  const privateKey = await readFile(join(jadePath, privateKeyFilename));
-
   try {
+    const privateKey = await readFile(join(jadePath, privateKeyFilename));
     jadeLog("Reading EC2 data...");
     const ec2Data = await readJSONFile("ec2Instance", jadePath);
     const publicIp = ec2Data.Instances[0].PublicIpAddress;
