@@ -5,6 +5,8 @@ const AWS = require("aws-sdk/global");
 const Lambda = require("aws-sdk/clients/lambda");
 const awsIAM = require("aws-sdk/clients/iam");
 const EC2 = require("aws-sdk/clients/ec2");
+const ApiGateway = require("aws-sdk/clients/apigateway");
+const STS = require("aws-sdk/clients/sts");
 const { getRegion } = require("../util/getRegion");
 
 const region = getRegion();
@@ -17,6 +19,8 @@ const cloudfront = new CloudFront();
 const lambda = new Lambda();
 const iam = new awsIAM();
 const ec2 = new EC2();
+const apigateway = new ApiGateway({ apiVersion: "2015-07-09" });
+const sts = new STS({ apiVersion: "2011-06-15" });
 
 // CLOUDFRONT
 const asyncCreateCloudfrontDistribution = promisify(
@@ -78,6 +82,20 @@ const asyncAssociateIamInstanceProfile = promisify(
 const asyncWaitFor = promisify(ec2.waitFor.bind(ec2));
 const asyncDescribeImages = promisify(ec2.describeImages.bind(ec2));
 
+// ApiGateway
+const asyncCreateRestApi = promisify(apigateway.createRestApi.bind(apigateway));
+const asyncGetResources = promisify(apigateway.getResources.bind(apigateway));
+const asyncPutMethod = promisify(apigateway.putMethod.bind(apigateway));
+const asyncPutIntegration = promisify(
+  apigateway.putIntegration.bind(apigateway)
+);
+const asyncCreateResource = promisify(
+  apigateway.createResource.bind(apigateway)
+);
+
+// STS
+const asyncGetCallerIdentity = promisify(sts.getCallerIdentity.bind(sts));
+
 module.exports = {
   // asyncGetDistribution,
   // asyncListDistributions,
@@ -110,4 +128,10 @@ module.exports = {
   asyncHeadBucket,
   asyncGetRole,
   asyncGetFunction,
+  asyncCreateRestApi,
+  asyncCreateResource,
+  asyncGetResources,
+  asyncGetCallerIdentity,
+  asyncPutMethod,
+  asyncPutIntegration,
 };
