@@ -20,21 +20,21 @@ const ec2 = new EC2();
 
 // CLOUDFRONT
 const asyncCreateCloudfrontDistribution = promisify(
-  cloudfront.createDistribution.bind(cloudfront)
+  cloudfront.createDistribution.bind(cloudfront),
 );
 const asyncUpdateCloudfrontDistribution = promisify(
-  cloudfront.updateDistribution.bind(cloudfront)
+  cloudfront.updateDistribution.bind(cloudfront),
 );
 const asyncGetCloudfrontDistributionConfig = promisify(
-  cloudfront.getDistributionConfig.bind(cloudfront)
+  cloudfront.getDistributionConfig.bind(cloudfront),
 );
 const asyncCreateCloudfrontInvalidation = promisify(
-  cloudfront.createInvalidation.bind(cloudfront)
+  cloudfront.createInvalidation.bind(cloudfront),
 );
 
-// const asyncListDistributions = promisify(
-//   cloudfront.listDistributions.bind(cloudfront)
-// );
+const asyncListDistributions = promisify(
+  cloudfront.listDistributions.bind(cloudfront),
+);
 // const asyncDeleteDistribution = promisify(
 //   cloudfront.deleteDistribution.bind(cloudfront)
 // );
@@ -51,7 +51,7 @@ const asyncDeleteS3Bucket = promisify(s3.deleteBucket.bind(s3));
 const asyncPutBucketPolicy = promisify(s3.putBucketPolicy.bind(s3));
 const asyncUploadToBucket = promisify(s3.putObject.bind(s3));
 const asyncPutBucketNotificationConfiguration = promisify(
-  s3.putBucketNotificationConfiguration.bind(s3)
+  s3.putBucketNotificationConfiguration.bind(s3),
 );
 const asyncHeadBucket = promisify(s3.headBucket.bind(s3));
 
@@ -66,7 +66,7 @@ const asyncAttachRolePolicy = promisify(iam.attachRolePolicy.bind(iam));
 const asyncCreateRole = promisify(iam.createRole.bind(iam));
 const asyncDeleteRole = promisify(iam.deleteRole.bind(iam));
 const asyncCreateInstanceProfile = promisify(
-  iam.createInstanceProfile.bind(iam)
+  iam.createInstanceProfile.bind(iam),
 );
 const asyncAddRoleToProfile = promisify(iam.addRoleToInstanceProfile.bind(iam));
 const asyncGetRole = promisify(iam.getRole.bind(iam));
@@ -74,23 +74,23 @@ const asyncGetRole = promisify(iam.getRole.bind(iam));
 // EC2
 const asyncCreateSecurityGroup = promisify(ec2.createSecurityGroup.bind(ec2));
 const asyncDescribeSecurityGroups = promisify(
-  ec2.describeSecurityGroups.bind(ec2)
+  ec2.describeSecurityGroups.bind(ec2),
 );
 const asyncAuthorizeSecurityGroupIngress = promisify(
-  ec2.authorizeSecurityGroupIngress.bind(ec2)
+  ec2.authorizeSecurityGroupIngress.bind(ec2),
 );
 const asyncCreateKeyPair = promisify(ec2.createKeyPair.bind(ec2));
 const asyncDescribeInstances = promisify(ec2.describeInstances.bind(ec2));
 const asyncRunInstances = promisify(ec2.runInstances.bind(ec2));
 const asyncAssociateIamInstanceProfile = promisify(
-  ec2.associateIamInstanceProfile.bind(ec2)
+  ec2.associateIamInstanceProfile.bind(ec2),
 );
 const asyncWaitFor = promisify(ec2.waitFor.bind(ec2));
 const asyncDescribeImages = promisify(ec2.describeImages.bind(ec2));
 
 module.exports = {
   // asyncGetDistribution,
-  // asyncListDistributions,
+  asyncListDistributions,
   // asyncDeleteDistribution,
   asyncListBuckets,
   asyncListBucketObjects,

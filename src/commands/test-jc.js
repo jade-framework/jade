@@ -31,12 +31,9 @@ const functionDescription = `Invalidate file in Cloudfront.`;
 //   updateBucketPolicy(`${bucketName}`);
 // };
 // createBuckets(`test-${uuid.v4()}`);
-// createCloudfrontDistribution(
-//   'test-0a9394f7-6e3c-4442-84f5-1fb91f81c18d',
-//   '/2020-08-04-v1'
-// );
-updateCloudfrontDistribution('EL5J0YDK2X0IH');
+// updateCloudfrontDistribution('EL5J0YDK2X0IH');
 const init = async () => {
+  createCloudfrontDistribution('test-398e95ce-925e-4c10-99c3-7d94b837498b');
   // const bucketName = `test-${uuid.v4()}`;
   // await createBuckets(bucketName);
   // await createCloudfrontDistribution(bucketName);

@@ -1,6 +1,5 @@
 /**
  * An AWS Lambda function that invalidates a file in a Cloudfront distribution
- * @TODO: NEED DISTRIBUTION ID
  */
 const util = require('util');
 const { promisify } = require('util');
@@ -10,6 +9,23 @@ const cloudfront = new Cloudfront();
 const asyncCreateCloudfrontInvalidation = promisify(
   cloudfront.createInvalidation.bind(cloudfront),
 );
+const asyncListDistributions = promisify(
+  cloudfront.listDistributions.bind(cloudfront),
+);
+
+const getCloudfrontDistributionId = async (bucketName) => {
+  let id;
+  try {
+    const list = await asyncListDistributions();
+    const targetDistribution = list.DistributionList.Items.find(
+      (el) => el.DefaultCacheBehavior.TargetOriginId === `S3-${bucketName}`,
+    );
+    id = targetDistribution.Id;
+  } catch (error) {
+    console.log(error);
+  }
+  return id;
+};
 
 exports.handler = async (event, context, callback) => {
   // Read options from the event parameter.
@@ -18,8 +34,13 @@ exports.handler = async (event, context, callback) => {
     util.inspect(event, { depth: 5 }),
   );
 
+  const distId = await getCloudfrontDistributionId(
+    event.Records[0].s3.bucket.name,
+  );
+  console.log('distId', distId);
+
   const params = {
-    DistributionId: 'EL5J0YDK2X0IH',
+    DistributionId: distId,
     InvalidationBatch: {
       CallerReference: Date.now().toString(),
       Paths: {
