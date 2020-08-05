@@ -3,9 +3,13 @@
  * @TODO: NEED DISTRIBUTION ID
  */
 const util = require('util');
+const { promisify } = require('util');
 const Cloudfront = require('aws-sdk/clients/cloudfront');
 
 const cloudfront = new Cloudfront();
+const asyncCreateCloudfrontInvalidation = promisify(
+  cloudfront.createInvalidation.bind(cloudfront),
+);
 
 exports.handler = async (event, context, callback) => {
   // Read options from the event parameter.
@@ -25,8 +29,10 @@ exports.handler = async (event, context, callback) => {
     },
   };
 
-  cloudfront.createInvalidation(params, function (err, data) {
-    if (err) console.log(err, err.stack);
-    else console.log(data);
-  });
+  try {
+    const invalidateResponse = await asyncCreateCloudfrontInvalidation(params);
+    console.log(invalidateResponse);
+  } catch (error) {
+    console.log(error);
+  }
 };
