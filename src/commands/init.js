@@ -23,12 +23,9 @@ const { zipit } = require('../util/zipit');
 const { jadeLog, jadeErr } = require('../util/logger');
 const { build } = require('./build');
 const { prompt } = require('./prompt');
+const { jadeLambdaName } = require('../templates/constants');
 
 const cwd = process.cwd();
-const functionName = 'copyToBucket';
-const functionFile = `${functionName}.js.zip`;
-const functionHandler = `${functionName}.handler`;
-const functionDescription = `Copy a file from src to dest buckets.`;
 const gitRepos = ['GitHub', 'GitLab', 'Bitbucket'];
 
 // const init = async () => {
@@ -69,6 +66,11 @@ const gitRepos = ['GitHub', 'GitLab', 'Bitbucket'];
 */
 
 const initJadeLambdas = async (bucketName) => {
+  const functionName = jadeLambdaName;
+  const functionFile = `${functionName}.js.zip`;
+  const functionHandler = `${functionName}.handler`;
+  const functionDescription = `Invalidate index.html in Cloudfront on upload to S3.`;
+
   await zipit(`${functionName}.js`, `${cwd}/src/aws/lambda/${functionName}.js`);
   await uploadToBucket(functionFile, `${bucketName}-lambda`);
   const lambdaRoleResponse = await createLambdaRole('lambda-s3-role-2');
@@ -135,14 +137,14 @@ const initialQuestions = async (config) => {
 };
 
 const gitQuestions = async (initialAns) => {
-  const gitQuestions = [
+  const questions = [
     {
       name: 'gitUrl',
       message: `Please enter your ${initialAns.gitProvider} URL here:\n`,
       // validates: // to be validated
     },
   ];
-  const answers = await prompt(gitQuestions);
+  const answers = await prompt(questions);
   return answers;
 };
 
