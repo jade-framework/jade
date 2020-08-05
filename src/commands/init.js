@@ -84,7 +84,15 @@ const initJadeLambdas = async (bucketName) => {
         lambdaRoleResponse.Role.Arn
       );
       const lambdaArn = lambdaResponse.FunctionArn;
-      await createLambdaPermission(process.env.sourceAccount, lambdaArn);
+      const sourceAccount = process.env.sourceAccount;
+      const lambdaPermissionParams = {
+        Action: "lambda:InvokeFunction",
+        FunctionName: lambdaArn,
+        Principal: "s3.amazonaws.com",
+        SourceAccount: sourceAccount,
+        StatementId: `example-S3-permission`,
+      };
+      await createLambdaPermission(lambdaPermissionParams);
       resolve(lambdaArn);
     }, 10000)
   ); // It takes time for the IAM role to be replicated through all regions and become valid
