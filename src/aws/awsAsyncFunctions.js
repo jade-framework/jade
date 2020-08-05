@@ -29,6 +29,10 @@ const asyncUpdateCloudfrontDistribution = promisify(
 const asyncGetCloudfrontDistributionConfig = promisify(
   cloudfront.getDistributionConfig.bind(cloudfront)
 );
+const asyncCreateCloudfrontInvalidation = promisify(
+  cloudfront.createInvalidation.bind(cloudfront)
+);
+
 // const asyncListDistributions = promisify(
 //   cloudfront.listDistributions.bind(cloudfront)
 // );
@@ -119,4 +123,5 @@ module.exports = {
   asyncGetFunction,
   asyncUpdateCloudfrontDistribution,
   asyncGetCloudfrontDistributionConfig,
+  asyncCreateCloudfrontInvalidation,
 };
