@@ -8,9 +8,9 @@ const {
 const {
   ec2IamRoleName,
   ec2InstanceProfile,
-  hostDirectory,
+  cwd,
   s3FullAccessPolicyArn,
-} = require("../../constants/allConstants");
+} = require("../../templates/constants");
 
 const {
   join,
@@ -19,12 +19,14 @@ const {
   readJSONFile,
 } = require("../../util/fileUtils");
 
+const path = require("path");
+
 async function configEc2IamRole() {
-  const jadePath = getJadePath(hostDirectory);
+  const jadePath = getJadePath(cwd);
   try {
     const rolePolicy = await readJSONFile(
       "ec2IamConfig",
-      join(process.cwd(), "src", "constants") // hardcoded
+      join(path.resolve(path.dirname(".")), "src", "templates") // hardcoded
     );
 
     console.log("Creating new role...");

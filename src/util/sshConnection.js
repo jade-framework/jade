@@ -63,20 +63,34 @@ const promisifyConnection = (conn) => {
   conn.asyncSftp = (remotePath, ...localPaths) => {
     return new Promise((resolve, reject) => {
       console.log("SFTP beginning...");
-      conn.sftp((err, sftp) => {
+      conn.sftp(async (err, sftp) => {
+        console.log(sftp);
         if (err) {
           console.log(err);
           reject(err);
         } else {
-          const dirExists = sftp.readdir(dirname(remotePath), {}, () => {});
+          console.log(remotePath);
+          let dirExists;
+          sftp.readdir(remotePath, {}, (err, files) => {
+            console.log("err", err, files);
+            if (err) {
+              dirExists = false;
+            } else {
+              dirExists = true;
+            }
+          });
+          console.log(dirExists);
           if (!dirExists) {
-            sftp.mkdir(dirname(remotePath));
+            console.log("Creating directory...");
+            sftp.mkdir(remotePath);
           }
           let promises = localPaths.map((path) => {
+            console.log(`Adding ${path}`);
             return sftp.fastPut(path, remotePath, {}, (err) => {
               if (err) console.log(err);
             });
           });
+          console.log(promises);
           Promise.allSettled(promises).then((res) => {
             conn.end();
             console.log("SFTP ended.");

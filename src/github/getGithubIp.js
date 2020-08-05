@@ -1,7 +1,7 @@
 const https = require("https");
 const { promisify } = require("util");
 const { createJSONFile, getJadePath } = require("../util/fileUtils");
-const { hostDirectory } = require("../constants/allConstants");
+const { cwd } = require("../templates/constants");
 
 // module.exports =
 function getGithubIp(callback) {

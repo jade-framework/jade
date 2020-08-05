@@ -6,7 +6,7 @@ const {
   awsLambdaRolePolicyArn,
   lambdaIamRoleName,
   lambdaFunctionName,
-} = require("../constants/allConstants");
+} = require("../templates/constants");
 
 const cleanup = async (bucketName) => {
   deleteAllBuckets();

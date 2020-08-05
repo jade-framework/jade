@@ -6,7 +6,7 @@ const {
   createJSONFile,
 } = require("../../util/fileUtils");
 
-const { hostDirectory } = require("../../constants/allConstants");
+const { cwd } = require("../../templates/constants");
 
 const getInstanceData = async (instanceId) => {
   const describeInstancesResponse = await asyncDescribeInstances({
@@ -17,7 +17,7 @@ const getInstanceData = async (instanceId) => {
 };
 
 async function setInstanceIp() {
-  const path = getJadePath(hostDirectory);
+  const path = getJadePath(cwd);
   try {
     console.log("Fetching EC2 instance public IP...");
     const ec2Data = await readJSONFile("ec2Instance", path);

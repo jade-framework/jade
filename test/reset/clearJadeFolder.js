@@ -1,9 +1,9 @@
 const fs = require("fs");
 const path = require("path");
 const { getJadePath } = require("../../src/util/fileUtils");
-const { hostDirectory } = require("../../src/constants/allConstants");
+const { cwd } = require("../../src/templates/constants");
 
-const jadePath = getJadePath(hostDirectory);
+const jadePath = getJadePath(cwd);
 
 async function clearJadeFolder() {
   fs.readdir(jadePath, (err, files) => {
