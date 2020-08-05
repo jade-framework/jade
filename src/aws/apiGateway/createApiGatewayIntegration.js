@@ -1,4 +1,3 @@
-const { readConfig } = require("../../util/fileUtils");
 const { getRegion } = require("../../util/getRegion");
 const { createLambdaPermission } = require("../lambda/createLambdaPermission");
 
@@ -7,7 +6,6 @@ const {
   asyncPutIntegration,
   asyncGetCallerIdentity,
 } = require("../awsAsyncFunctions");
-const { createLambdaPermission } = require("../lambda");
 
 const createApiGatewayIntegration = async (params) => {
   const {
