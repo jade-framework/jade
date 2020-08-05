@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 
-const os = require("os");
+// const os = require('os');
 
 // const handleArgs = require('../src/util/handleArgs');
 // const { bamError } = require('../src/util/logger');
 // const catchSetupAndConfig = require('../src/util/catchSetupAndConfig');
 // const bamSpinner = require('../src/util/spinner');
-const { executeCommand } = require("../src/commands/executeCommand");
+const { executeCommand } = require('../src/commands/executeCommand');
 
 const [, , command, ...args] = process.argv;
-const homedir = os.homedir();
+// const homedir = os.homedir();
+const cwd = process.cwd();
 
 // (async () => {
 //   try {
@@ -25,10 +26,11 @@ const homedir = os.homedir();
 //     bamError(err);
 //   }
 // })();
+console.log('Hi');
 
 (async () => {
   try {
-    await executeCommand(command, args, homedir);
+    await executeCommand(command, args, cwd);
   } catch (err) {
     console.log(err);
   }
