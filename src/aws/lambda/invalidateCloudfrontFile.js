@@ -2,11 +2,10 @@
  * An AWS Lambda function that invalidates a file in a Cloudfront distribution
  * @TODO: NEED DISTRIBUTION ID
  */
-const S3 = require('aws-sdk/clients/s3');
 const util = require('util');
+const Cloudfront = require('aws-sdk/clients/cloudfront');
 
-// get reference to S3 client
-const s3 = new S3();
+const cloudfront = new Cloudfront();
 
 exports.handler = async (event, context, callback) => {
   // Read options from the event parameter.
@@ -14,14 +13,9 @@ exports.handler = async (event, context, callback) => {
     'Reading options from event:\n',
     util.inspect(event, { depth: 5 }),
   );
-  const srcBucket = event.Records[0].s3.bucket.name;
-  // Object key may have spaces or unicode non-ASCII characters.
-  const srcKey = decodeURIComponent(
-    event.Records[0].s3.object.key.replace(/\+/g, ' '),
-  );
 
-  const invalidateParams = {
-    DistributionId: 'E1K4R3R9VUVT11',
+  const params = {
+    DistributionId: 'EL5J0YDK2X0IH',
     InvalidationBatch: {
       CallerReference: Date.now().toString(),
       Paths: {
@@ -31,12 +25,8 @@ exports.handler = async (event, context, callback) => {
     },
   };
 
-  try {
-    const invalidateResponse = await asyncCreateCloudfrontInvalidation(
-      invalidateParams,
-    );
-    console.log(invalidateResponse);
-  } catch (error) {
-    console.log(error);
-  }
+  cloudfront.createInvalidation(params, function (err, data) {
+    if (err) console.log(err, err.stack);
+    else console.log(data);
+  });
 };

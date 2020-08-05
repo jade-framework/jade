@@ -1,4 +1,3 @@
-const uuid = require('uuid');
 const {
   asyncUpdateCloudfrontDistribution,
   asyncGetCloudfrontDistributionConfig,
@@ -6,13 +5,13 @@ const {
 } = require('../awsAsyncFunctions');
 
 const updateCloudfrontDistribution = async (distId, dirName) => {
-  const config = await asyncGetCloudfrontDistributionConfig({ Id: distId });
-  config.DistributionConfig.Origins.Items[0].OriginPath = `/${dirName}`;
-  const params = {
-    DistributionConfig: config.DistributionConfig,
-    Id: distId,
-    IfMatch: config.ETag,
-  };
+  // const config = await asyncGetCloudfrontDistributionConfig({ Id: distId });
+  // config.DistributionConfig.Origins.Items[0].OriginPath = `/${dirName}`;
+  // const params = {
+  //   DistributionConfig: config.DistributionConfig,
+  //   Id: distId,
+  //   IfMatch: config.ETag,
+  // };
   const invalidateParams = {
     DistributionId: distId,
     InvalidationBatch: {
@@ -24,10 +23,10 @@ const updateCloudfrontDistribution = async (distId, dirName) => {
     },
   };
   try {
-    const updateResponse = await asyncUpdateCloudfrontDistribution(params);
-    console.log(updateResponse);
+    // const updateResponse = await asyncUpdateCloudfrontDistribution(params);
+    // console.log(updateResponse);
     const invalidateResponse = await asyncCreateCloudfrontInvalidation(
-      invalidateParams
+      invalidateParams,
     );
     console.log(invalidateResponse);
   } catch (error) {

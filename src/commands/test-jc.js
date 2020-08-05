@@ -35,26 +35,26 @@ const functionDescription = `Invalidate file in Cloudfront.`;
 //   'test-0a9394f7-6e3c-4442-84f5-1fb91f81c18d',
 //   '/2020-08-04-v1'
 // );
-// updateCloudfrontDistribution('E1K4R3R9VUVT11', '2020-08-04-v3');
+updateCloudfrontDistribution('EL5J0YDK2X0IH');
 const init = async () => {
-  const bucketName = `test-${uuid.v4()}`;
-  await createBuckets(bucketName);
-  await createCloudfrontDistribution(bucketName);
-  await zipit(`${functionName}.js`, `${cwd}/src/aws/lambda/${functionName}.js`);
-  await uploadToBucket(functionFile, `${bucketName}-lambda`);
-  const lambdaRoleResponse = await createLambdaRole('lambda-s3-role-2');
-  setTimeout(async () => {
-    const lambdaResponse = await createLambdaFunction(
-      `${bucketName}-lambda`,
-      functionFile,
-      functionName,
-      functionHandler,
-      functionDescription,
-      lambdaRoleResponse.Role.Arn
-    );
-    const lambdaArn = lambdaResponse.FunctionArn;
-    await createLambdaPermission(process.env.sourceAccount, lambdaArn);
-    await setBucketNotificationConfig(bucketName, lambdaArn);
-  }, 10000);
+  // const bucketName = `test-${uuid.v4()}`;
+  // await createBuckets(bucketName);
+  // await createCloudfrontDistribution(bucketName);
+  // await zipit(`${functionName}.js`, `${cwd}/src/aws/lambda/${functionName}.js`);
+  // await uploadToBucket(functionFile, `${bucketName}-lambda`);
+  // const lambdaRoleResponse = await createLambdaRole('lambda-s3-role-2');
+  // setTimeout(async () => {
+  //   const lambdaResponse = await createLambdaFunction(
+  //     `${bucketName}-lambda`,
+  //     functionFile,
+  //     functionName,
+  //     functionHandler,
+  //     functionDescription,
+  //     lambdaRoleResponse.Role.Arn
+  //   );
+  //   const lambdaArn = lambdaResponse.FunctionArn;
+  //   await createLambdaPermission(process.env.sourceAccount, lambdaArn);
+  //   await setBucketNotificationConfig(bucketName, lambdaArn);
+  // }, 10000);
 };
 init();
