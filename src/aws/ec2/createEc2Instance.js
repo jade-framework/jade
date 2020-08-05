@@ -11,11 +11,11 @@ const {
 } = require("../../util/fileUtils");
 
 const {
-  hostDirectory,
+  cwd,
   instanceType,
   securityGroup,
   keyPair,
-} = require("../../constants/allConstants");
+} = require("../../templates/constants");
 
 const { getAmi } = require("./getAmi");
 
@@ -37,7 +37,7 @@ const runInstancesParams = {
 };
 
 const createEc2Instance = async () => {
-  const jadePath = getJadePath(hostDirectory);
+  const jadePath = getJadePath(cwd);
   try {
     const securityGroupData = await readJSONFile(securityGroup, jadePath);
     const keyPairData = await readJSONFile(keyPair, jadePath);

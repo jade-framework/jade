@@ -7,17 +7,16 @@ const awsIAM = require('aws-sdk/clients/iam');
 const EC2 = require('aws-sdk/clients/ec2');
 const { getRegion } = require('../util/getRegion');
 
-// TODO: refactor to { apiVersion, region }
 const region = getRegion();
 const apiVersion = 'latest';
 
-AWS.config.update({ region: 'us-east-1' });
+AWS.config.update({ apiVersion, region });
 
-const s3 = new S3({ apiVersion: '2006-03-01' });
-const cloudfront = new CloudFront({ apiVersion: '2019-03-26' });
+const s3 = new S3();
+const cloudfront = new CloudFront();
 const lambda = new Lambda();
-const iam = new awsIAM({ apiVersion: '2010-05-08', region });
-const ec2 = new EC2({ apiVersion, region });
+const iam = new awsIAM();
+const ec2 = new EC2();
 
 // CLOUDFRONT
 const asyncCreateCloudfrontDistribution = promisify(
@@ -63,9 +62,9 @@ const asyncDeleteLambdaFunction = promisify(lambda.deleteFunction.bind(lambda));
 const asyncGetFunction = promisify(lambda.getFunction.bind(lambda));
 
 // IAM
-const asyncCreateLambdaRole = promisify(iam.createRole.bind(iam));
 const asyncAttachRolePolicy = promisify(iam.attachRolePolicy.bind(iam));
 const asyncCreateRole = promisify(iam.createRole.bind(iam));
+const asyncDeleteRole = promisify(iam.deleteRole.bind(iam));
 const asyncCreateInstanceProfile = promisify(
   iam.createInstanceProfile.bind(iam)
 );
@@ -104,9 +103,9 @@ module.exports = {
   asyncCreateCloudfrontDistribution,
   asyncAddPermission,
   asyncCreateLambdaFunction,
-  asyncCreateLambdaRole,
   asyncAttachRolePolicy,
   asyncCreateRole,
+  asyncDeleteRole,
   asyncCreateInstanceProfile,
   asyncAddRoleToProfile,
   asyncCreateSecurityGroup,

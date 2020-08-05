@@ -1,4 +1,5 @@
 const errorEmoji = "⚠️";
+const { jadePrefix } = require("../templates/constants");
 
 const jadeErr = (text) => {
   console.log(errorEmoji.concat(` ${text}`));
@@ -11,7 +12,12 @@ const jadeWarn = (text) => {
   console.log(`${escape}${yellow}${text}${reset}`);
 };
 
+const jadeLog = (text) => {
+  console.log(`${jadePrefix} ${text}`);
+};
+
 module.exports = {
   jadeErr,
   jadeWarn,
+  jadeLog,
 };

@@ -5,16 +5,15 @@ const {
   readFile,
   sleep,
   createJSONFile,
+  readConfig,
 } = require("../util/fileUtils");
-const {
-  hostDirectory,
-  privateKeyFilename,
-} = require("../constants/allConstants");
+const { cwd, privateKeyFilename } = require("../templates/constants");
 const { getConnection } = require("../util/sshConnection");
+const { jadeLog, jadeErr } = require("../util/logger");
 
-const jadePath = getJadePath(hostDirectory);
+const jadePath = getJadePath(cwd);
 const remoteDir = "/home/ec2-user/server";
-const localDir = join(hostDirectory, "src", "server");
+const localDir = join(cwd, "src", "server");
 
 // TODO: divide these into "installation" and "runtime" commands
 const linuxCommands = [
@@ -28,10 +27,9 @@ const nodeCommands = [
   "npm install -g yarn",
 ];
 
-const gitCommands = [
-  "sudo yum install git -y",
-  "git clone https://github.com/jade-framework/gatsby-blog",
-];
+const gitCommands = (gitUrl) => {
+  return ["sudo yum install git -y", `git clone ${gitUrl}`];
+};
 
 const buildCommands = ["cd gatsby-blog", "yarn install", "yarn build"];
 
@@ -43,12 +41,13 @@ const webhookCommands = [
 ];
 
 const deployCommands = (bucketName) => {
-  return [`aws s3 sync public s3://${bucketName}`];
+  return [`aws s3 sync public s3://${bucketName}/${new Date().getTime()}`];
 };
 
 const sendSetupCommands = async (
   host,
   bucketName,
+  gitUrl,
   maxRetries = 10,
   attempts = 0
 ) => {
@@ -59,18 +58,19 @@ const sendSetupCommands = async (
         [
           ...linuxCommands,
           ...nodeCommands,
-          ...gitCommands,
+          ...gitCommands(gitUrl),
           ...buildCommands,
           ...webhookCommands,
           ...deployCommands(bucketName),
           "exit\n",
         ].join("\n")
       );
+      return conn;
     })
     .catch(async (err) => {
-      console.log(err);
+      jadeLog(err);
       await sleep(5000);
-      sendSetupCommands(host, maxRetries, attempts + 1);
+      sendSetupCommands(host, bucketName, gitUrl, maxRetries, attempts + 1);
     });
 };
 
@@ -85,19 +85,20 @@ const sendSetupFiles = async (host, maxRetries = 10, attempts = 0) => {
         join(localDir, "sysmon.conf"),
         join(jadePath, "s3BucketName.json")
       );
+      return conn;
     })
     .catch(async (err) => {
-      console.log(err);
+      jadeErr(err);
       await sleep(5000);
       sendSetupFiles(host, maxRetries, attempts + 1);
     });
 };
 
-async function installEc2JadeEnvironment(bucketName) {
+async function installEc2JadeEnvironment() {
   const privateKey = await readFile(join(jadePath, privateKeyFilename));
 
   try {
-    console.log("Reading EC2 data...");
+    jadeLog("Reading EC2 data...");
     const ec2Data = await readJSONFile("ec2Instance", jadePath);
     const publicIp = ec2Data.Instances[0].PublicIpAddress;
 
@@ -108,16 +109,17 @@ async function installEc2JadeEnvironment(bucketName) {
       privateKey,
     };
 
-    await createJSONFile("s3BucketName", jadePath, { bucketName });
-
-    console.log("Beginning connection to EC2 server...");
+    const bucketJson = await readJSONFile("s3BucketName", jadePath);
+    const bucketName = bucketJson.bucketName;
+    const config = await readConfig(cwd);
+    const gitUrl = config.gitUrl;
+    jadeLog("Beginning connection to EC2 server...");
 
     await sendSetupFiles(host);
-    await sendSetupCommands(host, bucketName);
-    console.log("EC2 server setup successfully.");
-    return;
+    await sendSetupCommands(host, bucketName, gitUrl);
+    jadeLog("EC2 server setup successfully.");
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 }
 
