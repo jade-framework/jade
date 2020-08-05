@@ -63,8 +63,7 @@ const promisifyConnection = (conn) => {
   conn.asyncSftp = (remotePath, ...localPaths) => {
     return new Promise((resolve, reject) => {
       console.log("SFTP beginning...");
-      conn.sftp(async (err, sftp) => {
-        console.log(sftp);
+      conn.sftp((err, sftp) => {
         if (err) {
           console.log(err);
           reject(err);
