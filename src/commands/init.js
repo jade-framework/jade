@@ -25,10 +25,6 @@ const { build } = require('./build');
 const { prompt } = require('./prompt');
 
 const cwd = process.cwd();
-const functionName = 'copyToBucket';
-const functionFile = `${functionName}.js.zip`;
-const functionHandler = `${functionName}.handler`;
-const functionDescription = `Copy a file from src to dest buckets.`;
 const gitRepos = ['GitHub', 'GitLab', 'Bitbucket'];
 
 // const init = async () => {
@@ -69,6 +65,11 @@ const gitRepos = ['GitHub', 'GitLab', 'Bitbucket'];
 */
 
 const initJadeLambdas = async (bucketName) => {
+  const functionName = jadeLambdaName;
+  const functionFile = `${functionName}.js.zip`;
+  const functionHandler = `${functionName}.handler`;
+  const functionDescription = `Invalidate index.html in Cloudfront on upload to S3.`;
+
   await zipit(`${functionName}.js`, `${cwd}/src/aws/lambda/${functionName}.js`);
   await uploadToBucket(functionFile, `${bucketName}-lambda`);
   const lambdaRoleResponse = await createLambdaRole('lambda-s3-role-2');

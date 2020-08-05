@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const os = require('os');
+// const os = require('os');
 
 // const handleArgs = require('../src/util/handleArgs');
 // const { bamError } = require('../src/util/logger');
@@ -26,7 +26,8 @@ const cwd = process.cwd();
 //     bamError(err);
 //   }
 // })();
-console.log('hi');
+console.log('Hi');
+
 (async () => {
   try {
     await executeCommand(command, args, cwd);

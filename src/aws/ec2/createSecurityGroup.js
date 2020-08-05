@@ -2,7 +2,7 @@ const {
   asyncCreateSecurityGroup,
   asyncDescribeSecurityGroups,
   asyncAuthorizeSecurityGroupIngress,
-} = require("../awsAsyncFunctions");
+} = require('../awsAsyncFunctions');
 
 const {
   exists,
@@ -10,24 +10,24 @@ const {
   createJSONFile,
   readJSONFile,
   getJadePath,
-} = require("../../util/fileUtils");
+} = require('../../util/fileUtils');
 
 const {
   cwd,
   securityGroup,
   securityGroupName,
-} = require("../../templates/constants");
+} = require('../../templates/constants');
 
-const getGithubIp = require("../../github/getGithubIp");
+const getGithubIp = require('../../github/getGithubIp');
 
 // default data
 const securityGroupParams = {
   GroupName: securityGroupName,
-  Description: "Security Group to configure EC2 instances",
+  Description: 'Security Group to configure EC2 instances',
   TagSpecifications: [
     {
-      ResourceType: "security-group",
-      Tags: [{ Key: "Name", Value: securityGroupName }],
+      ResourceType: 'security-group',
+      Tags: [{ Key: 'Name', Value: securityGroupName }],
     },
   ],
 };
@@ -35,11 +35,11 @@ const securityGroupParams = {
 const setIngressHookRules = (policy, addresses) => {
   const ipRanges = addresses.map((address) => ({
     CidrIp: address,
-    Description: "Github hook address",
+    Description: 'Github hook address',
   }));
   const permissions = {
     FromPort: 80,
-    IpProtocol: "tcp",
+    IpProtocol: 'tcp',
     IpRanges: ipRanges,
     ToPort: 80,
   };
@@ -50,10 +50,10 @@ const setIngressSshRule = (policy) => {
   const permission = {
     // Allow SSH
     FromPort: 22,
-    IpProtocol: "tcp",
+    IpProtocol: 'tcp',
     IpRanges: [
       {
-        CidrIp: "0.0.0.0/0",
+        CidrIp: '0.0.0.0/0',
       },
     ],
     ToPort: 22,
@@ -66,7 +66,7 @@ const createSecurityGroup = async () => {
   let ingressRules = { IpPermissions: [] };
 
   try {
-    const Filters = [{ Name: "tag:Name", Values: [`${securityGroupName}`] }];
+    const Filters = [{ Name: 'tag:Name', Values: [`${securityGroupName}`] }];
     const jadeSecurityGroups = await asyncDescribeSecurityGroups({
       Filters,
     });
@@ -74,17 +74,17 @@ const createSecurityGroup = async () => {
       jadeSecurityGroups.SecurityGroups &&
       jadeSecurityGroups.SecurityGroups.length > 0
     ) {
-      console.log("Jade security group already exists.");
+      console.log('Jade security group already exists.');
     } else {
-      console.log("Creating Jade security group...");
+      console.log('Creating Jade security group...');
       const securityGroupResponse = await asyncCreateSecurityGroup(
-        securityGroupParams
+        securityGroupParams,
       );
 
-      console.log("Getting Github IP addresses...");
+      console.log('Getting Github IP addresses...');
       const githubIps = await getGithubIp();
-      await createJSONFile("githubApi", jadePath, githubIps);
-      const githubIpAddresses = await readJSONFile("githubApi", jadePath);
+      await createJSONFile('githubApi', jadePath, githubIps);
+      const githubIpAddresses = await readJSONFile('githubApi', jadePath);
       const githubHookIps = githubIpAddresses.hooks;
       setIngressSshRule(ingressRules);
       setIngressHookRules(ingressRules, githubHookIps);
@@ -93,9 +93,9 @@ const createSecurityGroup = async () => {
         GroupId: securityGroupResponse.GroupId,
       };
 
-      console.log("Setting security group ingress rules...");
+      console.log('Setting security group ingress rules...');
       const ingressRulesResponse = await asyncAuthorizeSecurityGroupIngress(
-        ingressRules
+        ingressRules,
       );
       await createJSONFile(securityGroup, jadePath, {
         ...securityGroupParams,
