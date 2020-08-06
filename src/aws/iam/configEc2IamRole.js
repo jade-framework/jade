@@ -80,4 +80,3 @@ async function configEc2IamRole() {
 }
 
 module.exports = { configEc2IamRole };
-configEc2IamRole();
