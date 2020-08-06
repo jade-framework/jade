@@ -31,6 +31,7 @@ module.exports = async function triggerBuild(webhook) {
     (async () => {
       await exec(`yarn --cwd ${repoDir} build`);
       await exec(`aws s3 sync public s3://${bucketName}`);
+      await exec(`aws s3 sync public s3://${bucketName}-builds/${Date.now()}`);
     })();
 
     return {

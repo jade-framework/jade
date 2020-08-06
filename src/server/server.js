@@ -1,27 +1,27 @@
-const http = require("http");
-const triggerBuild = require("./triggerBuild");
+const http = require('http');
+const triggerBuild = require('./triggerBuild');
 
-const hostname = "0.0.0.0";
+const hostname = '0.0.0.0';
 const port = 5000;
 async function start() {
   try {
     const server = http.createServer((req, res) => {
-      req.on("error", (err) => {
+      req.on('error', (err) => {
         console.error(err);
         res.statusCode = 400;
         res.end();
       });
-      res.on("error", (err) => {
+      res.on('error', (err) => {
         console.error(err);
       });
 
-      if (req.method === "POST" && req.url === "/webhook") {
+      if (req.method === 'POST' && req.url === '/webhook') {
         let body = [];
         req
-          .on("data", (chunk) => {
+          .on('data', (chunk) => {
             body.push(chunk);
           })
-          .on("end", () => {
+          .on('end', () => {
             body = JSON.parse(Buffer.concat(body).toString());
             console.log(body); // convert to logger later
             (async () => {
