@@ -69,6 +69,7 @@ const initJadeLambdas = async (bucketName) => {
     }
 
     let lambdaResponse = await lambdaExists(functionName);
+    console.log(lambdaResponse);
     if (!lambdaResponse) {
       lambdaResponse = await createLambdaFunction(
         `${bucketName}-lambda`,
@@ -78,25 +79,27 @@ const initJadeLambdas = async (bucketName) => {
         functionDescription,
         lambdaRoleResponse.Role.Arn,
       );
-      const { Account } = await asyncGetCallerIdentity();
-      const lambdaPermissionParams = {
-        Action: 'lambda:InvokeFunction',
-        FunctionName: lambdaArn,
-        Principal: 's3.amazonaws.com',
-        SourceAccount: Account,
-        StatementId: `example-S3-permission`,
-      };
-      await createLambdaPermission(lambdaPermissionParams);
     } else {
       lambdaResponse = lambdaResponse.Configuration;
     }
 
     const lambdaArn = lambdaResponse.FunctionArn;
+    const { Account } = await asyncGetCallerIdentity();
+    const lambdaPermissionParams = {
+      Action: 'lambda:InvokeFunction',
+      FunctionName: lambdaArn,
+      Principal: 's3.amazonaws.com',
+      SourceAccount: Account,
+      StatementId: `example-S3-permission`,
+    };
+    await createLambdaPermission(lambdaPermissionParams);
     return lambdaArn;
   } catch (err) {
     console.log(err);
   }
 };
+
+initJadeLambdas('imhavingananeurysm-a193766a-48f0-4e20-9f8e-70bda355afd5');
 
 const parseName = (name) => {
   name = name.replace(/\s+/gi, '-');
