@@ -3,63 +3,69 @@ const {
   asyncAttachRolePolicy,
   asyncCreateInstanceProfile,
   asyncAddRoleToProfile,
-} = require("../awsAsyncFunctions");
+  asyncGetRole,
+} = require('../awsAsyncFunctions');
 
 const {
   ec2IamRoleName,
   ec2InstanceProfile,
   cwd,
   s3FullAccessPolicyArn,
-} = require("../../templates/constants");
+} = require('../../templates/constants');
 
 const {
   join,
   getJadePath,
   createJSONFile,
   readJSONFile,
-} = require("../../util/fileUtils");
+} = require('../../util/fileUtils');
 
-const path = require("path");
+const path = require('path');
+const jadePath = getJadePath(cwd);
+
+const getJadeEc2Role = async () => {
+  const resp = await asyncGetRole();
+};
 
 async function configEc2IamRole() {
-  const jadePath = getJadePath(cwd);
   try {
+    await getJadeEc2Role();
     const rolePolicy = await readJSONFile(
-      "ec2IamConfig",
-      join(path.resolve(path.dirname(".")), "src", "templates") // hardcoded
+      'ec2IamConfig',
+      join(path.resolve(path.dirname('.')), 'src', 'templates'),
     );
 
-    console.log("Creating new role...");
+    console.log('Creating new role...');
     const createRoleResponse = await asyncCreateRole({
       AssumeRolePolicyDocument: JSON.stringify(rolePolicy),
       RoleName: ec2IamRoleName,
-      Tags: [{ Key: "Name", Value: ec2IamRoleName }],
+      Tags: [{ Key: 'Name', Value: ec2IamRoleName }],
     });
-    await createJSONFile("ec2Role", jadePath, createRoleResponse);
+    await createJSONFile('ec2Role', jadePath, createRoleResponse);
 
-    console.log("Attaching S3 role policy...");
+    console.log('Attaching S3 role policy...');
     await asyncAttachRolePolicy({
       PolicyArn: s3FullAccessPolicyArn,
       RoleName: ec2IamRoleName,
     });
 
-    console.log("Creating instance profile...");
+    console.log('Creating instance profile...');
     const createInstanceResponse = await asyncCreateInstanceProfile({
       InstanceProfileName: ec2InstanceProfile,
     });
 
     await createJSONFile(
-      "ec2InstanceProfile",
+      'ec2InstanceProfile',
       jadePath,
-      createInstanceResponse
+      createInstanceResponse,
     );
 
-    console.log("Adding role to instance profile...");
+    console.log('Adding role to instance profile...');
     await asyncAddRoleToProfile({
       InstanceProfileName: ec2InstanceProfile,
       RoleName: ec2IamRoleName,
     });
-    console.log("Jade instance profile for EC2 created.");
+    console.log('Jade instance profile for EC2 created.');
   } catch (err) {
     console.log(err);
   }

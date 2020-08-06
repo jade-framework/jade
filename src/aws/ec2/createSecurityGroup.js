@@ -32,10 +32,10 @@ const securityGroupParams = {
   ],
 };
 
-const setIngressHookRules = (policy, addresses) => {
+const setIngressHookRules = (policy, addresses, description) => {
   const ipRanges = addresses.map((address) => ({
     CidrIp: address,
-    Description: 'Github hook address',
+    Description: description,
   }));
   const permissions = {
     FromPort: 80,
@@ -67,7 +67,7 @@ const createSecurityGroup = async () => {
 
   try {
     const Filters = [{ Name: 'tag:Name', Values: [`${securityGroupName}`] }];
-    const jadeSecurityGroups = await asyncDescribeSecurityGroups({
+    let jadeSecurityGroups = await asyncDescribeSecurityGroups({
       Filters,
     });
     if (
@@ -81,28 +81,30 @@ const createSecurityGroup = async () => {
         securityGroupParams,
       );
 
-      console.log('Getting Github IP addresses...');
+      console.log('Whitelisting Github IP addresses...');
       const githubIps = await getGithubIp();
       await createJSONFile('githubApi', jadePath, githubIps);
       const githubIpAddresses = await readJSONFile('githubApi', jadePath);
       const githubHookIps = githubIpAddresses.hooks;
+      const githubRuleDesc = 'Github hook address';
       setIngressSshRule(ingressRules);
-      setIngressHookRules(ingressRules, githubHookIps);
+      setIngressHookRules(ingressRules, githubHookIps, githubRuleDesc);
+
       ingressRules = {
         ...ingressRules,
         GroupId: securityGroupResponse.GroupId,
       };
 
       console.log('Setting security group ingress rules...');
-      const ingressRulesResponse = await asyncAuthorizeSecurityGroupIngress(
-        ingressRules,
-      );
-      await createJSONFile(securityGroup, jadePath, {
-        ...securityGroupParams,
-        ...securityGroupResponse,
-        ...ingressRulesResponse,
+      await asyncAuthorizeSecurityGroupIngress(ingressRules);
+
+      jadeSecurityGroups = await asyncDescribeSecurityGroups({
+        Filters,
       });
     }
+    console.log('Saving security group data as JSON...');
+    await createJSONFile(securityGroup, jadePath, jadeSecurityGroups);
+    console.log('Jade security group done.');
   } catch (err) {
     console.log(err);
   }

@@ -8,8 +8,14 @@ const {
   createLambdaFunction,
   createLambdaPermission,
   createLambdaRole,
+  lambdaExists,
 } = require('../aws/lambda');
 const { createCloudfrontDistribution } = require('../aws/cloudfront');
+const { roleExists } = require('../aws/iam');
+const {
+  asyncIamWaitFor,
+  asyncGetCallerIdentity,
+} = require('../aws/awsAsyncFunctions');
 
 const {
   createDirectory,
@@ -22,7 +28,9 @@ const {
 const { zipit } = require('../util/zipit');
 const { jadeLog, jadeErr } = require('../util/logger');
 const { build } = require('./build');
-const { prompt } = require('./prompt');
+const { prompt } = require('../util/prompt');
+const { validateProjectName, validateGitUrl } = require('../util/validations');
+const { lambdaIamRoleName, jadeLambdaName } = require('../templates/constants');
 
 const cwd = process.cwd();
 const gitRepos = ['GitHub', 'GitLab', 'Bitbucket'];
@@ -33,7 +41,7 @@ const gitRepos = ['GitHub', 'GitLab', 'Bitbucket'];
 //   await createBuckets(bucketName);
 // await zipit(`${functionName}.js`, `${cwd}/src/aws/lambda/${functionName}.js`);
 // await uploadToBucket(functionFile, `${bucketName}-lambda`);
-//   const lambdaRoleResponse = await createLambdaRole("lambda-s3-role-2");
+//   const lambdaRoleResponse = await createLambdaRole(lambdaIamRoleName);
 //   setTimeout(async () => {
 //     const lambdaResponse = await createLambdaFunction(
 //       `${bucketName}-lambda`,
@@ -70,12 +78,30 @@ const initJadeLambdas = async (bucketName) => {
   const functionHandler = `${functionName}.handler`;
   const functionDescription = `Invalidate index.html in Cloudfront on upload to S3.`;
 
-  await zipit(`${functionName}.js`, `${cwd}/src/aws/lambda/${functionName}.js`);
-  await uploadToBucket(functionFile, `${bucketName}-lambda`);
-  const lambdaRoleResponse = await createLambdaRole('lambda-s3-role-2');
-  return new Promise((resolve) =>
-    setTimeout(async () => {
-      const lambdaResponse = await createLambdaFunction(
+  try {
+    await zipit(
+      `${functionName}.js`,
+      join(
+        path.resolve(path.dirname('.')),
+        'src',
+        'aws',
+        'lambda',
+        `${functionName}.js`,
+      ),
+    );
+    await uploadToBucket(functionFile, `${bucketName}-lambda`);
+
+    let lambdaRoleResponse = await roleExists(lambdaIamRoleName);
+    if (!lambdaRoleResponse) {
+      lambdaRoleResponse = await createLambdaRole(lambdaIamRoleName);
+      console.log('Waiting for Lambda role to be ready...');
+      await asyncIamWaitFor('roleExists', { RoleName: lambdaIamRoleName });
+      console.log('Lambda role ready.');
+    }
+
+    let lambdaResponse = await lambdaExists(functionName);
+    if (!lambdaResponse) {
+      lambdaResponse = await createLambdaFunction(
         `${bucketName}-lambda`,
         functionFile,
         functionName,
@@ -83,29 +109,51 @@ const initJadeLambdas = async (bucketName) => {
         functionDescription,
         lambdaRoleResponse.Role.Arn,
       );
-      const lambdaArn = lambdaResponse.FunctionArn;
-      const sourceAccount = process.env.sourceAccount;
+      const { Account } = await asyncGetCallerIdentity();
       const lambdaPermissionParams = {
         Action: 'lambda:InvokeFunction',
         FunctionName: lambdaArn,
         Principal: 's3.amazonaws.com',
-        SourceAccount: sourceAccount,
+        SourceAccount: Account,
         StatementId: `example-S3-permission`,
       };
       await createLambdaPermission(lambdaPermissionParams);
-      resolve(lambdaArn);
-    }, 10000),
-  ); // It takes time for the IAM role to be replicated through all regions and become valid
+    } else {
+      lambdaResponse = lambdaResponse.Configuration;
+    }
+
+    const lambdaArn = lambdaResponse.FunctionArn;
+    return lambdaArn;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
-const start = async (jadePath) => {
-  const bucketName = `jade-${uuid.v4()}`;
-  await createBuckets(bucketName);
-  await createJSONFile('s3BucketName', jadePath, { bucketName });
+const parseName = (name) => {
+  return name.replace(/\s+/gi, '-');
+};
+
+const start = async (jadePath, { projectName }) => {
+  let bucketName;
+  if (exists(join(jadePath, 's3BucketName.json'))) {
+    const bucketJson = await readJSONFile('s3BucketName', jadePath);
+    existingProjectName = bucketJson.projectName;
+    if (projectName === bucketName) {
+      jadeErr(
+        `The name ${projectName} is already in use. Please enter a new name`,
+      );
+      return;
+    }
+  } else {
+    bucketName = `${projectName}-${uuid.v4()}`;
+    await createBuckets(bucketName);
+    await createJSONFile('s3BucketName', jadePath, { projectName, bucketName });
+  }
   const lambdaArn = await initJadeLambdas(bucketName);
-  await createCloudfrontDistribution(bucketName);
-  await setBucketNotificationConfig(bucketName, lambdaArn);
-  await build();
+  console.log(lambdaArn);
+  // await createCloudfrontDistribution(bucketName);
+  // await setBucketNotificationConfig(bucketName, lambdaArn);
+  // await build();
 };
 
 const initialQuestions = async (config) => {
@@ -114,6 +162,12 @@ const initialQuestions = async (config) => {
       message: 'What is your project name?\n',
       name: 'projectName',
       default: config.projectName || 'My Jade Project',
+      // validate: (input) => {
+      //   return validateProjectName({ projectName: input });
+      // },
+      filter: (input) => {
+        return parseName(input);
+      },
     },
     {
       type: 'list',
@@ -140,7 +194,9 @@ const gitQuestions = async (initialAns) => {
     {
       name: 'gitUrl',
       message: `Please enter your ${initialAns.gitProvider} URL here:\n`,
-      // validates: // to be validated
+      validate: (input) => {
+        return validateGitUrl({ gitUrl: input });
+      },
     },
   ];
   const answers = await prompt(questions);
@@ -148,7 +204,6 @@ const gitQuestions = async (initialAns) => {
 };
 
 const init = async (directory) => {
-  console.log(directory);
   try {
     let config = {};
     const jadePath = join(directory, '.jade');
@@ -165,15 +220,21 @@ const init = async (directory) => {
 
     if (initialAns.gitExists) {
       const gitAns = await gitQuestions(initialAns);
-      await writeConfig(directory, { ...initialAns, ...gitAns });
+      const combinedAns = { ...initialAns, ...gitAns };
+      const invalid = await validateUserInitInput(combinedAns);
+      if (invalid) {
+        jadeErr(invalid);
+        return;
+      }
+      await writeConfig(directory, combinedAns);
       jadeLog('Thank you! The Jade framework will now be setup.');
-      await start(jadePath);
+      await start(jadePath, initialAns);
     } else {
       // const gitWalkthrough = await prompt();
       await prompt([
         {
           name: 'noGit',
-          message: `Thank you for using Jade. To continue, please setup a Git repository at one of these providers: ${gitRepos.join(
+          message: `Thank you for using Jade. To continue, please setup a Git repository with one of these providers: ${gitRepos.join(
             ' | ',
           )}\n\x1b[30;0mPress any key to continue...`,
         },

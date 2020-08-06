@@ -26,7 +26,6 @@ const cwd = process.cwd();
 //     bamError(err);
 //   }
 // })();
-console.log('Hi');
 
 (async () => {
   try {

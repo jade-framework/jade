@@ -3,8 +3,9 @@ const S3 = require('aws-sdk/clients/s3');
 const CloudFront = require('aws-sdk/clients/cloudfront');
 const AWS = require('aws-sdk/global');
 const Lambda = require('aws-sdk/clients/lambda');
-const awsIAM = require('aws-sdk/clients/iam');
+const IAM = require('aws-sdk/clients/iam');
 const EC2 = require('aws-sdk/clients/ec2');
+const STS = require('aws-sdk/clients/sts');
 const { getRegion } = require('../util/getRegion');
 
 const region = getRegion();
@@ -15,8 +16,9 @@ AWS.config.update({ apiVersion, region });
 const s3 = new S3();
 const cloudfront = new CloudFront();
 const lambda = new Lambda();
-const iam = new awsIAM();
+const iam = new IAM();
 const ec2 = new EC2();
+const sts = new STS();
 
 // CLOUDFRONT
 const asyncCreateCloudfrontDistribution = promisify(
@@ -49,6 +51,7 @@ const asyncDeleteBucketObjects = promisify(s3.deleteObjects.bind(s3));
 const asyncCreateS3Bucket = promisify(s3.createBucket.bind(s3));
 const asyncDeleteS3Bucket = promisify(s3.deleteBucket.bind(s3));
 const asyncPutBucketPolicy = promisify(s3.putBucketPolicy.bind(s3));
+const asyncPutBucketTagging = promisify(s3.putBucketTagging.bind(s3));
 const asyncUploadToBucket = promisify(s3.putObject.bind(s3));
 const asyncPutBucketNotificationConfiguration = promisify(
   s3.putBucketNotificationConfiguration.bind(s3),
@@ -70,6 +73,7 @@ const asyncCreateInstanceProfile = promisify(
 );
 const asyncAddRoleToProfile = promisify(iam.addRoleToInstanceProfile.bind(iam));
 const asyncGetRole = promisify(iam.getRole.bind(iam));
+const asyncIamWaitFor = promisify(iam.waitFor.bind(iam));
 
 // EC2
 const asyncCreateSecurityGroup = promisify(ec2.createSecurityGroup.bind(ec2));
@@ -80,13 +84,18 @@ const asyncAuthorizeSecurityGroupIngress = promisify(
   ec2.authorizeSecurityGroupIngress.bind(ec2),
 );
 const asyncCreateKeyPair = promisify(ec2.createKeyPair.bind(ec2));
+const asyncDescribeKeyPairs = promisify(ec2.describeKeyPairs.bind(ec2));
+const asyncDeleteKeyPair = promisify(ec2.deleteKeyPair.bind(ec2));
 const asyncDescribeInstances = promisify(ec2.describeInstances.bind(ec2));
 const asyncRunInstances = promisify(ec2.runInstances.bind(ec2));
 const asyncAssociateIamInstanceProfile = promisify(
   ec2.associateIamInstanceProfile.bind(ec2),
 );
-const asyncWaitFor = promisify(ec2.waitFor.bind(ec2));
+const asyncEc2WaitFor = promisify(ec2.waitFor.bind(ec2));
 const asyncDescribeImages = promisify(ec2.describeImages.bind(ec2));
+
+// STS
+const asyncGetCallerIdentity = promisify(sts.getCallerIdentity.bind(sts));
 
 module.exports = {
   // asyncGetDistribution,
@@ -98,11 +107,13 @@ module.exports = {
   asyncCreateS3Bucket,
   asyncDeleteS3Bucket,
   asyncPutBucketPolicy,
+  asyncPutBucketTagging,
   asyncUploadToBucket,
   asyncPutBucketNotificationConfiguration,
   asyncCreateCloudfrontDistribution,
   asyncAddPermission,
   asyncCreateLambdaFunction,
+  asyncDeleteLambdaFunction,
   asyncAttachRolePolicy,
   asyncCreateRole,
   asyncDeleteRole,
@@ -112,15 +123,19 @@ module.exports = {
   asyncDescribeSecurityGroups,
   asyncAuthorizeSecurityGroupIngress,
   asyncCreateKeyPair,
+  asyncDescribeKeyPairs,
+  asyncDeleteKeyPair,
   asyncDescribeInstances,
   asyncRunInstances,
   asyncAssociateIamInstanceProfile,
-  asyncWaitFor,
+  asyncEc2WaitFor,
   asyncDescribeImages,
   asyncHeadBucket,
   asyncGetRole,
+  asyncIamWaitFor,
   asyncGetFunction,
   asyncUpdateCloudfrontDistribution,
   asyncGetCloudfrontDistributionConfig,
   asyncCreateCloudfrontInvalidation,
+  asyncGetCallerIdentity,
 };

@@ -9,7 +9,7 @@ const securityGroupName = 'jade-security-group';
 const ec2IamRoleName = 'jade-ec2-role';
 const ec2InstanceProfile = 'jade-ec2-instance-profile';
 const s3FullAccessPolicyArn = 'arn:aws:iam::aws:policy/AmazonS3FullAccess';
-const lambdaIamRoleName = 'lambda-s3-role-2';
+const lambdaIamRoleName = 'jade-lambda-s3-role-2';
 const awsLambdaExecutePolicyArn = 'arn:aws:iam::aws:policy/AWSLambdaExecute';
 const awsLambdaRolePolicyArn =
   'arn:aws:iam::aws:policy/service-role/AWSLambdaRole';

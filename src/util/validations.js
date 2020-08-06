@@ -1,27 +1,27 @@
-const { credentials } = require("./getCredentials");
-const { jadeErr } = require("./logger.js");
-const { exists, readFile } = require("./fileUtils");
+const { credentials } = require('./getCredentials');
+const { jadeErr } = require('./logger.js');
+const { exists, readFile } = require('./fileUtils');
 
 const {
   asyncHeadBucket,
   asyncGetRole,
   asyncGetFunction,
   asyncListBuckets,
-} = require("../aws/awsAsyncFunctions");
+} = require('../aws/awsAsyncFunctions');
 
 const cwd = process.cwd();
 
 // checks for AWS credentials
 const awsCredentialsConfigured = () => {
-  console.log("Looking for AWS Credentials...");
+  console.log('Looking for AWS Credentials...');
 
   if (credentials) {
-    console.log("Access Key:", credentials.accessKeyId);
+    console.log('Access Key:', credentials.accessKeyId);
     return true;
   } else {
-    jadeErr("CredentialsError: Could not load credentials from any providers");
+    jadeErr('CredentialsError: Could not load credentials from any providers');
     console.log(
-      "For instructions, please visit: https://awscli.amazonaws.com/v2/documentation/api/latest/topic/config-vars.html"
+      'For instructions, please visit: https://awscli.amazonaws.com/v2/documentation/api/latest/topic/config-vars.html',
     );
     return false;
   }
@@ -94,10 +94,8 @@ const lambdaExistsOnAws = async (name) => {
 const isValidLambda = async (name) => {
   const path = `${cwd}/src/aws/lambda/${name}.js`;
   const lambdaFile = await readFile(path);
-  return lambdaFile.includes("exports.handler");
+  return lambdaFile.includes('exports.handler');
 };
-
-const 
 
 // Resource helper methods
 const roleExistsOnAws = async (name) => {
@@ -168,7 +166,7 @@ const validateLambdaDeletion = async (name) => {
   ];
   const status = await validateResource(name, validations);
   return status;
-}
+};
 
 // Role validations
 const validateRoleAssumption = async (name) => {
@@ -215,7 +213,37 @@ const validateBucketUpload = async (name) => {
   const status = await validateResource(name, validations);
 
   return status;
-}
+};
+
+// Validate user input
+const validateProjectName = (projectName) => {
+  return projectName.length > 0 && projectName.length <= 31;
+};
+
+const validateGitUrl = (gitUrl) => {
+  return /(http(s)?)(:(\/\/))(www\.)?(github|gitlab|bitbucket).com([\w\.@\:/\-~]+)(\.git)?(\/)?/.test(
+    gitUrl,
+  );
+};
+
+const validateUserInitInput = async (input) => {
+  const validations = [
+    {
+      validation: validateProjectName,
+      invalidBoolean: false,
+      invalidMessage: `Project name ${projectName} is invalid. Please make sure it is between 1 and 31 characters.`,
+    },
+    {
+      validation: validateGitUrl,
+      invalidBoolean: false,
+      invalidMessage: `URL should have the following format:\nhttps://github.com/user/repo-name`,
+    },
+  ];
+
+  const status = await validateResource(input, validations);
+
+  return status;
+};
 
 // Validations helper method
 const validateResource = async (resourceData, validations) => {
@@ -241,4 +269,7 @@ module.exports = {
   validateLambdaDeployment,
   validateLambdaDeletion,
   validateBucketUpload,
+  validateUserInitInput,
+  validateProjectName,
+  validateGitUrl,
 };

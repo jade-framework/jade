@@ -1,4 +1,4 @@
-const AWS = require("aws-sdk/global");
+const AWS = require('aws-sdk/global');
 const config = new AWS.Config();
 
 const credentials = config.credentials;
