@@ -13,7 +13,7 @@ const createBucket = async (bucketName) => {
       Bucket: bucketName,
       Tagging: { TagSet: [{ Key: 'project', Value: 'jade' }] },
     });
-    console.log(`Tag added to bucket. ${response2}`);
+    console.log(`Jade project tag added to bucket.`);
   } catch (error) {
     console.log('Error creating S3 Bucket', error);
   }

@@ -55,6 +55,7 @@ const asyncPutBucketNotificationConfiguration = promisify(
 );
 const asyncHeadBucket = promisify(s3.headBucket.bind(s3));
 const asyncPutBucketTagging = promisify(s3.putBucketTagging.bind(s3));
+const asyncGetBucketTagging = promisify(s3.getBucketTagging.bind(s3));
 
 // LAMBDA
 const asyncAddPermission = promisify(lambda.addPermission.bind(lambda));
@@ -125,4 +126,5 @@ module.exports = {
   asyncGetCloudfrontDistributionConfig,
   asyncCreateCloudfrontInvalidation,
   asyncPutBucketTagging,
+  asyncGetBucketTagging,
 };
