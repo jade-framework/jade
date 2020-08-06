@@ -20,6 +20,7 @@ const {
 
 const {
   createDirectory,
+  sleep,
   exists,
   join,
   createJSONFile,
@@ -65,11 +66,11 @@ const initJadeLambdas = async (bucketName) => {
       lambdaRoleResponse = await createLambdaRole(lambdaIamRoleName);
       console.log('Waiting for Lambda role to be ready...');
       await asyncIamWaitFor('roleExists', { RoleName: lambdaIamRoleName });
+      await sleep(5000);
       console.log('Lambda role ready.');
     }
-    console.log(`role response: ${lambdaRoleResponse}`);
     let lambdaResponse = await lambdaExists(functionName);
-    console.log(`lambda response: ${lambdaResponse}`);
+    let lambdaArn;
     if (!lambdaResponse) {
       lambdaResponse = await createLambdaFunction(
         `${bucketName}-lambda`,
@@ -79,20 +80,20 @@ const initJadeLambdas = async (bucketName) => {
         functionDescription,
         lambdaRoleResponse.Role.Arn,
       );
+      lambdaArn = lambdaResponse.FunctionArn;
+      const { Account } = await asyncGetCallerIdentity();
+      const lambdaPermissionParams = {
+        Action: 'lambda:InvokeFunction',
+        FunctionName: lambdaArn,
+        Principal: 's3.amazonaws.com',
+        SourceAccount: Account,
+        StatementId: `example-S3-permission`,
+      };
+      await createLambdaPermission(lambdaPermissionParams);
     } else {
       lambdaResponse = lambdaResponse.Configuration;
+      lambdaArn = lambdaResponse.FunctionArn;
     }
-
-    const lambdaArn = lambdaResponse.FunctionArn;
-    const { Account } = await asyncGetCallerIdentity();
-    const lambdaPermissionParams = {
-      Action: 'lambda:InvokeFunction',
-      FunctionName: lambdaArn,
-      Principal: 's3.amazonaws.com',
-      SourceAccount: Account,
-      StatementId: `example-S3-permission`,
-    };
-    await createLambdaPermission(lambdaPermissionParams);
     return lambdaArn;
   } catch (err) {
     console.log(err);

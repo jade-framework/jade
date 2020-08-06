@@ -21,11 +21,11 @@ const createLambdaFunction = async (
   };
 
   try {
-    const response = await asyncCreateLambdaFunction(params);
-    console.log('Successfully created lambda function.', response);
+    await asyncCreateLambdaFunction(params);
+    console.log('Successfully created Lambda function.');
     return response;
   } catch (error) {
-    console.log('Error creating lambda function', error);
+    console.log('Error creating Lambda function', error);
   }
 };
 
