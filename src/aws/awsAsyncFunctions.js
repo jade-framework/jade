@@ -5,6 +5,7 @@ const AWS = require('aws-sdk/global');
 const Lambda = require('aws-sdk/clients/lambda');
 const awsIAM = require('aws-sdk/clients/iam');
 const EC2 = require('aws-sdk/clients/ec2');
+const Dynamo = require('aws-sdk/clients/dynamodb');
 const { getRegion } = require('../util/getRegion');
 
 const region = getRegion();
@@ -17,6 +18,7 @@ const cloudfront = new CloudFront();
 const lambda = new Lambda();
 const iam = new awsIAM();
 const ec2 = new EC2();
+const dynamo = new Dynamo();
 
 // CLOUDFRONT
 const asyncCreateCloudfrontDistribution = promisify(
@@ -91,6 +93,11 @@ const asyncAssociateIamInstanceProfile = promisify(
 const asyncWaitFor = promisify(ec2.waitFor.bind(ec2));
 const asyncDescribeImages = promisify(ec2.describeImages.bind(ec2));
 
+// DYNAMO
+const asyncCreateTable = promisify(dynamo.createTable.bind(dynamo));
+const asyncPutItem = promisify(dynamo.putItem.bind(dynamo));
+const asyncDynamoWaitFor = promisify(dynamo.waitFor.bind(dynamo));
+
 module.exports = {
   // asyncGetDistribution,
   asyncListDistributions,
@@ -130,4 +137,7 @@ module.exports = {
   asyncGetBucketTagging,
   asyncDeleteLambdaFunction,
   asyncDetachRolePolicy,
+  asyncCreateTable,
+  asyncPutItem,
+  asyncDynamoWaitFor,
 };
