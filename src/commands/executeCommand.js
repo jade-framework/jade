@@ -1,4 +1,7 @@
 const { init } = require('./init');
+const { add } = require('./add');
+// const { delete } = require('./delete');
+// const { destroy } = require('./destroy');
 
 const commandIsBlank = (cmd) => cmd === undefined || cmd === '';
 const commandIsHelp = (cmd) => cmd === 'help' || cmd === '-h' || cmd === 'man';
@@ -6,6 +9,12 @@ const commandIsHelp = (cmd) => cmd === 'help' || cmd === '-h' || cmd === 'man';
 const executeCommand = async (command, args, homedir) => {
   if (command === 'init') {
     await init(homedir);
+  } else if (command === 'add') {
+    await add(homedir, args);
+  } else if (command === 'delete') {
+    console.log('delete one app');
+  } else if (command === 'destroy') {
+    console.log('destroy entire app');
   } else if (commandIsHelp(command) || commandIsBlank(command)) {
     // await help(args);
     console.log(`Help method, command is ${command}, args is ${args}.`);
