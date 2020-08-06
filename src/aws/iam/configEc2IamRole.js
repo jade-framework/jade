@@ -68,7 +68,6 @@ async function configEc2IamRole() {
     } else {
       console.log('Using existing Jade instance profile.');
     }
-
     await createJSONFile(
       'ec2InstanceProfile',
       jadePath,
