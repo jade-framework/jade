@@ -1,20 +1,16 @@
-const { deleteAllBuckets } = require("../aws/s3/deleteAllBuckets");
-const { deleteIamRole } = require("../aws/iam/");
-const deleteLambdaFunction = require("../aws/lambda/deleteLambdaFunction");
+const { deleteAllBuckets } = require('../aws/s3/deleteAllBuckets');
+const { deleteIamRole } = require('../aws/iam');
+const deleteLambdaFunction = require('../aws/lambda/deleteLambdaFunction');
 const {
-  awsLambdaExecutePolicyArn,
-  awsLambdaRolePolicyArn,
+  lambdaRolePolicies,
   lambdaIamRoleName,
-  lambdaFunctionName,
-} = require("../templates/constants");
+  lambdaNames,
+} = require('../templates/constants');
 
-const cleanup = async (bucketName) => {
+const cleanup = async () => {
   deleteAllBuckets();
-  deleteIamRole(lambdaIamRoleName, [
-    awsLambdaRolePolicyArn,
-    awsLambdaExecutePolicyArn,
-  ]);
-  deleteLambdaFunction(lambdaFunctionName);
+  await deleteIamRole(lambdaIamRoleName, lambdaRolePolicies);
+  deleteLambdaFunction(lambdaNames);
 };
 
-cleanup();
+module.exports = cleanup;

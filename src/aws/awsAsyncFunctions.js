@@ -54,6 +54,8 @@ const asyncPutBucketNotificationConfiguration = promisify(
   s3.putBucketNotificationConfiguration.bind(s3),
 );
 const asyncHeadBucket = promisify(s3.headBucket.bind(s3));
+const asyncPutBucketTagging = promisify(s3.putBucketTagging.bind(s3));
+const asyncGetBucketTagging = promisify(s3.getBucketTagging.bind(s3));
 
 // LAMBDA
 const asyncAddPermission = promisify(lambda.addPermission.bind(lambda));
@@ -70,6 +72,7 @@ const asyncCreateInstanceProfile = promisify(
 );
 const asyncAddRoleToProfile = promisify(iam.addRoleToInstanceProfile.bind(iam));
 const asyncGetRole = promisify(iam.getRole.bind(iam));
+const asyncDetachRolePolicy = promisify(iam.detachRolePolicy.bind(iam));
 
 // EC2
 const asyncCreateSecurityGroup = promisify(ec2.createSecurityGroup.bind(ec2));
@@ -123,4 +126,8 @@ module.exports = {
   asyncUpdateCloudfrontDistribution,
   asyncGetCloudfrontDistributionConfig,
   asyncCreateCloudfrontInvalidation,
+  asyncPutBucketTagging,
+  asyncGetBucketTagging,
+  asyncDeleteLambdaFunction,
+  asyncDetachRolePolicy,
 };

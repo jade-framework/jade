@@ -9,13 +9,17 @@ const securityGroupName = 'jade-security-group';
 const ec2IamRoleName = 'jade-ec2-role';
 const ec2InstanceProfile = 'jade-ec2-instance-profile';
 const s3FullAccessPolicyArn = 'arn:aws:iam::aws:policy/AmazonS3FullAccess';
-const lambdaIamRoleName = 'lambda-s3-role-2';
+const lambdaIamRoleName = 'jade-lambda-role';
 const awsLambdaExecutePolicyArn = 'arn:aws:iam::aws:policy/AWSLambdaExecute';
 const awsLambdaRolePolicyArn =
   'arn:aws:iam::aws:policy/service-role/AWSLambdaRole';
-const lambdaFunctionName = 'copyToBucket';
 const jadePrefix = '\x1b[32;1m💎\x1b[32;0m';
-const jadeLambdaName = 'jadeInvalidateCloudfrontFile';
+const lambdaNames = 'jadeInvalidateCloudfrontFile';
+const lambdaRolePolicies = [
+  'arn:aws:iam::aws:policy/CloudFrontFullAccess',
+  'arn:aws:iam::aws:policy/AWSLambdaExecute',
+  'arn:aws:iam::aws:policy/service-role/AWSLambdaRole',
+];
 
 module.exports = {
   instanceType,
@@ -31,7 +35,7 @@ module.exports = {
   lambdaIamRoleName,
   awsLambdaExecutePolicyArn,
   awsLambdaRolePolicyArn,
-  lambdaFunctionName,
   jadePrefix,
-  jadeLambdaName,
+  lambdaNames,
+  lambdaRolePolicies,
 };
