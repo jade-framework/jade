@@ -18,35 +18,32 @@ const deployApiForGitHooks = async (resourceName) => {
   const region = getRegion();
   const jadePath = getJadePath(cwd);
   const stageName = 'webhook';
-  const resourcePolicyParams = {
-    Version: '2012-10-17',
-    Statement: [
-      {
-        Effect: 'Allow',
-        Principal: '*',
-        Action: 'execute-api:Invoke',
-        Resource: 'execute-api:/*/*/*',
-      },
-      {
-        Effect: 'Deny',
-        Principal: '*',
-        Action: 'execute-api:Invoke',
-        Resource: 'execute-api:/*/*/*',
-        Condition: {
-          NotIpAddress: {
-            'aws:SourceIp': ['sourceIpOrCIDRBlock', 'sourceIpOrCIDRBlock'],
-          },
-        },
-      },
-    ],
-  };
 
   try {
     const githubApi = await readJSONFile('githubApi', jadePath);
     const githubApiHooks = githubApi.hooks;
-    resourcePolicyParams.Statement[1].Condition.NotIpAddress[
-      'aws:SourceIp'
-    ] = githubApiHooks;
+    const resourcePolicyParams = {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Effect: 'Allow',
+          Principal: '*',
+          Action: 'execute-api:Invoke',
+          Resource: 'execute-api:/*/*/*',
+        },
+        {
+          Effect: 'Deny',
+          Principal: '*',
+          Action: 'execute-api:Invoke',
+          Resource: 'execute-api:/*/*/*',
+          Condition: {
+            NotIpAddress: {
+              'aws:SourceIp': githubApiHooks,
+            },
+          },
+        },
+      ],
+    };
 
     const createApiParams = {
       name: resourceName,
