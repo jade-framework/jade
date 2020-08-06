@@ -1,11 +1,11 @@
-const { getRegion } = require("../../util/getRegion");
-const { createLambdaPermission } = require("../lambda/createLambdaPermission");
+const { getRegion } = require('../../util/getRegion');
+const { createLambdaPermission } = require('../lambda/createLambdaPermission');
 
 const {
   asyncPutMethod,
   asyncPutIntegration,
   asyncGetCallerIdentity,
-} = require("../awsAsyncFunctions");
+} = require('../awsAsyncFunctions');
 
 const createApiGatewayIntegration = async (params) => {
   const {
@@ -15,7 +15,6 @@ const createApiGatewayIntegration = async (params) => {
     statementId,
     resourceName,
     apiPath,
-    path,
   } = params;
 
   const region = getRegion();
@@ -25,15 +24,15 @@ const createApiGatewayIntegration = async (params) => {
   const addPermissionParams = {
     FunctionName: resourceName,
     StatementId: statementId,
-    Principal: "apigateway.amazonaws.com",
-    Action: "lambda:InvokeFunction",
+    Principal: 'apigateway.amazonaws.com',
+    Action: 'lambda:InvokeFunction',
     SourceArn: sourceArn,
   };
 
   await createLambdaPermission(addPermissionParams);
 
   const putMethodParams = {
-    authorizationType: "NONE",
+    authorizationType: 'NONE',
     httpMethod,
     resourceId,
     restApiId,
@@ -45,8 +44,8 @@ const createApiGatewayIntegration = async (params) => {
     httpMethod,
     resourceId,
     restApiId,
-    type: "AWS_PROXY",
-    integrationHttpMethod: "POST",
+    type: 'AWS_PROXY',
+    integrationHttpMethod: 'POST',
     uri: `arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${accountNumber}:function:${resourceName}/invocations`,
   };
 

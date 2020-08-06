@@ -112,6 +112,9 @@ const asyncPutIntegration = promisify(
 const asyncCreateResource = promisify(
   apigateway.createResource.bind(apigateway),
 );
+const asyncCreateDeployment = promisify(
+  apigateway.createDeployment.bind(apigateway),
+);
 
 // STS
 const asyncGetCallerIdentity = promisify(sts.getCallerIdentity.bind(sts));
@@ -164,4 +167,5 @@ module.exports = {
   asyncGetCallerIdentity,
   asyncPutMethod,
   asyncPutIntegration,
+  asyncCreateDeployment,
 };

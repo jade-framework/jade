@@ -1,67 +1,89 @@
-const uuid = require("uuid");
-const { getRegion } = require("../../util/getRegion");
+const uuid = require('uuid');
+const { getRegion } = require('../../util/getRegion');
 
 const {
   createApiGatewayIntegration,
-} = require("./createApiGatewayIntegration");
+} = require('./createApiGatewayIntegration');
 
 const {
   asyncCreateRestApi,
-  asyncCreateResource,
   asyncGetResources,
-} = require("../awsAsyncFunctions");
+  asyncCreateDeployment,
+} = require('../awsAsyncFunctions');
 
-const deployApi = async (resourceName, path, httpMethods, stageName) => {
+const { getJadePath, readJSONFile } = require('../../util/fileUtils');
+const { cwd } = require('../../templates/constants');
+
+const deployApiForGitHooks = async (resourceName) => {
   const region = getRegion();
+  const jadePath = getJadePath(cwd);
+  const stageName = 'webhook';
+  const resourcePolicyParams = {
+    Version: '2012-10-17',
+    Statement: [
+      {
+        Effect: 'Allow',
+        Principal: '*',
+        Action: 'execute-api:Invoke',
+        Resource: 'execute-api:/*/*/*',
+      },
+      {
+        Effect: 'Deny',
+        Principal: '*',
+        Action: 'execute-api:Invoke',
+        Resource: 'execute-api:/*/*/*',
+        Condition: {
+          NotIpAddress: {
+            'aws:SourceIp': ['sourceIpOrCIDRBlock', 'sourceIpOrCIDRBlock'],
+          },
+        },
+      },
+    ],
+  };
 
   try {
-    const data = await asyncCreateRestApi({ name: resourceName });
+    const githubApi = await readJSONFile('githubApi', jadePath);
+    const githubApiHooks = githubApi.hooks;
+    resourcePolicyParams.Statement[1].Condition.NotIpAddress[
+      'aws:SourceIp'
+    ] = githubApiHooks;
+
+    const createApiParams = {
+      name: resourceName,
+      policy: JSON.stringify(resourcePolicyParams),
+    };
+    const data = await asyncCreateRestApi(createApiParams);
     const restApiId = data.id;
 
     const resources = await asyncGetResources({ restApiId });
     const rootResourceId = resources.items[0].id;
+    const rootPath = '/';
+    const rootPermissionId = uuid.v4();
 
-    const createResourceParams = {
-      parentId: rootResourceId,
-      pathPart: "{proxy+}",
+    const rootIntegrationParams = {
+      httpMethod: 'POST',
       restApiId,
+      resourceName,
+      resourceId: rootResourceId,
+      statementId: rootPermissionId,
+      apiPath: rootPath,
     };
 
-    // create greedy path resource to allow path params
-    const greedyPathResourceId = (
-      await asyncCreateResource(createResourceParams)
-    ).id;
+    await createApiGatewayIntegration(rootIntegrationParams);
 
-    const methodPermissionIds = {};
-    const rootPath = "/";
-    const greedyPath = "/*";
+    const deploymentParams = {
+      restApiId,
+      stageName,
+    };
 
-    for (let i = 0; i < httpMethods.length; i += 1) {
-      const httpMethod = httpMethods[i];
-      const rootPermissionId = uuid.v4();
-      const greedyPermissionId = uuid.v4();
-      methodPermissionIds[httpMethod] = {
-        rootPermissionId,
-        greedyPermissionId,
-      };
-
-      const rootIntegrationParams = {
-        httpMethod,
-        restApiId,
-        resourceName,
-        path,
-        resourceId: rootResourceId,
-        statementId: rootPermissionId,
-        apiPath: rootPath,
-      };
-
-      await createApiGatewayIntegration(rootIntegrationParams);
-    }
+    await asyncCreateDeployment(deploymentParams);
+    const endpoint = `https://${restApiId}.execute-api.${region}.amazonaws.com/${stageName}`;
+    return endpoint;
   } catch (err) {
     console.log(err);
   }
 };
 
 module.exports = {
-  deployApi,
+  deployApiForGitHooks,
 };
