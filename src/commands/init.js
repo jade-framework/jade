@@ -100,8 +100,7 @@ const initJadeLambdas = async (bucketName) => {
 };
 
 const parseName = (name) => {
-  name = name.replace(/\s+/gi, '-');
-  name = name.toLowerCase();
+  name = name.replace(/\s+/gi, '-').toLowerCase();
   return name.replace(/[^a-z0-9]/gi, '');
 };
 
