@@ -73,7 +73,7 @@ const gitRepos = ['GitHub', 'GitLab', 'Bitbucket'];
 */
 
 const initJadeLambdas = async (bucketName) => {
-  const functionName = jadeLambdaName;
+  const functionName = lambdaNames;
   const functionFile = `${functionName}.js.zip`;
   const functionHandler = `${functionName}.handler`;
   const functionDescription = `Invalidate index.html in Cloudfront on upload to S3.`;

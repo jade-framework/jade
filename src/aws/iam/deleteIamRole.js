@@ -1,7 +1,7 @@
 const {
   asyncDetachRolePolicy,
   asyncDeleteRole,
-} = require("../awsAsyncFunctions");
+} = require('../awsAsyncFunctions');
 
 /**
  * Delete an AWS IAM role
