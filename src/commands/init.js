@@ -99,8 +99,6 @@ const initJadeLambdas = async (bucketName) => {
   }
 };
 
-initJadeLambdas('imhavingananeurysm-a193766a-48f0-4e20-9f8e-70bda355afd5');
-
 const parseName = (name) => {
   name = name.replace(/\s+/gi, '-');
   name = name.toLowerCase();
