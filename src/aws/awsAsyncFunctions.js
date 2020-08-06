@@ -51,7 +51,6 @@ const asyncDeleteBucketObjects = promisify(s3.deleteObjects.bind(s3));
 const asyncCreateS3Bucket = promisify(s3.createBucket.bind(s3));
 const asyncDeleteS3Bucket = promisify(s3.deleteBucket.bind(s3));
 const asyncPutBucketPolicy = promisify(s3.putBucketPolicy.bind(s3));
-const asyncPutBucketTagging = promisify(s3.putBucketTagging.bind(s3));
 const asyncUploadToBucket = promisify(s3.putObject.bind(s3));
 const asyncPutBucketNotificationConfiguration = promisify(
   s3.putBucketNotificationConfiguration.bind(s3),
@@ -73,6 +72,7 @@ const asyncDeleteRole = promisify(iam.deleteRole.bind(iam));
 const asyncCreateInstanceProfile = promisify(
   iam.createInstanceProfile.bind(iam),
 );
+const asyncGetInstanceProfile = promisify(iam.getInstanceProfile.bind(iam));
 const asyncAddRoleToProfile = promisify(iam.addRoleToInstanceProfile.bind(iam));
 const asyncGetRole = promisify(iam.getRole.bind(iam));
 const asyncIamWaitFor = promisify(iam.waitFor.bind(iam));
@@ -110,7 +110,6 @@ module.exports = {
   asyncCreateS3Bucket,
   asyncDeleteS3Bucket,
   asyncPutBucketPolicy,
-  asyncPutBucketTagging,
   asyncUploadToBucket,
   asyncPutBucketNotificationConfiguration,
   asyncCreateCloudfrontDistribution,
@@ -121,6 +120,7 @@ module.exports = {
   asyncCreateRole,
   asyncDeleteRole,
   asyncCreateInstanceProfile,
+  asyncGetInstanceProfile,
   asyncAddRoleToProfile,
   asyncCreateSecurityGroup,
   asyncDescribeSecurityGroups,

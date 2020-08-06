@@ -216,14 +216,32 @@ const validateBucketUpload = async (name) => {
 };
 
 // Validate user input
-const validateProjectName = (projectName) => {
-  return projectName.length > 0 && projectName.length <= 31;
+const projectNameLength = 31;
+
+const validateProjectName = ({ projectName }) => {
+  return projectName.length > 0 && projectName.length <= projectNameLength;
 };
 
-const validateGitUrl = (gitUrl) => {
+const promptProjectName = (projectName) => {
+  let valid = validateProjectName({ projectName });
+  if (!valid) {
+    valid = `Your project name needs to be between 1 and ${projectNameLength} characters.`;
+  }
+  return valid;
+};
+
+const validateGitUrl = ({ gitUrl }) => {
   return /(http(s)?)(:(\/\/))(www\.)?(github|gitlab|bitbucket).com([\w\.@\:/\-~]+)(\.git)?(\/)?/.test(
     gitUrl,
   );
+};
+
+const promptGitUrl = (gitUrl) => {
+  let valid = validateGitUrl({ gitUrl });
+  if (!valid) {
+    valid = `The url should be in the form "https://github.com/user/repo"`;
+  }
+  return valid;
 };
 
 const validateUserInitInput = async (input) => {
@@ -231,7 +249,7 @@ const validateUserInitInput = async (input) => {
     {
       validation: validateProjectName,
       invalidBoolean: false,
-      invalidMessage: `Project name ${projectName} is invalid. Please make sure it is between 1 and 31 characters.`,
+      invalidMessage: `Project name ${projectName} is invalid. Please make sure it is between 1 and ${projectNameLength} characters.`,
     },
     {
       validation: validateGitUrl,
@@ -270,6 +288,6 @@ module.exports = {
   validateLambdaDeletion,
   validateBucketUpload,
   validateUserInitInput,
-  validateProjectName,
-  validateGitUrl,
+  promptProjectName,
+  promptGitUrl,
 };

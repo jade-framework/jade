@@ -94,7 +94,7 @@ const sendSetupFiles = async (host, maxRetries = 10, attempts = 0) => {
     });
 };
 
-async function installEc2JadeEnvironment() {
+async function installEc2JadeEnvironment(bucketName) {
   try {
     const privateKey = await readFile(join(jadePath, privateKeyFilename));
     jadeLog('Reading EC2 data...');
@@ -108,10 +108,10 @@ async function installEc2JadeEnvironment() {
       privateKey,
     };
 
-    const bucketJson = await readJSONFile('s3BucketName', jadePath);
-    const bucketName = bucketJson.bucketName;
     const config = await readConfig(cwd);
-    const gitUrl = config.gitUrl;
+    const project = config.find((obj) => obj.bucketName === bucketName);
+    console.log(project);
+    const gitUrl = project.gitUrl;
     jadeLog('Beginning connection to EC2 server...');
 
     await sendSetupFiles(host);

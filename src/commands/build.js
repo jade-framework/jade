@@ -4,11 +4,11 @@ const { installEc2JadeEnvironment } = require('./installEc2JadeEnvironment');
 const { printBuildSuccess } = require('./printBuildSuccess');
 const { jadeErr } = require('../util/logger');
 
-async function build() {
+async function build(bucketName) {
   try {
     await configEc2IamRole();
     await createAndConfigEc2();
-    await installEc2JadeEnvironment();
+    await installEc2JadeEnvironment(bucketName);
     await printBuildSuccess();
   } catch (err) {
     jadeErr(err);
