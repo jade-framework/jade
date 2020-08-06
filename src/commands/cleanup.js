@@ -4,11 +4,13 @@ const deleteLambdaFunction = require('../aws/lambda/deleteLambdaFunction');
 const {
   lambdaRolePolicies,
   lambdaIamRoleName,
-  lambdaFunctionName,
+  lambdaNames,
 } = require('../templates/constants');
 
 const cleanup = async () => {
   deleteAllBuckets();
-  deleteIamRole(lambdaIamRoleName, lambdaRolePolicies);
-  deleteLambdaFunction(lambdaFunctionName);
+  await deleteIamRole(lambdaIamRoleName, lambdaRolePolicies);
+  deleteLambdaFunction(lambdaNames);
 };
+
+module.exports = cleanup;
