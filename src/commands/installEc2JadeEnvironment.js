@@ -41,7 +41,10 @@ const webhookCommands = [
 ];
 
 const deployCommands = (bucketName) => {
-  return [`aws s3 sync public s3://${bucketName}`];
+  return [
+    `aws s3 sync public s3://${bucketName}`,
+    `aws s3 sync public s3://${bucketName}-builds/${Date.now()}`,
+  ];
 };
 
 const sendSetupCommands = async (
