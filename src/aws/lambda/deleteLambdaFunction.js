@@ -1,6 +1,6 @@
 const { asyncDeleteLambdaFunction } = require('../awsAsyncFunctions');
 
-const deleteLambdaFunction = async functionName => {
+const deleteLambdaFunction = async (functionName) => {
   try {
     console.log(`Deleting labda function ${functionName}`);
     await asyncDeleteLambdaFunction({ FunctionName: functionName });

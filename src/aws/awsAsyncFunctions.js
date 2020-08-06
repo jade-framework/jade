@@ -72,6 +72,7 @@ const asyncCreateInstanceProfile = promisify(
 );
 const asyncAddRoleToProfile = promisify(iam.addRoleToInstanceProfile.bind(iam));
 const asyncGetRole = promisify(iam.getRole.bind(iam));
+const asyncDetachRolePolicy = promisify(iam.detachRolePolicy.bind(iam));
 
 // EC2
 const asyncCreateSecurityGroup = promisify(ec2.createSecurityGroup.bind(ec2));
@@ -127,4 +128,6 @@ module.exports = {
   asyncCreateCloudfrontInvalidation,
   asyncPutBucketTagging,
   asyncGetBucketTagging,
+  asyncDeleteLambdaFunction,
+  asyncDetachRolePolicy,
 };

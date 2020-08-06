@@ -1,7 +1,7 @@
 const {
   asyncDetachRolePolicy,
   asyncDeleteRole,
-} = require("../awsAsyncFunctions");
+} = require('../awsAsyncFunctions');
 
 /**
  * Delete an AWS IAM role
@@ -21,3 +21,8 @@ const deleteIamRole = async (iamRoleName, iamPolicyArns) => {
 };
 
 module.exports = { deleteIamRole };
+deleteIamRole('lambda-s3-role-2', [
+  'arn:aws:iam::aws:policy/CloudFrontFullAccess',
+  'arn:aws:iam::aws:policy/AWSLambdaExecute',
+  'arn:aws:iam::aws:policy/service-role/AWSLambdaRole',
+]);

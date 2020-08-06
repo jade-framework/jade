@@ -6,7 +6,7 @@ const createLambdaFunction = async (
   functionName,
   handler,
   description = 'Sample description',
-  role
+  role,
 ) => {
   const params = {
     Code: {
