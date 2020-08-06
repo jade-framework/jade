@@ -38,7 +38,11 @@ const {
   promptGitUrl,
   validateBucketCreation,
 } = require('../util/validations');
-const { lambdaIamRoleName, lambdaNames } = require('../templates/constants');
+const {
+  lambdaIamRoleName,
+  lambdaNames,
+  s3BucketName,
+} = require('../templates/constants');
 
 const gitRepos = ['GitHub', 'GitLab', 'Bitbucket'];
 
@@ -108,20 +112,20 @@ const parseName = (name) => {
 const start = async (directory, { projectName, bucketName, gitUrl }) => {
   let bucketNames = [];
   const jadePath = getJadePath(directory);
-  if (await exists(join(jadePath, 's3BucketName.json'))) {
-    bucketNames = await readJSONFile('s3BucketName', jadePath);
+  if (await exists(join(jadePath, `${s3BucketName}.json`))) {
+    bucketNames = await readJSONFile(s3BucketName, jadePath);
   }
-  await createJSONFile('s3BucketName', jadePath, [
+  await createJSONFile(s3BucketName, jadePath, [
     ...bucketNames,
     { projectName, bucketName, gitUrl },
   ]);
 
-  await createBuckets(bucketName);
+  // await createBuckets(bucketName);
 
-  const lambdaArn = await initJadeLambdas(bucketName);
-  await createCloudfrontDistribution(bucketName);
-  await setBucketNotificationConfig(bucketName, lambdaArn);
-  await build(bucketName);
+  // const lambdaArn = await initJadeLambdas(bucketName);
+  // await createCloudfrontDistribution(bucketName);
+  // await setBucketNotificationConfig(bucketName, lambdaArn);
+  // await build(bucketName);
 };
 
 const initialQuestions = async (config) => {
