@@ -120,12 +120,12 @@ const start = async (directory, { projectName, bucketName, gitUrl }) => {
     { projectName, bucketName, gitUrl },
   ]);
 
-  // await createBuckets(bucketName);
+  await createBuckets(bucketName);
 
-  // const lambdaArn = await initJadeLambdas(bucketName);
-  // await createCloudfrontDistribution(bucketName);
-  // await setBucketNotificationConfig(bucketName, lambdaArn);
-  // await build(bucketName);
+  const lambdaArn = await initJadeLambdas(bucketName);
+  await createCloudfrontDistribution(bucketName);
+  await setBucketNotificationConfig(bucketName, lambdaArn);
+  await build(bucketName);
 };
 
 const initialQuestions = async (config) => {
@@ -178,9 +178,21 @@ const noGitAlert = async () => {
       name: 'noGit',
       message: `Thank you for using Jade. To continue, please setup a Git repository with one of these providers: ${gitRepos.join(
         ' | ',
-      )}\n\x1b[30;0mPress any key to continue...`,
+      )}\n\x1b[30;0mPress enter to continue...`,
     },
   ]);
+};
+
+const confirmResponses = async ({ projectName, gitUrl }) => {
+  const message = `Your project name is: | ${projectName} |\nYour Git URL is: | ${gitUrl} |\nIs this correct?`;
+  const answer = await prompt([
+    {
+      type: 'confirm',
+      name: 'confirmed',
+      message,
+    },
+  ]);
+  return answer;
 };
 
 const init = async (directory) => {
@@ -205,18 +217,21 @@ const init = async (directory) => {
         const projectData = { ...initialAns, ...gitAns, bucketName };
         const newConfig = [...config, projectData];
         await writeConfig(directory, newConfig);
-        jadeLog('Thank you! The Jade framework will now be setup.');
-        await start(directory, projectData);
+        const proceed = await confirmResponses(projectData);
+        if (proceed) {
+          jadeLog('Thank you! The Jade framework will now be setup.');
+          await start(directory, projectData);
+        } else {
+          jadeLog('Please run this `jade init` again to restart.');
+        }
       } else {
         jadeLog(
-          'Sorry your project name does not generate a valid AWS bucket. Please try again.',
+          'Sorry, your project name did not generate a valid AWS bucket. Please try again.',
         );
       }
     } else {
       await noGitAlert();
     }
-
-    // Implement some kind of check for the user "is this info correct?"
   } catch (err) {
     jadeErr(err);
   }
