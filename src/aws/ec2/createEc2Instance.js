@@ -1,7 +1,7 @@
 const {
   asyncRunInstances,
   asyncAssociateIamInstanceProfile,
-  asyncWaitFor,
+  asyncEc2WaitFor,
 } = require('../awsAsyncFunctions');
 
 const {
@@ -58,7 +58,7 @@ const createEc2Instance = async () => {
     const InstanceId = runInstancesResponse.Instances[0].InstanceId;
 
     console.log('Waiting for EC2 instance to start running...');
-    await asyncWaitFor('instanceRunning', { InstanceIds: [InstanceId] });
+    await asyncEc2WaitFor('instanceRunning', { InstanceIds: [InstanceId] });
 
     console.log('Associating IAM instance profile with EC2 instance...');
     await asyncAssociateIamInstanceProfile({

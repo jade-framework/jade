@@ -1,11 +1,11 @@
-const { asyncAddPermission } = require("../awsAsyncFunctions");
+const { asyncAddPermission } = require('../awsAsyncFunctions');
 
 const createLambdaPermission = async (params) => {
   try {
-    const response = await asyncAddPermission(params);
-    console.log("Successfully added lambda permission.", response);
+    await asyncAddPermission(params);
+    console.log('Successfully added lambda permission.');
   } catch (error) {
-    console.log("Error adding lambda permission.", error, error.stack);
+    console.log('Error adding lambda permission.', error, error.stack);
   }
 };
 

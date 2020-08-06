@@ -1,12 +1,14 @@
-const fs = require("fs");
-const { join } = require("path");
-const { promisify } = require("util");
+const fs = require('fs');
+const { join } = require('path');
+const { promisify } = require('util');
 
-const getJadePath = (path) => join(path, ".jade");
+const getJadePath = (path) => join(path, '.jade');
 const mkdir = promisify(fs.mkdir);
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 const chmod = promisify(fs.chmod);
+const readdir = promisify(fs.readdir);
+const unlink = promisify(fs.unlink);
 
 const exists = async (path) =>
   new Promise((res) => {
@@ -15,7 +17,7 @@ const exists = async (path) =>
 
 const readConfig = async (path) => {
   const jadePath = getJadePath(path);
-  const config = await readFile(join(jadePath, "config.json"));
+  const config = await readFile(join(jadePath, 'config.json'));
   return JSON.parse(config);
 };
 
@@ -23,7 +25,7 @@ const readConfig = async (path) => {
 const writeConfig = async (path, config) => {
   const jadePath = getJadePath(path);
   const configJSON = JSON.stringify(config, null, 2);
-  await writeFile(join(jadePath, "config.json"), configJSON);
+  await writeFile(join(jadePath, 'config.json'), configJSON);
 };
 
 const createDirectory = async (name, path) => {
@@ -50,10 +52,12 @@ const sleep = async (ms) => new Promise((r) => setTimeout(r, ms));
 module.exports = {
   join,
   exists,
+  chmod,
+  readdir,
+  unlink,
   getJadePath,
   readFile,
   writeFile,
-  chmod,
   readConfig,
   writeConfig,
   createDirectory,

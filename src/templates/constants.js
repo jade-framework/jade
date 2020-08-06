@@ -20,6 +20,7 @@ const lambdaRolePolicies = [
   'arn:aws:iam::aws:policy/AWSLambdaExecute',
   'arn:aws:iam::aws:policy/service-role/AWSLambdaRole',
 ];
+const s3BucketName = 's3BucketName';
 
 module.exports = {
   instanceType,
@@ -38,4 +39,5 @@ module.exports = {
   jadePrefix,
   lambdaNames,
   lambdaRolePolicies,
+  s3BucketName,
 };

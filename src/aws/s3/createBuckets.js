@@ -2,6 +2,14 @@ const { createBucket } = require('./createBucket');
 const { updateBucketPolicy } = require('./updateBucketPolicy');
 
 const createBuckets = async (bucketName) => {
+<<<<<<< HEAD
+  await createBucket(`${bucketName}`);
+  await updateBucketPolicy(`${bucketName}`);
+  // await createBucket(`${bucketName}-copy`);
+  // updateBucketPolicy(`${bucketName}-copy`);
+  await createBucket(`${bucketName}-lambda`);
+  await updateBucketPolicy(`${bucketName}-lambda`);
+=======
   try {
     await createBucket(`${bucketName}`);
     updateBucketPolicy(`${bucketName}`);
@@ -14,6 +22,7 @@ const createBuckets = async (bucketName) => {
   } catch (error) {
     console.log(error);
   }
+>>>>>>> master
 };
 
 module.exports = {

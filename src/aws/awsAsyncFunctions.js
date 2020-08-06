@@ -3,8 +3,9 @@ const S3 = require('aws-sdk/clients/s3');
 const CloudFront = require('aws-sdk/clients/cloudfront');
 const AWS = require('aws-sdk/global');
 const Lambda = require('aws-sdk/clients/lambda');
-const awsIAM = require('aws-sdk/clients/iam');
+const IAM = require('aws-sdk/clients/iam');
 const EC2 = require('aws-sdk/clients/ec2');
+const STS = require('aws-sdk/clients/sts');
 const Dynamo = require('aws-sdk/clients/dynamodb');
 const { getRegion } = require('../util/getRegion');
 
@@ -16,8 +17,9 @@ AWS.config.update({ apiVersion, region });
 const s3 = new S3();
 const cloudfront = new CloudFront();
 const lambda = new Lambda();
-const iam = new awsIAM();
+const iam = new IAM();
 const ec2 = new EC2();
+const sts = new STS();
 const dynamo = new Dynamo();
 
 // CLOUDFRONT
@@ -72,8 +74,10 @@ const asyncDeleteRole = promisify(iam.deleteRole.bind(iam));
 const asyncCreateInstanceProfile = promisify(
   iam.createInstanceProfile.bind(iam),
 );
+const asyncGetInstanceProfile = promisify(iam.getInstanceProfile.bind(iam));
 const asyncAddRoleToProfile = promisify(iam.addRoleToInstanceProfile.bind(iam));
 const asyncGetRole = promisify(iam.getRole.bind(iam));
+const asyncIamWaitFor = promisify(iam.waitFor.bind(iam));
 const asyncDetachRolePolicy = promisify(iam.detachRolePolicy.bind(iam));
 
 // EC2
@@ -85,13 +89,18 @@ const asyncAuthorizeSecurityGroupIngress = promisify(
   ec2.authorizeSecurityGroupIngress.bind(ec2),
 );
 const asyncCreateKeyPair = promisify(ec2.createKeyPair.bind(ec2));
+const asyncDescribeKeyPairs = promisify(ec2.describeKeyPairs.bind(ec2));
+const asyncDeleteKeyPair = promisify(ec2.deleteKeyPair.bind(ec2));
 const asyncDescribeInstances = promisify(ec2.describeInstances.bind(ec2));
 const asyncRunInstances = promisify(ec2.runInstances.bind(ec2));
 const asyncAssociateIamInstanceProfile = promisify(
   ec2.associateIamInstanceProfile.bind(ec2),
 );
-const asyncWaitFor = promisify(ec2.waitFor.bind(ec2));
+const asyncEc2WaitFor = promisify(ec2.waitFor.bind(ec2));
 const asyncDescribeImages = promisify(ec2.describeImages.bind(ec2));
+
+// STS
+const asyncGetCallerIdentity = promisify(sts.getCallerIdentity.bind(sts));
 
 // DYNAMO
 const asyncCreateTable = promisify(dynamo.createTable.bind(dynamo));
@@ -113,26 +122,32 @@ module.exports = {
   asyncCreateCloudfrontDistribution,
   asyncAddPermission,
   asyncCreateLambdaFunction,
+  asyncDeleteLambdaFunction,
   asyncAttachRolePolicy,
   asyncCreateRole,
   asyncDeleteRole,
   asyncCreateInstanceProfile,
+  asyncGetInstanceProfile,
   asyncAddRoleToProfile,
   asyncCreateSecurityGroup,
   asyncDescribeSecurityGroups,
   asyncAuthorizeSecurityGroupIngress,
   asyncCreateKeyPair,
+  asyncDescribeKeyPairs,
+  asyncDeleteKeyPair,
   asyncDescribeInstances,
   asyncRunInstances,
   asyncAssociateIamInstanceProfile,
-  asyncWaitFor,
+  asyncEc2WaitFor,
   asyncDescribeImages,
   asyncHeadBucket,
   asyncGetRole,
+  asyncIamWaitFor,
   asyncGetFunction,
   asyncUpdateCloudfrontDistribution,
   asyncGetCloudfrontDistributionConfig,
   asyncCreateCloudfrontInvalidation,
+  asyncGetCallerIdentity,
   asyncPutBucketTagging,
   asyncGetBucketTagging,
   asyncDeleteLambdaFunction,

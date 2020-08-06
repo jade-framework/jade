@@ -41,14 +41,14 @@ const createLambdaRole = async (roleName) => {
 
   try {
     const createResponse = await asyncCreateRole(createParams);
-    console.log('Successfully created Lambda role.', createResponse);
+    console.log('Successfully created Lambda role.');
 
-    const attachResponse = await asyncAttachRolePolicy(lambdaPolicyParam1);
-    console.log('Successfully attached policy.', attachResponse);
-    const attachResponse2 = await asyncAttachRolePolicy(lambdaPolicyParam2);
-    console.log('Successfully attached policy.', attachResponse2);
-    const attachResponse3 = await asyncAttachRolePolicy(lambdaPolicyParam3);
-    console.log('Successfully attached policy.', attachResponse3);
+    await asyncAttachRolePolicy(lambdaPolicyParam1);
+    console.log('Successfully attached Lambda Role policy.');
+    await asyncAttachRolePolicy(lambdaPolicyParam2);
+    console.log('Successfully attached Lambda Execute policy.');
+    await asyncAttachRolePolicy(lambdaPolicyParam3);
+    console.log('Successfully attached CloudFront policy.');
     return createResponse;
   } catch (error) {
     console.log('Could not create role.', error);
