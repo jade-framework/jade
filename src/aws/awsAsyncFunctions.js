@@ -7,6 +7,8 @@ const IAM = require('aws-sdk/clients/iam');
 const EC2 = require('aws-sdk/clients/ec2');
 const STS = require('aws-sdk/clients/sts');
 const Dynamo = require('aws-sdk/clients/dynamodb');
+const ApiGateway = require('aws-sdk/clients/apigateway');
+const STS = require('aws-sdk/clients/sts');
 const { getRegion } = require('../util/getRegion');
 
 const region = getRegion();
@@ -21,6 +23,8 @@ const iam = new IAM();
 const ec2 = new EC2();
 const sts = new STS();
 const dynamo = new Dynamo();
+const apigateway = new ApiGateway();
+const sts = new STS();
 
 // CLOUDFRONT
 const asyncCreateCloudfrontDistribution = promisify(
@@ -107,6 +111,23 @@ const asyncCreateTable = promisify(dynamo.createTable.bind(dynamo));
 const asyncPutItem = promisify(dynamo.putItem.bind(dynamo));
 const asyncDynamoWaitFor = promisify(dynamo.waitFor.bind(dynamo));
 
+// ApiGateway
+const asyncCreateRestApi = promisify(apigateway.createRestApi.bind(apigateway));
+const asyncGetResources = promisify(apigateway.getResources.bind(apigateway));
+const asyncPutMethod = promisify(apigateway.putMethod.bind(apigateway));
+const asyncPutIntegration = promisify(
+  apigateway.putIntegration.bind(apigateway),
+);
+const asyncCreateResource = promisify(
+  apigateway.createResource.bind(apigateway),
+);
+const asyncCreateDeployment = promisify(
+  apigateway.createDeployment.bind(apigateway),
+);
+
+// STS
+const asyncGetCallerIdentity = promisify(sts.getCallerIdentity.bind(sts));
+
 module.exports = {
   // asyncGetDistribution,
   asyncListDistributions,
@@ -155,4 +176,11 @@ module.exports = {
   asyncCreateTable,
   asyncPutItem,
   asyncDynamoWaitFor,
+  asyncCreateRestApi,
+  asyncCreateResource,
+  asyncGetResources,
+  asyncGetCallerIdentity,
+  asyncPutMethod,
+  asyncPutIntegration,
+  asyncCreateDeployment,
 };
