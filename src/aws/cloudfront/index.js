@@ -12,6 +12,8 @@
 const {
   createCloudFrontDistribution,
 } = require('./createCloudFrontDistribution');
-const { getCloudFrontDistribution } = require('./getCloudFrontDistribution');
+const {
+  getCloudFrontDistributionId,
+} = require('./getCloudFrontDistributionId');
 
-module.exports = { createCloudFrontDistribution, getCloudFrontDistribution };
+module.exports = { createCloudFrontDistribution, getCloudFrontDistributionId };
