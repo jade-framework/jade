@@ -6,12 +6,7 @@ const {
   getCloudfrontDistribution,
 } = require('../aws/cloudfront/getCloudfrontDistributionId');
 
-const {
-  writeConfig,
-  getJadePath,
-  readJSONFile,
-} = require('../../util/fileUtils');
-const deleteCloudfrontDistribution = require('../aws/cloudfront/deleteCloudfrontDistribution');
+const { writeConfig, getJadePath, readJSONFile } = require('../util/fileUtils');
 
 const deleteApp = async (path, apps) => {
   const jadePath = getJadePath(path);
