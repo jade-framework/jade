@@ -12,7 +12,7 @@ const executeCommand = async (command, args, homedir) => {
   } else if (command === 'add') {
     await add(homedir, args);
   } else if (command === 'delete') {
-    await deleteApp(homedir, args[0]);
+    await deleteApp(homedir, args);
   } else if (command === 'destroy') {
     console.log('destroy entire app');
   } else if (commandIsHelp(command) || commandIsBlank(command)) {

@@ -13,29 +13,32 @@ const {
 } = require('../../util/fileUtils');
 const deleteCloudfrontDistribution = require('../aws/cloudfront/deleteCloudfrontDistribution');
 
-const deleteApp = async (path, appName) => {
+const deleteApp = async (path, apps) => {
   const jadePath = getJadePath(path);
 
-  try {
-    let config = await readJSONFile('config', jadePath);
-    const appConfig = config.find((app) => {
-      app.projectName === appName;
-    });
-    const bucketName = appConfig.bucketName;
-    deleteBucket(bucketName);
-    deleteBucket(`${bucketName}-builds`);
-    deleteBucket(`${bucketName}-lambda`);
+  for (let i = 0; i < apps.length; i += 1) {
+    try {
+      let config = await readJSONFile('config', jadePath);
+      const appConfig = config.find((app) => {
+        app.projectName === appName;
+      });
+      const bucketName = appConfig.bucketName;
+      deleteBucket(bucketName);
+      deleteBucket(`${bucketName}-builds`);
+      deleteBucket(`${bucketName}-lambda`);
 
-    const cloudfrontId = await getCloudfrontDistribution(bucketName);
-    await deleteCloudfrontDistribution(cloudfrontId);
+      const cloudfrontId = await getCloudfrontDistribution(bucketName);
+      await deleteCloudfrontDistribution(cloudfrontId);
 
-    config = config.filter((app) => {
-      return app.projectName !== appName;
-    });
+      config = config.filter((app) => {
+        return app.projectName !== appName;
+      });
 
-    await writeConfig(path, config);
-  } catch (err) {
-    console.log(err);
+      await writeConfig(path, config);
+    } catch (err) {
+      console.log(err);
+    }
+    27;
   }
 };
 
