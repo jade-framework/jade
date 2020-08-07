@@ -1,6 +1,7 @@
 const { credentials } = require('./getCredentials');
 const { jadeErr } = require('./logger.js');
 const { exists, readFile } = require('./fileUtils');
+const { asyncGetCallerIdentity } = require('../aws/awsAsyncFunctions');
 
 const {
   asyncHeadBucket,
@@ -11,7 +12,7 @@ const {
 
 const cwd = process.cwd();
 
-// checks for AWS credentials
+// AWS Credentials helper methods
 const awsCredentialsConfigured = () => {
   console.log('Looking for AWS Credentials...');
 
@@ -19,10 +20,15 @@ const awsCredentialsConfigured = () => {
     console.log('Access Key:', credentials.accessKeyId);
     return true;
   } else {
-    jadeErr('CredentialsError: Could not load credentials from any providers');
-    console.log(
-      'For instructions, please visit: https://awscli.amazonaws.com/v2/documentation/api/latest/topic/config-vars.html',
-    );
+    return false;
+  }
+};
+
+const isValidAwsCredentials = async () => {
+  try {
+    await asyncGetCallerIdentity();
+    return true;
+  } catch (err) {
     return false;
   }
 };
@@ -263,6 +269,27 @@ const validateUserInitInput = async (input) => {
   return status;
 };
 
+// Validate AWS credentials
+const validateAwsCredentials = async () => {
+  const validations = [
+    {
+      validation: awsCredentialsConfigured,
+      invalidBoolean: false,
+      invalidMessage:
+        'CredentialsError: Could not load credentials from any providers. For instructions, please visit: https://awscli.amazonaws.com/v2/documentation/api/latest/topic/config-vars.html',
+    },
+    {
+      validation: isValidAwsCredentials,
+      invalidBoolean: false,
+      invalidMessage: `Credentials are invalid. Please configure the correct AWS Credentials.`,
+    },
+  ];
+
+  const status = await validateResource(null, validations);
+
+  return status;
+};
+
 // Validations helper method
 const validateResource = async (resourceData, validations) => {
   let msg;
@@ -290,4 +317,5 @@ module.exports = {
   validateUserInitInput,
   promptProjectName,
   promptGitUrl,
+  validateAwsCredentials,
 };
