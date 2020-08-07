@@ -3,55 +3,48 @@
 const uuid = require('uuid');
 
 const {
-  asyncCreateTable,
-  asyncPutItem,
+  asyncDynamoCreateTable,
+  asyncDynamoDescribeTable,
   asyncDynamoWaitFor,
 } = require('../awsAsyncFunctions');
 
-const createDynamoTable = async (tableName, appName) => {
+// to discuss: AWS.config.update({endpoint: "http://localhost:8000"})
+
+const createDynamoTable = async (tableName) => {
   console.log('Creating DynamoDB table...');
 
   const params = {
     TableName: tableName,
-    AttributeDefinitions: [
-      {
-        AttributeName: 'AppID',
-        AttributeType: 'S',
-      },
-    ],
     KeySchema: [
       {
-        AttributeName: 'AppID',
+        AttributeName: 'AppId',
         KeyType: 'HASH',
       },
     ],
+    AttributeDefinitions: [
+      {
+        AttributeName: 'AppId',
+        AttributeType: 'S',
+      },
+    ],
     BillingMode: 'PAY_PER_REQUEST',
-  };
-
-  const putParams = {
-    TableName: tableName,
-    Item: {
-      AppID: {
-        S: uuid.v4(),
+    Tags: [
+      {
+        Key: 'project',
+        Value: 'jade',
       },
-      AppName: {
-        S: appName,
-      },
-    },
+    ],
   };
 
   try {
-    const createResponse = await asyncCreateTable(params);
-    console.log(`DynamoDB table ${tableName} created.`, createResponse);
+    const createResponse = await asyncDynamoCreateTable(params);
 
     await asyncDynamoWaitFor('tableExists', { TableName: tableName });
-
-    const putResponse = await asyncPutItem(putParams);
-    console.log(`Put items to table ${tableName}.`, putResponse);
+    console.log(await asyncDynamoDescribeTable({ TableName: tableName }));
+    console.log(`DynamoDB table ${tableName} created.`, createResponse);
   } catch (error) {
     console.log('Error creating DynamoDB table', error);
   }
 };
 
 module.exports = { createDynamoTable };
-createDynamoTable('Jade', 'My App');

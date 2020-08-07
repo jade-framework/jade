@@ -4,12 +4,11 @@ const {
   readJSONFile,
   readFile,
   sleep,
-  createJSONFile,
   readConfig,
-} = require('../util/fileUtils');
-const { cwd, privateKeyFilename } = require('../templates/constants');
-const { getConnection } = require('../util/sshConnection');
-const { jadeLog, jadeErr } = require('../util/logger');
+} = require('../../util/fileUtils');
+const { cwd, privateKeyFilename } = require('../../templates/constants');
+const { getConnection } = require('../../util/sshConnection');
+const { jadeLog, jadeErr } = require('../../util/logger');
 
 const jadePath = getJadePath(cwd);
 const remoteDir = '/home/ec2-user/server';
