@@ -15,7 +15,6 @@ const {
   asyncIamWaitFor,
   asyncGetCallerIdentity,
 } = require('../awsAsyncFunctions');
-
 const initJadeLambdas = async (bucketName) => {
   const functionName = lambdaNames;
   const functionFile = `${functionName}.js.zip`;
@@ -45,6 +44,7 @@ const initJadeLambdas = async (bucketName) => {
     }
     let lambdaResponse = await lambdaExists(functionName);
     let lambdaArn;
+
     if (!lambdaResponse) {
       lambdaResponse = await createLambdaFunction(
         `${bucketName}-lambda`,
