@@ -123,9 +123,6 @@ const asyncCreateDeployment = promisify(
   apigateway.createDeployment.bind(apigateway),
 );
 
-// STS
-const asyncGetCallerIdentity = promisify(sts.getCallerIdentity.bind(sts));
-
 module.exports = {
   // asyncGetDistribution,
   asyncListDistributions,
