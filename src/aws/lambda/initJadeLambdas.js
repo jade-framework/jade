@@ -74,4 +74,4 @@ const initJadeLambdas = async (bucketName) => {
   }
 };
 
-module.exports = initJadeLambdas;
+module.exports = { initJadeLambdas };

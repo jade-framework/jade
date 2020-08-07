@@ -70,7 +70,7 @@ const sendSetupCommands = async (
       return conn;
     })
     .catch(async (err) => {
-      jadeLog(err);
+      jadeErr(err);
       await sleep(5000);
       sendSetupCommands(host, bucketName, gitUrl, maxRetries, attempts + 1);
     });
@@ -112,7 +112,6 @@ async function installEc2JadeEnvironment(bucketName) {
 
     const config = await readConfig(cwd);
     const project = config.find((obj) => obj.bucketName === bucketName);
-    console.log(project);
     const gitUrl = project.gitUrl;
     jadeLog('Beginning connection to EC2 server...');
 
