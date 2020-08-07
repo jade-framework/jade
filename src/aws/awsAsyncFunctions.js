@@ -8,7 +8,6 @@ const EC2 = require('aws-sdk/clients/ec2');
 const STS = require('aws-sdk/clients/sts');
 const Dynamo = require('aws-sdk/clients/dynamodb');
 const ApiGateway = require('aws-sdk/clients/apigateway');
-const STS = require('aws-sdk/clients/sts');
 const { getRegion } = require('../util/getRegion');
 
 const region = getRegion();
@@ -24,7 +23,6 @@ const ec2 = new EC2();
 const sts = new STS();
 const dynamo = new Dynamo();
 const apigateway = new ApiGateway();
-const sts = new STS();
 
 // CLOUDFRONT
 const asyncCreateCloudfrontDistribution = promisify(
@@ -124,9 +122,6 @@ const asyncCreateResource = promisify(
 const asyncCreateDeployment = promisify(
   apigateway.createDeployment.bind(apigateway),
 );
-
-// STS
-const asyncGetCallerIdentity = promisify(sts.getCallerIdentity.bind(sts));
 
 module.exports = {
   // asyncGetDistribution,
