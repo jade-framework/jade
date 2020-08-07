@@ -8,7 +8,7 @@ const {
   createLambdaPermission,
   createLambdaRole,
   lambdaExists,
-} = require('.');
+} = require('./index');
 const { uploadToBucket } = require('../s3');
 const { roleExists } = require('../iam');
 const {
@@ -74,4 +74,4 @@ const initJadeLambdas = async (bucketName) => {
   }
 };
 
-module.exports = { initJadeLambdas };
+module.exports = initJadeLambdas;

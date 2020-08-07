@@ -18,7 +18,7 @@ const { createCloudfrontDistribution } = require('../aws/cloudfront');
 //   asyncIamWaitFor,
 //   asyncGetCallerIdentity,
 // } = require('../aws/awsAsyncFunctions');
-const { initJadeLambdas } = require('../aws/lambda');
+const initJadeLambdas = require('../aws/lambda/initJadeLambdas');
 
 const {
   createDirectory,
