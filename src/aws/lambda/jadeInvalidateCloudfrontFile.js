@@ -1,19 +1,19 @@
 /**
- * An AWS Lambda function that invalidates a file in a Cloudfront distribution
+ * An AWS Lambda function that invalidates a file in a CloudFront distribution
  */
 const util = require('util');
 const { promisify } = require('util');
-const Cloudfront = require('aws-sdk/clients/cloudfront');
+const CloudFront = require('aws-sdk/clients/cloudfront');
 
-const cloudfront = new Cloudfront();
-const asyncCreateCloudfrontInvalidation = promisify(
-  cloudfront.createInvalidation.bind(cloudfront),
+const cloudFront = new CloudFront();
+const asyncCreateCloudFrontInvalidation = promisify(
+  cloudFront.createInvalidation.bind(cloudFront),
 );
 const asyncListDistributions = promisify(
-  cloudfront.listDistributions.bind(cloudfront),
+  cloudFront.listDistributions.bind(cloudFront),
 );
 
-const getCloudfrontDistributionId = async (bucketName) => {
+const getCloudFrontDistributionId = async (bucketName) => {
   let id;
   try {
     const list = await asyncListDistributions();
@@ -34,7 +34,7 @@ exports.handler = async (event, context, callback) => {
     util.inspect(event, { depth: 5 }),
   );
 
-  const distId = await getCloudfrontDistributionId(
+  const distId = await getCloudFrontDistributionId(
     event.Records[0].s3.bucket.name,
   );
   console.log('distId', distId);
@@ -51,7 +51,7 @@ exports.handler = async (event, context, callback) => {
   };
 
   try {
-    const invalidateResponse = await asyncCreateCloudfrontInvalidation(params);
+    const invalidateResponse = await asyncCreateCloudFrontInvalidation(params);
     console.log(invalidateResponse);
   } catch (error) {
     console.log(error);

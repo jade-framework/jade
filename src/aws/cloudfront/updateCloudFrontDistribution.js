@@ -1,14 +1,14 @@
 const {
-  asyncUpdateCloudfrontDistribution,
-  asyncGetCloudfrontDistributionConfig,
-  asyncCreateCloudfrontInvalidation,
-  asyncListDistributions,
+  asyncUpdateCloudFrontDistribution,
+  asyncGetCloudFrontDistributionConfig,
+  asyncCreateCloudFrontInvalidation,
+  asyncListCloudFrontDistributions,
 } = require('../awsAsyncFunctions');
 
-const getCloudfrontDistributionId = async (bucketName) => {
+const getCloudFrontDistributionId = async (bucketName) => {
   let id;
   try {
-    const list = await asyncListDistributions();
+    const list = await asyncListCloudFrontDistributions();
     console.log(list.DistributionList.Items);
     const targetDistribution = list.DistributionList.Items.find(
       (el) => el.DefaultCacheBehavior.TargetOriginId === `S3-${bucketName}`,
@@ -20,15 +20,15 @@ const getCloudfrontDistributionId = async (bucketName) => {
   return id;
 };
 
-const updateCloudfrontDistribution = async () => {
-  // const config = await asyncGetCloudfrontDistributionConfig({ Id: distId });
+const updateCloudFrontDistribution = async () => {
+  // const config = await asyncGetCloudFrontDistributionConfig({ Id: distId });
   // config.DistributionConfig.Origins.Items[0].OriginPath = `/${dirName}`;
   // const params = {
   //   DistributionConfig: config.DistributionConfig,
   //   Id: distId,
   //   IfMatch: config.ETag,
   // };
-  const distId = await getCloudfrontDistributionId(
+  const distId = await getCloudFrontDistributionId(
     'test-398e95ce-925e-4c10-99c3-7d94b837498b',
   );
   const invalidateParams = {
@@ -42,9 +42,9 @@ const updateCloudfrontDistribution = async () => {
     },
   };
   try {
-    // const updateResponse = await asyncUpdateCloudfrontDistribution(params);
+    // const updateResponse = await asyncUpdateCloudFrontDistribution(params);
     // console.log(updateResponse);
-    const invalidateResponse = await asyncCreateCloudfrontInvalidation(
+    const invalidateResponse = await asyncCreateCloudFrontInvalidation(
       invalidateParams,
     );
     console.log(invalidateResponse);
@@ -54,7 +54,7 @@ const updateCloudfrontDistribution = async () => {
 };
 
 module.exports = {
-  updateCloudfrontDistribution,
+  updateCloudFrontDistribution,
 };
 
-updateCloudfrontDistribution();
+// updateCloudFrontDistribution();

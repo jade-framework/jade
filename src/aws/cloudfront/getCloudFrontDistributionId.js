@@ -1,9 +1,9 @@
-const { asyncListDistributions } = require('../awsAsyncFunctions');
+const { asyncListCloudFrontDistributions } = require('../awsAsyncFunctions');
 
-const getCloudfrontDistributionId = async (bucketName) => {
+const getCloudFrontDistributionId = async (bucketName) => {
   let id;
   try {
-    const list = await asyncListDistributions();
+    const list = await asyncListCloudFrontDistributions();
     const targetDistribution = list.DistributionList.Items.find(
       (el) => el.DefaultCacheBehavior.TargetOriginId === bucketName,
     );
@@ -15,9 +15,9 @@ const getCloudfrontDistributionId = async (bucketName) => {
 };
 
 module.exports = {
-  getCloudfrontDistributionId,
+  getCloudFrontDistributionId,
 };
 
-// getCloudfrontDistributionId(
+// getCloudFrontDistributionId(
 //   'S3-test-398e95ce-925e-4c10-99c3-7d94b837498b',
 // ).then((val) => console.log(val));

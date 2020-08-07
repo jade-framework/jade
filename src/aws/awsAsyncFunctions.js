@@ -16,7 +16,7 @@ const apiVersion = 'latest';
 AWS.config.update({ apiVersion, region });
 
 const s3 = new S3();
-const cloudfront = new CloudFront();
+const cloudFront = new CloudFront();
 const lambda = new Lambda();
 const iam = new IAM();
 const ec2 = new EC2();
@@ -25,27 +25,27 @@ const dynamo = new Dynamo();
 const apigateway = new ApiGateway();
 
 // CLOUDFRONT
-const asyncCreateCloudfrontDistribution = promisify(
-  cloudfront.createDistribution.bind(cloudfront),
+const asyncCreateCloudFrontDistribution = promisify(
+  cloudFront.createDistribution.bind(cloudFront),
 );
-const asyncUpdateCloudfrontDistribution = promisify(
-  cloudfront.updateDistribution.bind(cloudfront),
+const asyncUpdateCloudFrontDistribution = promisify(
+  cloudFront.updateDistribution.bind(cloudFront),
 );
-const asyncGetCloudfrontDistributionConfig = promisify(
-  cloudfront.getDistributionConfig.bind(cloudfront),
+const asyncGetCloudFrontDistributionConfig = promisify(
+  cloudFront.getDistributionConfig.bind(cloudFront),
 );
-const asyncCreateCloudfrontInvalidation = promisify(
-  cloudfront.createInvalidation.bind(cloudfront),
+const asyncCreateCloudFrontInvalidation = promisify(
+  cloudFront.createInvalidation.bind(cloudFront),
 );
 
-const asyncListDistributions = promisify(
-  cloudfront.listDistributions.bind(cloudfront),
+const asyncListCloudFrontDistributions = promisify(
+  cloudFront.listDistributions.bind(cloudFront),
 );
-const asyncDeleteDistribution = promisify(
-  cloudfront.deleteDistribution.bind(cloudfront),
+const asyncDeleteCloudFrontDistribution = promisify(
+  cloudFront.deleteDistribution.bind(cloudFront),
 );
 // const asyncGetDistribution = promisify(
-//   cloudfront.getDistribution.bind(cloudfront)
+//   cloudFront.getDistribution.bind(cloudFront)
 // );
 
 // S3
@@ -125,9 +125,6 @@ const asyncCreateDeployment = promisify(
 );
 
 module.exports = {
-  // asyncGetDistribution,
-  asyncListDistributions,
-  // asyncDeleteDistribution,
   asyncListBuckets,
   asyncListBucketObjects,
   asyncDeleteBucketObjects,
@@ -136,7 +133,12 @@ module.exports = {
   asyncPutBucketPolicy,
   asyncUploadToBucket,
   asyncPutBucketNotificationConfiguration,
-  asyncCreateCloudfrontDistribution,
+  asyncCreateCloudFrontDistribution,
+  asyncUpdateCloudFrontDistribution,
+  asyncGetCloudFrontDistributionConfig,
+  asyncCreateCloudFrontInvalidation,
+  asyncListCloudFrontDistributions,
+  asyncDeleteCloudFrontDistribution,
   asyncAddPermission,
   asyncCreateLambdaFunction,
   asyncDeleteLambdaFunction,
@@ -161,9 +163,6 @@ module.exports = {
   asyncGetRole,
   asyncIamWaitFor,
   asyncGetFunction,
-  asyncUpdateCloudfrontDistribution,
-  asyncGetCloudfrontDistributionConfig,
-  asyncCreateCloudfrontInvalidation,
   asyncGetCallerIdentity,
   asyncPutBucketTagging,
   asyncGetBucketTagging,

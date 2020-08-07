@@ -1,6 +1,7 @@
 const { credentials } = require('./getCredentials');
 const { jadeErr } = require('./logger.js');
 const { exists, readFile } = require('./fileUtils');
+const { projectNameLength } = require('../templates/constants');
 
 const {
   asyncHeadBucket,
@@ -13,10 +14,10 @@ const cwd = process.cwd();
 
 // checks for AWS credentials
 const awsCredentialsConfigured = () => {
-  console.log('Looking for AWS Credentials...');
+  // console.log('Looking for AWS Credentials...');
 
   if (credentials) {
-    console.log('Access Key:', credentials.accessKeyId);
+    // console.log('Access Key:', credentials.accessKeyId);
     return true;
   } else {
     jadeErr('CredentialsError: Could not load credentials from any providers');
@@ -214,9 +215,6 @@ const validateBucketUpload = async (name) => {
 
   return status;
 };
-
-// Validate user input
-const projectNameLength = 31;
 
 const validateProjectName = ({ projectName }) => {
   return projectName.length > 0 && projectName.length <= projectNameLength;
