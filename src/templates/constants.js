@@ -21,6 +21,7 @@ const lambdaRolePolicies = [
   'arn:aws:iam::aws:policy/service-role/AWSLambdaRole',
 ];
 const s3BucketName = 's3BucketName';
+const gitRepos = ['GitHub', 'GitLab', 'Bitbucket'];
 
 module.exports = {
   instanceType,
@@ -40,4 +41,5 @@ module.exports = {
   lambdaNames,
   lambdaRolePolicies,
   s3BucketName,
+  gitRepos,
 };

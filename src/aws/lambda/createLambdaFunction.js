@@ -21,7 +21,7 @@ const createLambdaFunction = async (
   };
 
   try {
-    await asyncCreateLambdaFunction(params);
+    const response = await asyncCreateLambdaFunction(params);
     console.log('Successfully created Lambda function.');
     return response;
   } catch (error) {
