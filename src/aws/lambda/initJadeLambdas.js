@@ -1,21 +1,20 @@
 const path = require('path');
 
-const { join, sleep } = require('../../util/fileUtils');
+const { lambdaIamRoleName, lambdaNames } = require('../../templates/constants');
 const { zipit } = require('../../util/zipit');
-
+const { sleep, join } = require('../../util/fileUtils');
+const {
+  createLambdaFunction,
+  createLambdaPermission,
+  createLambdaRole,
+  lambdaExists,
+} = require('./index');
+const { uploadToBucket } = require('../s3');
+const { roleExists } = require('../iam');
 const {
   asyncIamWaitFor,
   asyncGetCallerIdentity,
 } = require('../awsAsyncFunctions');
-const { createLambdaFunction } = require('./createLambdaFunction');
-const { createLambdaPermission } = require('./createLambdaPermission');
-const { createLambdaRole } = require('./createLambdaRole');
-const { lambdaExists } = require('./lambdaExists');
-const { uploadToBucket } = require('../s3');
-const { roleExists } = require('../iam');
-const { lambdaIamRoleName, lambdaNames } = require('../../templates/constants');
-
-// initialize Jade lambdas
 const initJadeLambdas = async (bucketName) => {
   const functionName = lambdaNames;
   const functionFile = `${functionName}.js.zip`;
@@ -43,10 +42,9 @@ const initJadeLambdas = async (bucketName) => {
       await sleep(5000);
       console.log('Lambda role ready.');
     }
-
+    let lambdaResponse = await lambdaExists(functionName);
     let lambdaArn;
 
-    let lambdaResponse = await lambdaExists(functionName);
     if (!lambdaResponse) {
       lambdaResponse = await createLambdaFunction(
         `${bucketName}-lambda`,
@@ -76,4 +74,4 @@ const initJadeLambdas = async (bucketName) => {
   }
 };
 
-module.exports = { initJadeLambdas };
+module.exports = initJadeLambdas;
