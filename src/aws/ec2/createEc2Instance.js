@@ -51,7 +51,7 @@ const createEc2Instance = async () => {
       ...runInstancesParams,
       ImageId: await getAmi(),
       KeyName: keyPairData.KeyName,
-      SecurityGroupIds: [securityGroupData.GroupId],
+      SecurityGroupIds: [securityGroupData.SecurityGroups[0].GroupId],
     });
 
     await createJSONFile('ec2Instance', jadePath, runInstancesResponse);

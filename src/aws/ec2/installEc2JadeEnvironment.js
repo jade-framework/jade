@@ -72,28 +72,38 @@ const sendSetupCommands = async (
     .catch(async (err) => {
       jadeErr(err);
       await sleep(5000);
-      sendSetupCommands(host, bucketName, gitUrl, maxRetries, attempts + 1);
+      await sendSetupCommands(
+        host,
+        bucketName,
+        gitUrl,
+        maxRetries,
+        attempts + 1,
+      );
     });
 };
 
 const sendSetupFiles = async (host, maxRetries = 10, attempts = 0) => {
-  if (attempts >= maxRetries) return Promise.reject('Too many attempts.');
-  await getConnection(host)
-    .then(async (conn) => {
-      await conn.asyncSftp(
-        remoteDir,
-        join(localDir, 'server.js'),
-        join(localDir, 'triggerBuild.js'),
-        join(localDir, 'sysmon.conf'),
-        join(jadePath, 's3BucketName.json'),
-      );
-      return conn;
-    })
-    .catch(async (err) => {
-      jadeErr(err);
-      await sleep(5000);
-      sendSetupFiles(host, maxRetries, attempts + 1);
-    });
+  try {
+    if (attempts >= maxRetries) return Promise.reject('Too many attempts.');
+    await getConnection(host)
+      .then(async (conn) => {
+        await conn.asyncSftp(
+          remoteDir,
+          join(localDir, 'server.js'),
+          join(localDir, 'triggerBuild.js'),
+          join(localDir, 'sysmon.conf'),
+          join(jadePath, 's3BucketName.json'),
+        );
+        return conn;
+      })
+      .catch(async (err) => {
+        jadeErr(err);
+        await sleep(5000);
+        await sendSetupFiles(host, maxRetries, attempts + 1);
+      });
+  } catch (err) {
+    jadeErr(err);
+  }
 };
 
 async function installEc2JadeEnvironment(bucketName) {
