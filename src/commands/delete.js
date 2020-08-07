@@ -1,10 +1,10 @@
 const { deleteBucket } = require('../aws/s3/deleteBucket');
 const {
-  deleteCloudfrontDistribution,
-} = require('../aws/cloudfront/deleteCloudfrontDistribution');
+  deleteCloudFrontDistribution,
+} = require('../aws/cloudfront/deleteCloudFrontDistribution');
 const {
-  getCloudfrontDistribution,
-} = require('../aws/cloudfront/getCloudfrontDistributionId');
+  getCloudFrontDistribution,
+} = require('../aws/cloudfront/getCloudFrontDistributionId');
 
 const { writeConfig, getJadePath, readJSONFile } = require('../util/fileUtils');
 
@@ -22,8 +22,8 @@ const deleteApp = async (path, apps) => {
       deleteBucket(`${bucketName}-builds`);
       deleteBucket(`${bucketName}-lambda`);
 
-      const cloudfrontId = await getCloudfrontDistribution(bucketName);
-      await deleteCloudfrontDistribution(cloudfrontId);
+      const cloudFrontId = await getCloudFrontDistribution(bucketName);
+      await deleteCloudFrontDistribution(cloudFrontId);
 
       config = config.filter((app) => {
         return app.projectName !== appName;

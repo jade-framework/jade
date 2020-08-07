@@ -7,11 +7,11 @@ const {
 const { createBucket } = require('../aws/s3/createBucket');
 const { updateBucketPolicy } = require('../aws/s3/updateBucketPolicy');
 const {
-  createCloudfrontDistribution,
-} = require('../aws/cloudfront/createCloudfrontDistribution');
+  createCloudFrontDistribution,
+} = require('../aws/cloudfront/createCloudFrontDistribution');
 const {
-  updateCloudfrontDistribution,
-} = require('../aws/cloudfront/updateCloudfrontDistribution');
+  updateCloudFrontDistribution,
+} = require('../aws/cloudfront/updateCloudFrontDistribution');
 const { zipit } = require('../util/zipit');
 const { createLambdaRole } = require('../aws/lambda/createLambdaRole');
 const { createLambdaFunction } = require('../aws/lambda/createLambdaFunction');
@@ -21,22 +21,22 @@ const {
 const cwd = process.cwd();
 
 const bucketName = 'test-0a9394f7-6e3c-4442-84f5-1fb91f81c18d';
-const functionName = 'invalidateCloudfrontFile';
+const functionName = 'invalidateCloudFrontFile';
 const functionFile = `${functionName}.js.zip`;
 const functionHandler = `${functionName}.handler`;
-const functionDescription = `Invalidate file in Cloudfront.`;
+const functionDescription = `Invalidate file in CloudFront.`;
 
 // const createBuckets = async bucketName => {
 //   await createBucket(`${bucketName}`);
 //   updateBucketPolicy(`${bucketName}`);
 // };
 // createBuckets(`test-${uuid.v4()}`);
-// updateCloudfrontDistribution('EL5J0YDK2X0IH');
+// updateCloudFrontDistribution('EL5J0YDK2X0IH');
 const init = async () => {
-  createCloudfrontDistribution('test-398e95ce-925e-4c10-99c3-7d94b837498b');
+  createCloudFrontDistribution('test-398e95ce-925e-4c10-99c3-7d94b837498b');
   // const bucketName = `test-${uuid.v4()}`;
   // await createBuckets(bucketName);
-  // await createCloudfrontDistribution(bucketName);
+  // await createCloudFrontDistribution(bucketName);
   // await zipit(`${functionName}.js`, `${cwd}/src/aws/lambda/${functionName}.js`);
   // await uploadToBucket(functionFile, `${bucketName}-lambda`);
   // const lambdaRoleResponse = await createLambdaRole('lambda-s3-role-2');

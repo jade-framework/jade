@@ -14,7 +14,7 @@ const awsLambdaExecutePolicyArn = 'arn:aws:iam::aws:policy/AWSLambdaExecute';
 const awsLambdaRolePolicyArn =
   'arn:aws:iam::aws:policy/service-role/AWSLambdaRole';
 const jadePrefix = '\x1b[32;1m💎\x1b[32;0m';
-const lambdaNames = 'jadeInvalidateCloudfrontFile';
+const lambdaNames = 'jadeInvalidateCloudFrontFile';
 const lambdaRolePolicies = [
   'arn:aws:iam::aws:policy/CloudFrontFullAccess',
   'arn:aws:iam::aws:policy/AWSLambdaExecute',
@@ -22,6 +22,7 @@ const lambdaRolePolicies = [
 ];
 const s3BucketName = 's3BucketName';
 const gitRepos = ['GitHub', 'GitLab', 'Bitbucket'];
+const projectNameLength = 24;
 
 module.exports = {
   instanceType,
@@ -42,4 +43,5 @@ module.exports = {
   lambdaRolePolicies,
   s3BucketName,
   gitRepos,
+  projectNameLength,
 };

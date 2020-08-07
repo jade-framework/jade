@@ -15,11 +15,12 @@ const {
   asyncIamWaitFor,
   asyncGetCallerIdentity,
 } = require('../awsAsyncFunctions');
+
 const initJadeLambdas = async (bucketName) => {
   const functionName = lambdaNames;
   const functionFile = `${functionName}.js.zip`;
   const functionHandler = `${functionName}.handler`;
-  const functionDescription = `Invalidate index.html in Cloudfront on upload to S3.`;
+  const functionDescription = `Invalidate index.html in CloudFront on upload to S3.`;
 
   try {
     await zipit(

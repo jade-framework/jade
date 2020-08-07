@@ -1,7 +1,7 @@
 const uuid = require('uuid');
 const { createBuckets, setBucketNotificationConfig } = require('../aws/s3');
 const { initJadeLambdas } = require('../aws/lambda');
-const { createCloudfrontDistribution } = require('../aws/cloudfront');
+const { createCloudFrontDistribution } = require('../aws/cloudfront');
 
 const {
   createDirectory,
@@ -25,15 +25,8 @@ const {
   awsCredentialsConfigured,
   validateBucketCreation,
 } = require('../util/validations');
-const { s3BucketName } = require('../templates/constants');
-
-
-const parseName = (name) => {
-  return name
-    .replace(/\s+/gi, '-')
-    .toLowerCase()
-    .replace(/[^a-z0-9]/gi, '');
-};
+const { lambdaNames, s3BucketName } = require('../templates/constants');
+const { getBucketNames, parseName } = require('../util/helpers');
 
 const start = async (directory, { projectName, bucketName, gitUrl }) => {
   let bucketNames = [];
@@ -49,7 +42,7 @@ const start = async (directory, { projectName, bucketName, gitUrl }) => {
   await createBuckets(bucketName);
 
   const lambdaArn = await initJadeLambdas(bucketName);
-  await createCloudfrontDistribution(bucketName);
+  await createCloudFrontDistribution(bucketName);
   await setBucketNotificationConfig(bucketName, lambdaArn);
   await build(bucketName);
 };
@@ -57,6 +50,7 @@ const start = async (directory, { projectName, bucketName, gitUrl }) => {
 const init = async (directory) => {
   try {
     let config = [];
+    // use a validation here
     if (!awsCredentialsConfigured()) return;
     const jadePath = join(directory, '.jade');
     if (!(await exists(jadePath))) {
@@ -74,11 +68,18 @@ const init = async (directory) => {
       const gitAns = await gitQuestions(initialAns);
       const bucketName = `${parseName(initialAns.projectName)}-${uuid.v4()}`;
       if (!(await validateBucketCreation(bucketName))) {
-        const projectData = { ...initialAns, ...gitAns, bucketName };
+        const projectData = {
+          ...initialAns,
+          ...gitAns,
+          bucketName,
+          bucketNames: getBucketNames(bucketName),
+          lambdaNames,
+          createdOn: new Date(),
+        };
         const newConfig = [...config, projectData];
-        await writeConfig(directory, newConfig);
         const proceed = await confirmResponses(projectData);
         if (proceed) {
+          await writeConfig(directory, newConfig);
           jadeLog('Thank you! The Jade framework will now be setup.');
           await start(directory, projectData);
         } else {
