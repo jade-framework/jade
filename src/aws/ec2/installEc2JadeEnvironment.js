@@ -4,12 +4,11 @@ const {
   readJSONFile,
   readFile,
   sleep,
-  createJSONFile,
   readConfig,
-} = require('../util/fileUtils');
-const { cwd, privateKeyFilename } = require('../templates/constants');
-const { getConnection } = require('../util/sshConnection');
-const { jadeLog, jadeErr } = require('../util/logger');
+} = require('../../util/fileUtils');
+const { cwd, privateKeyFilename } = require('../../templates/constants');
+const { getConnection } = require('../../util/sshConnection');
+const { jadeLog, jadeErr } = require('../../util/logger');
 
 const jadePath = getJadePath(cwd);
 const remoteDir = '/home/ec2-user/server';
@@ -71,30 +70,40 @@ const sendSetupCommands = async (
       return conn;
     })
     .catch(async (err) => {
-      jadeLog(err);
+      jadeErr(err);
       await sleep(5000);
-      sendSetupCommands(host, bucketName, gitUrl, maxRetries, attempts + 1);
+      await sendSetupCommands(
+        host,
+        bucketName,
+        gitUrl,
+        maxRetries,
+        attempts + 1,
+      );
     });
 };
 
 const sendSetupFiles = async (host, maxRetries = 10, attempts = 0) => {
-  if (attempts >= maxRetries) return Promise.reject('Too many attempts.');
-  await getConnection(host)
-    .then(async (conn) => {
-      await conn.asyncSftp(
-        remoteDir,
-        join(localDir, 'server.js'),
-        join(localDir, 'triggerBuild.js'),
-        join(localDir, 'sysmon.conf'),
-        join(jadePath, 's3BucketName.json'),
-      );
-      return conn;
-    })
-    .catch(async (err) => {
-      jadeErr(err);
-      await sleep(5000);
-      sendSetupFiles(host, maxRetries, attempts + 1);
-    });
+  try {
+    if (attempts >= maxRetries) return Promise.reject('Too many attempts.');
+    await getConnection(host)
+      .then(async (conn) => {
+        await conn.asyncSftp(
+          remoteDir,
+          join(localDir, 'server.js'),
+          join(localDir, 'triggerBuild.js'),
+          join(localDir, 'sysmon.conf'),
+          join(jadePath, 's3BucketName.json'),
+        );
+        return conn;
+      })
+      .catch(async (err) => {
+        jadeErr(err);
+        await sleep(5000);
+        await sendSetupFiles(host, maxRetries, attempts + 1);
+      });
+  } catch (err) {
+    jadeErr(err);
+  }
 };
 
 async function installEc2JadeEnvironment(bucketName) {
@@ -113,7 +122,6 @@ async function installEc2JadeEnvironment(bucketName) {
 
     const config = await readConfig(cwd);
     const project = config.find((obj) => obj.bucketName === bucketName);
-    console.log(project);
     const gitUrl = project.gitUrl;
     jadeLog('Beginning connection to EC2 server...');
 

@@ -41,9 +41,9 @@ const asyncCreateCloudfrontInvalidation = promisify(
 const asyncListDistributions = promisify(
   cloudfront.listDistributions.bind(cloudfront),
 );
-// const asyncDeleteDistribution = promisify(
-//   cloudfront.deleteDistribution.bind(cloudfront)
-// );
+const asyncDeleteDistribution = promisify(
+  cloudfront.deleteDistribution.bind(cloudfront),
+);
 // const asyncGetDistribution = promisify(
 //   cloudfront.getDistribution.bind(cloudfront)
 // );
@@ -105,9 +105,10 @@ const asyncDescribeImages = promisify(ec2.describeImages.bind(ec2));
 const asyncGetCallerIdentity = promisify(sts.getCallerIdentity.bind(sts));
 
 // DYNAMO
-const asyncCreateTable = promisify(dynamo.createTable.bind(dynamo));
-const asyncPutItem = promisify(dynamo.putItem.bind(dynamo));
+const asyncDynamoCreateTable = promisify(dynamo.createTable.bind(dynamo));
+const asyncDynamoPutItem = promisify(dynamo.putItem.bind(dynamo));
 const asyncDynamoWaitFor = promisify(dynamo.waitFor.bind(dynamo));
+const asyncDynamoDescribeTable = promisify(dynamo.describeTable.bind(dynamo));
 
 // ApiGateway
 const asyncCreateRestApi = promisify(apigateway.createRestApi.bind(apigateway));
@@ -168,13 +169,13 @@ module.exports = {
   asyncGetBucketTagging,
   asyncDeleteLambdaFunction,
   asyncDetachRolePolicy,
-  asyncCreateTable,
-  asyncPutItem,
+  asyncDynamoCreateTable,
+  asyncDynamoPutItem,
   asyncDynamoWaitFor,
+  asyncDynamoDescribeTable,
   asyncCreateRestApi,
   asyncCreateResource,
   asyncGetResources,
-  asyncGetCallerIdentity,
   asyncPutMethod,
   asyncPutIntegration,
   asyncCreateDeployment,
