@@ -41,9 +41,9 @@ const asyncCreateCloudfrontInvalidation = promisify(
 const asyncListDistributions = promisify(
   cloudfront.listDistributions.bind(cloudfront),
 );
-// const asyncDeleteDistribution = promisify(
-//   cloudfront.deleteDistribution.bind(cloudfront)
-// );
+const asyncDeleteDistribution = promisify(
+  cloudfront.deleteDistribution.bind(cloudfront),
+);
 // const asyncGetDistribution = promisify(
 //   cloudfront.getDistribution.bind(cloudfront)
 // );
