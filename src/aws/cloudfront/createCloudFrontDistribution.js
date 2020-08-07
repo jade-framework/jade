@@ -1,10 +1,14 @@
 const uuid = require('uuid');
 const { asyncCreateCloudFrontDistribution } = require('../awsAsyncFunctions');
+const {
+  cloudFrontOriginDomain,
+  cloudFrontOriginId,
+} = require('../../templates/constants');
 
 const createCloudFrontDistribution = async (bucketName) => {
   const callerReference = 'jade-' + uuid.v4();
-  const originDomainName = `${bucketName}.s3.amazonaws.com`;
-  const originId = `S3-${bucketName}`; // unique ID of origin within the distribution
+  const originDomainName = cloudFrontOriginDomain(bucketName);
+  const originId = cloudFrontOriginId(bucketName);
 
   const distParams = {
     DistributionConfig: {
@@ -78,10 +82,9 @@ const createCloudFrontDistribution = async (bucketName) => {
   } catch (error) {
     console.log('Error creating CloudFront distribution', error);
   }
+  return originId;
 };
 
 module.exports = {
   createCloudFrontDistribution,
 };
-
-// createCloudFrontDistribution('jade-ffc2fc72-5601-4d08-8ad0-c3f33006d6e2');

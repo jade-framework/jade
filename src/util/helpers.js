@@ -1,5 +1,6 @@
+const { suffixes } = require('../templates/constants');
+
 const getBucketNames = (bucketName) => {
-  const suffixes = ['live', 'builds', 'lambda'];
   return suffixes.map((suffix) => `${bucketName}-${suffix}`);
 };
 
