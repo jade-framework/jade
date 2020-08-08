@@ -11,14 +11,16 @@ const {
   asyncCreateDeployment,
 } = require('../awsAsyncFunctions');
 
-const { getGithubIp } = require('../../github/getGithubIp');
+const { getJadePath, readJSONFile } = require('../../util/fileUtils');
+const { cwd } = require('../../templates/constants');
 
 const deployApiForGitHooks = async (resourceName) => {
   const region = getRegion();
+  const jadePath = getJadePath(cwd);
   const stageName = 'webhook';
 
   try {
-    const githubApi = await getGithubIp();
+    const githubApi = await readJSONFile('githubApi', jadePath);
     const githubApiHooks = githubApi.hooks;
     const resourcePolicyParams = {
       Version: '2012-10-17',
