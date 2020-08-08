@@ -33,10 +33,8 @@ const {
 } = require('../templates/constants');
 const { getBucketNames, parseName } = require('../util/helpers');
 
-const start = async (
-  directory,
-  { projectName, bucketName, gitUrl, cloudFrontOriginId },
-) => {
+// write CF ID into config, then upload to DDB
+const start = async (directory, { projectName, bucketName, gitUrl }) => {
   let bucketNames = [];
   const jadePath = getJadePath(directory);
   if (await exists(join(jadePath, `${s3BucketName}.json`))) {
@@ -50,7 +48,7 @@ const start = async (
   await createBuckets(bucketName);
 
   const lambdaArn = await initJadeLambdas(bucketName);
-  await createCloudFrontDistribution(bucketName, cloudFrontOriginId);
+  await createCloudFrontDistribution(bucketName);
   // await setBucketNotificationConfig(bucketName, lambdaArn);
   // await build(bucketName);
 };

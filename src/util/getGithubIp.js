@@ -1,6 +1,6 @@
 const https = require("https");
 const { promisify } = require("util");
-const { createJSONFile, getJadePath } = require("../util/fileUtils");
+const { createJSONFile, getJadePath } = require("./fileUtils");
 const { cwd } = require("../templates/constants");
 
 // module.exports =

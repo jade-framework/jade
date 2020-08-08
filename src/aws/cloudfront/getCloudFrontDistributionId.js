@@ -4,8 +4,6 @@ const getCloudFrontDistributionId = async (originId) => {
   let id;
   try {
     const list = await asyncListCloudFrontDistributions();
-    const length = list.DistributionList.Items.length;
-    console.log(list.DistributionList.Items[length - 1]);
     const targetDistribution = list.DistributionList.Items.find(
       (el) => el.DefaultCacheBehavior.TargetOriginId === originId,
     );
