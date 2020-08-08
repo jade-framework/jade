@@ -286,7 +286,7 @@ const validateGitUrl = ({ gitUrl }) => {
 const promptGitUrl = (gitUrl) => {
   let valid = validateGitUrl({ gitUrl });
   if (!valid) {
-    valid = `The url should be in the form "https://github.com/user/repo"`;
+    valid = `The url should be in the form "https://github.com/user/root".`;
   }
   return valid;
 };
@@ -301,7 +301,7 @@ const validateUserInitInput = async (input) => {
     {
       validation: validateGitUrl,
       invalidBoolean: false,
-      invalidMessage: `URL should have the following format:\nhttps://github.com/user/repo-name`,
+      invalidMessage: `URL should have the following format:\nhttps://github.com/user/root`,
     },
   ];
 
@@ -311,7 +311,28 @@ const validateUserInitInput = async (input) => {
 };
 
 // Validate AWS credentials
-const validateAwsCredentials = async () => {
+// const validateAwsCredentials = async () => {
+//   const validations = [
+//     {
+//       validation: awsCredentialsConfigured,
+//       invalidBoolean: false,
+//       invalidMessage:
+//         'CredentialsError: Could not load credentials from any providers. For instructions, please visit: https://awscli.amazonaws.com/v2/documentation/api/latest/topic/config-vars.html',
+//     },
+//     {
+//       validation: isValidAwsCredentials,
+//       invalidBoolean: false,
+//       invalidMessage: `Credentials are invalid. Please configure the correct AWS Credentials.`,
+//     },
+//   ];
+
+//   const status = await validateResource(null, validations);
+
+//   return status;
+// };
+
+// Validate User Permissions
+const validateUserPermissions = async () => {
   const validations = [
     {
       validation: awsCredentialsConfigured,
@@ -324,16 +345,6 @@ const validateAwsCredentials = async () => {
       invalidBoolean: false,
       invalidMessage: `Credentials are invalid. Please configure the correct AWS Credentials.`,
     },
-  ];
-
-  const status = await validateResource(null, validations);
-
-  return status;
-};
-
-// Validate User Permissions
-const validateUserPermissions = async () => {
-  const validations = [
     {
       validation: hasRequiredPermissions,
       invalidBoolean: false,
@@ -374,6 +385,6 @@ module.exports = {
   validateUserInitInput,
   promptProjectName,
   promptGitUrl,
-  validateAwsCredentials,
+  // validateAwsCredentials,
   validateUserPermissions,
 };

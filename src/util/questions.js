@@ -37,7 +37,7 @@ const gitQuestions = async (initialAns) => {
   const questions = [
     {
       name: 'gitUrl',
-      message: `Please enter your ${initialAns.gitProvider} URL here:\n`,
+      message: `Please enter your ${initialAns.gitProvider} URL here. Note that Jade will use the root folder for deployment (https://github.com/user/root):\n`,
       validate: (input) => {
         return promptGitUrl(input);
       },

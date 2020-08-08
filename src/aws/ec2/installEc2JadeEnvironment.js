@@ -6,7 +6,12 @@ const {
   sleep,
   readConfig,
 } = require('../../util/fileUtils');
-const { cwd, privateKeyFilename } = require('../../templates/constants');
+const { getGitFolder } = require('../../util/helpers');
+const {
+  cwd,
+  privateKeyFilename,
+  bucketSuffixes,
+} = require('../../templates/constants');
 const { getConnection } = require('../../util/sshConnection');
 const { jadeLog, jadeErr } = require('../../util/logger');
 
@@ -26,11 +31,16 @@ const nodeCommands = [
   'npm install -g yarn',
 ];
 
-const gitCommands = (gitUrl) => {
-  return ['sudo yum install git -y', `git clone ${gitUrl}`];
-};
+const gitCommands = (gitUrl) => [
+  'sudo yum install git -y',
+  `git clone ${gitUrl}`,
+];
 
-const buildCommands = ['cd gatsby-blog', 'yarn install', 'yarn build'];
+const buildCommands = (folder) => [
+  `cd ${folder}`,
+  'yarn install',
+  'yarn build',
+];
 
 const webhookCommands = [
   'sudo amazon-linux-extras install nginx1 -y',
@@ -39,17 +49,14 @@ const webhookCommands = [
   'node /home/ec2-user/server/server.js &',
 ];
 
-const deployCommands = (bucketName) => {
-  return [
-    `aws s3 sync public s3://${bucketName}`,
-    `aws s3 sync public s3://${bucketName}-builds/${Date.now()}`,
-  ];
-};
+const deployCommands = (bucketName) => [
+  `aws s3 sync public s3://${bucketName}-${bucketSuffixes[0]}`,
+  `aws s3 sync public s3://${bucketName}-${bucketSuffixes[1]}/${Date.now()}`,
+];
 
 const sendSetupCommands = async (
   host,
-  bucketName,
-  gitUrl,
+  { bucketName, gitUrl, gitFolder },
   maxRetries = 10,
   attempts = 0,
 ) => {
@@ -61,7 +68,7 @@ const sendSetupCommands = async (
           ...linuxCommands,
           ...nodeCommands,
           ...gitCommands(gitUrl),
-          ...buildCommands,
+          ...buildCommands(gitFolder),
           ...webhookCommands,
           ...deployCommands(bucketName),
           'exit\n',
@@ -122,11 +129,11 @@ async function installEc2JadeEnvironment(bucketName) {
 
     const config = await readConfig(cwd);
     const project = config.find((obj) => obj.bucketName === bucketName);
-    const gitUrl = project.gitUrl;
+    project.gitFolder = getGitFolder(project.gitUrl);
     jadeLog('Beginning connection to EC2 server...');
 
     await sendSetupFiles(host);
-    await sendSetupCommands(host, bucketName, gitUrl);
+    await sendSetupCommands(host, project);
     jadeLog('EC2 server setup successfully.');
   } catch (err) {
     jadeErr(err);

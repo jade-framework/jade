@@ -23,10 +23,10 @@ const lambdaRolePolicies = [
 const s3BucketName = 's3BucketName';
 const gitRepos = ['GitHub', 'GitLab', 'Bitbucket'];
 const projectNameLength = 24;
-const suffixes = ['production', 'builds', 'lambda'];
+const bucketSuffixes = ['prod', 'builds', 'lambda']; // production/live is always first, builds/history is always second
 const cloudFrontOriginId = (name) => `S3-${name}`;
 const cloudFrontOriginDomain = (name) => {
-  return `${name}-${suffixes[0]}.s3.amazonaws.com`;
+  return `${name}-${bucketSuffixes[0]}.s3.amazonaws.com`;
 };
 
 module.exports = {
@@ -49,7 +49,7 @@ module.exports = {
   s3BucketName,
   gitRepos,
   projectNameLength,
-  suffixes,
+  bucketSuffixes,
   cloudFrontOriginId,
   cloudFrontOriginDomain,
 };

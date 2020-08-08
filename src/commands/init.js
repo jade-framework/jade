@@ -13,7 +13,7 @@ const {
   writeConfig,
   getJadePath,
 } = require('../util/fileUtils');
-const { jadeLog, jadeErr } = require('../util/logger');
+const { jadeLog, jadeErr, jadeWarn } = require('../util/logger');
 const { build } = require('./build');
 const {
   initialQuestions,
@@ -22,8 +22,8 @@ const {
   confirmResponses,
 } = require('../util/questions');
 const {
-  awsCredentialsConfigured,
   validateBucketCreation,
+  validateUserPermissions,
 } = require('../util/validations');
 const {
   lambdaNames,
@@ -57,7 +57,11 @@ const init = async (directory) => {
   try {
     let config = [];
     // use a validation here
-    if (!awsCredentialsConfigured()) return;
+    const invalidUser = await validateUserPermissions();
+    if (invalidUser) {
+      jadeWarn(invalidUser);
+      return;
+    }
     const jadePath = join(directory, '.jade');
     if (!(await exists(jadePath))) {
       await createDirectory('.jade', directory);

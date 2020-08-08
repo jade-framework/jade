@@ -11,7 +11,7 @@ const {
   asyncCreateDeployment,
 } = require('../awsAsyncFunctions');
 
-const { getGithubIp } = require('../../github/getGithubIp');
+const { getGithubIp } = require('../../util/getGithubIp');
 
 const deployApiForGitHooks = async (resourceName) => {
   const region = getRegion();
@@ -82,3 +82,5 @@ const deployApiForGitHooks = async (resourceName) => {
 module.exports = {
   deployApiForGitHooks,
 };
+
+deployApiForGitHooks('hello');
