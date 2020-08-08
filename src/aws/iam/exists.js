@@ -1,6 +1,7 @@
 const {
   asyncGetRole,
   asyncGetInstanceProfile,
+  asyncGetGroup,
 } = require('../awsAsyncFunctions');
 
 const roleExists = async (roleName) => {
@@ -23,4 +24,14 @@ const instanceProfileExists = async (name) => {
   }
 };
 
-module.exports = { roleExists, instanceProfileExists };
+const groupExists = async (groupName) => {
+  try {
+    return await asyncGetGroup({
+      GroupName: groupName,
+    });
+  } catch (err) {
+    return false;
+  }
+};
+
+module.exports = { roleExists, instanceProfileExists, groupExists };

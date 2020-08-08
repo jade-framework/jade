@@ -1,14 +1,14 @@
 const { credentials, getUserName } = require('./getCredentials');
 const { jadeErr } = require('./logger.js');
 const { exists, readFile } = require('./fileUtils');
-const { projectNameLength } = require('../templates/constants');
+const { projectNameLength, jadeIamGroup } = require('../templates/constants');
+const { groupExists, deleteIamGroup } = require('../aws/iam');
 
 const {
   asyncGetCallerIdentity,
   asyncListAttachedUserPolicy,
-} = require('../aws/awsAsyncFunctions');
-
-const {
+  asyncCreateGroup,
+  asyncDeleteGroup,
   asyncHeadBucket,
   asyncGetRole,
   asyncGetFunction,
@@ -117,45 +117,6 @@ const roleExistsOnAws = async (name) => {
     return true;
   } catch (error) {
     return false;
-  }
-};
-
-const hasRequiredPermissions = async () => {
-  const requiredPolicies = [
-    'AmazonEC2FullAccess',
-    'AWSLambdaFullAccess',
-    'CloudFrontFullAccess',
-    'AmazonAPIGatewayAdministrator',
-  ];
-
-  try {
-    // grab user Policies
-    const userName = await getUserName();
-    const data = await asyncListAttachedUserPolicy({
-      UserName: userName,
-    });
-    const currentUserPolicies = data.AttachedPolicies;
-
-    // check if user has Administrator Access permission
-    if (
-      currentUserPolicies.find((policy) => {
-        return policy.PolicyName === 'AdministratorAccess';
-      })
-    ) {
-      return true;
-    }
-
-    // check user has all the required Policies
-    for (let i = 0; i < requiredPolicies.length; i += 1) {
-      let policy = currentUserPolicies.find((policy) => {
-        return policy.PolicyName === requiredPolicies[i];
-      });
-      if (!policy) return false;
-    }
-
-    return true;
-  } catch (err) {
-    console.log(err);
   }
 };
 
@@ -310,28 +271,57 @@ const validateUserInitInput = async (input) => {
   return status;
 };
 
-// Validate AWS credentials
-// const validateAwsCredentials = async () => {
-//   const validations = [
-//     {
-//       validation: awsCredentialsConfigured,
-//       invalidBoolean: false,
-//       invalidMessage:
-//         'CredentialsError: Could not load credentials from any providers. For instructions, please visit: https://awscli.amazonaws.com/v2/documentation/api/latest/topic/config-vars.html',
-//     },
-//     {
-//       validation: isValidAwsCredentials,
-//       invalidBoolean: false,
-//       invalidMessage: `Credentials are invalid. Please configure the correct AWS Credentials.`,
-//     },
-//   ];
-
-//   const status = await validateResource(null, validations);
-
-//   return status;
-// };
-
 // Validate User Permissions
+const hasRequiredPermissions = async () => {
+  const requiredPolicies = ['IAMFullAccess'];
+
+  try {
+    // grab user Policies
+    const userName = await getUserName();
+    const data = await asyncListAttachedUserPolicy({
+      UserName: userName,
+    });
+    const currentUserPolicies = data.AttachedPolicies;
+
+    // check if user has Administrator Access permission
+    if (
+      currentUserPolicies.find((policy) => {
+        return policy.PolicyName === 'AdministratorAccess';
+      })
+    ) {
+      return true;
+    }
+
+    // check user has all the required Policies
+    for (let i = 0; i < requiredPolicies.length; i += 1) {
+      let policy = currentUserPolicies.find((policy) => {
+        return policy.PolicyName === requiredPolicies[i];
+      });
+      if (!policy) return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const hasIamPermission = async (groupName) => {
+  try {
+    const group = await groupExists(groupName);
+
+    if (!group) {
+      await asyncCreateGroup({ GroupName: groupName });
+    }
+    await deleteIamGroup(groupName);
+
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
+
 const validateUserPermissions = async () => {
   const validations = [
     {
@@ -345,15 +335,19 @@ const validateUserPermissions = async () => {
       invalidBoolean: false,
       invalidMessage: `Credentials are invalid. Please configure the correct AWS Credentials.`,
     },
+    // {
+    //   validation: hasRequiredPermissions,
+    //   invalidBoolean: false,
+    //   invalidMessage: `User requires IAM permissions to create Jade IAM Group. Please add policy "IAMFullAccess" to your User account. For instructions, please visit: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user.html`,
+    // },
     {
-      validation: hasRequiredPermissions,
+      validation: hasIamPermission,
       invalidBoolean: false,
-      invalidMessage:
-        'User requires one or more of the following permissions: AmazonEC2FullAccess, AWSLambdaFullAccess, CloudFrontFullAccess, AmazonAPIGatewayAdministrator. Please add the required permissions or add the AdministratorAccess permission',
+      invalidMessage: `User requires read/write IAM permissions to create the Jade IAM Group. Please add policy "IAMFullAccess" to your User account. For instructions, please visit: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user.html`,
     },
   ];
 
-  const status = await validateResource(null, validations);
+  const status = await validateResource(jadeIamGroup, validations);
 
   return status;
 };
@@ -362,7 +356,7 @@ const validateUserPermissions = async () => {
 const validateResource = async (resourceData, validations) => {
   let msg;
 
-  for (let i = 0; i < validations.length; i += 1) {
+  for (let i = 0; i < validations.length; i++) {
     const { validation, invalidBoolean, invalidMessage } = validations[i];
     const result = await validation(resourceData);
 
@@ -385,6 +379,5 @@ module.exports = {
   validateUserInitInput,
   promptProjectName,
   promptGitUrl,
-  // validateAwsCredentials,
   validateUserPermissions,
 };

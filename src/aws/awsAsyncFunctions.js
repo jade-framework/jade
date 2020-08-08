@@ -84,6 +84,15 @@ const asyncDetachRolePolicy = promisify(iam.detachRolePolicy.bind(iam));
 const asyncListAttachedUserPolicy = promisify(
   iam.listAttachedUserPolicies.bind(iam),
 );
+const asyncGetGroup = promisify(iam.getGroup.bind(iam));
+const asyncListAttachedGroupPolicies = promisify(
+  iam.listAttachedGroupPolicies.bind(iam),
+);
+const asyncCreateGroup = promisify(iam.createGroup.bind(iam));
+const asyncAttachGroupPolicy = promisify(iam.attachGroupPolicy.bind(iam));
+const asyncDeleteGroup = promisify(iam.deleteGroup.bind(iam));
+const asyncDetachGroupPolicy = promisify(iam.detachGroupPolicy.bind(iam));
+const asyncAddUserToGroup = promisify(iam.addUserToGroup.bind(iam));
 
 // EC2
 const asyncCreateSecurityGroup = promisify(ec2.createSecurityGroup.bind(ec2));
@@ -148,6 +157,15 @@ module.exports = {
   asyncAttachRolePolicy,
   asyncCreateRole,
   asyncDeleteRole,
+  asyncDetachRolePolicy,
+  asyncListAttachedUserPolicy,
+  asyncGetGroup,
+  asyncListAttachedGroupPolicies,
+  asyncCreateGroup,
+  asyncAttachGroupPolicy,
+  asyncDeleteGroup,
+  asyncDetachGroupPolicy,
+  asyncAddUserToGroup,
   asyncCreateInstanceProfile,
   asyncGetInstanceProfile,
   asyncAddRoleToProfile,
@@ -170,7 +188,6 @@ module.exports = {
   asyncPutBucketTagging,
   asyncGetBucketTagging,
   asyncDeleteLambdaFunction,
-  asyncDetachRolePolicy,
   asyncDynamoCreateTable,
   asyncDynamoPutItem,
   asyncDynamoWaitFor,
@@ -181,5 +198,4 @@ module.exports = {
   asyncPutMethod,
   asyncPutIntegration,
   asyncCreateDeployment,
-  asyncListAttachedUserPolicy,
 };

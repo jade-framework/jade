@@ -4,6 +4,7 @@ const instanceType = 't2.micro';
 const keyPair = 'keyPair';
 const privateKeyFilename = 'jade-key-pair.pem';
 const jadeKeyPair = 'jade-key-pair';
+const jadeIamGroup = 'jade-iam-group';
 const securityGroup = 'securityGroup';
 const securityGroupName = 'jade-security-group';
 const ec2IamRoleName = 'jade-ec2-role';
@@ -30,10 +31,11 @@ const cloudFrontOriginDomain = (name) => {
 };
 
 module.exports = {
-  instanceType,
   cwd,
-  jadeKeyPair,
+  instanceType,
   keyPair,
+  jadeKeyPair,
+  jadeIamGroup,
   privateKeyFilename,
   securityGroup,
   securityGroupName,

@@ -2,6 +2,7 @@ const uuid = require('uuid');
 const { createBuckets, setBucketNotificationConfig } = require('../aws/s3');
 const { initJadeLambdas } = require('../aws/lambda');
 const { createCloudFrontDistribution } = require('../aws/cloudfront');
+const { addUserToJadeGroup, createJadeIamGroup } = require('../aws/iam');
 
 const {
   createDirectory,
@@ -49,35 +50,52 @@ const start = async (directory, { projectName, bucketName, gitUrl }) => {
 
   const lambdaArn = await initJadeLambdas(bucketName);
   await createCloudFrontDistribution(bucketName);
-  // await setBucketNotificationConfig(bucketName, lambdaArn);
-  // await build(bucketName);
+  await setBucketNotificationConfig(bucketName, lambdaArn);
+  await build(bucketName);
+};
+
+const validateUser = async () => {
+  jadeLog('Checking if your AWS account is correctly setup...');
+  const invalidUser = await validateUserPermissions();
+  if (invalidUser) {
+    jadeWarn(invalidUser);
+    return false;
+  } else {
+    jadeLog('AWS permissions ready.');
+    return true;
+  }
+};
+
+const setupConfig = async (directory) => {
+  const jadePath = join(directory, '.jade');
+  let config = [];
+
+  if (!(await exists(jadePath))) {
+    await createDirectory('.jade', directory);
+  }
+  if (!(await exists(join(jadePath, 'config.json')))) {
+    await writeConfig(directory, config);
+  } else {
+    config = await readConfig(directory);
+  }
+  return config;
 };
 
 const init = async (directory) => {
   try {
-    let config = [];
-    // use a validation here
-    const invalidUser = await validateUserPermissions();
-    if (invalidUser) {
-      jadeWarn(invalidUser);
-      return;
-    }
-    const jadePath = join(directory, '.jade');
-    if (!(await exists(jadePath))) {
-      await createDirectory('.jade', directory);
-    }
-    if (!(await exists(join(jadePath, 'config.json')))) {
-      await writeConfig(directory, config);
-    } else {
-      config = await readConfig(directory);
-    }
+    const isValid = await validateUser();
+    if (!isValid) return;
 
+    const config = await setupConfig(directory);
     const initialAns = await initialQuestions(config);
 
     if (initialAns.gitExists) {
       const gitAns = await gitQuestions(initialAns);
       const bucketName = `${parseName(initialAns.projectName)}-${uuid.v4()}`;
-      if (!(await validateBucketCreation(bucketName))) {
+      const invalidBucketName = await validateBucketCreation(bucketName);
+      if (invalidBucketName) {
+        jadeWarn(invalidBucketName);
+      } else {
         const projectData = {
           ...initialAns,
           ...gitAns,
@@ -88,19 +106,18 @@ const init = async (directory) => {
           cloudFrontOriginDomain: cloudFrontOriginDomain(bucketName),
           createdOn: new Date(),
         };
-        const newConfig = [...config, projectData];
         const proceed = await confirmResponses(projectData);
+
         if (proceed) {
-          await writeConfig(directory, newConfig);
           jadeLog('Thank you! The Jade framework will now be setup.');
+          const newConfig = [...config, projectData];
+          await writeConfig(directory, newConfig);
+          await createJadeIamGroup();
+          await addUserToJadeGroup();
           await start(directory, projectData);
         } else {
-          jadeLog('Please run `jade init` again to restart.');
+          jadeLog('Please run `jade init` again to restart Jade setup.');
         }
-      } else {
-        jadeLog(
-          'Sorry, your project name did not generate a valid AWS bucket. Please try again.',
-        );
       }
     } else {
       await noGitAlert();
