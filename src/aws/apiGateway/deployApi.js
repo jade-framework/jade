@@ -1,4 +1,4 @@
-const uuid = require('uuid');
+// const uuid = require('uuid');
 const { getRegion } = require('../../util/getRegion');
 
 const {
@@ -55,7 +55,8 @@ const deployApiForGitHooks = async (resourceName) => {
     const resources = await asyncGetResources({ restApiId });
     const rootResourceId = resources.items[0].id;
     const rootPath = '/';
-    const rootPermissionId = uuid.v4();
+    // const rootPermissionId = uuid.v4();
+    const rootPermissionId = 'abc123';
 
     const rootIntegrationParams = {
       httpMethod: 'POST',
@@ -84,3 +85,4 @@ const deployApiForGitHooks = async (resourceName) => {
 module.exports = {
   deployApiForGitHooks,
 };
+deployApiForGitHooks('jadeTriggerBuild');
