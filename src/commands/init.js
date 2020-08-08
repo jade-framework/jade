@@ -13,7 +13,7 @@ const {
   writeConfig,
   getJadePath,
 } = require('../util/fileUtils');
-const { jadeLog, jadeErr } = require('../util/logger');
+const { jadeLog, jadeErr, jadeWarn } = require('../util/logger');
 const { build } = require('./build');
 const {
   initialQuestions,
@@ -22,8 +22,8 @@ const {
   confirmResponses,
 } = require('../util/questions');
 const {
-  awsCredentialsConfigured,
   validateBucketCreation,
+  validateUserPermissions,
 } = require('../util/validations');
 const {
   lambdaNames,
@@ -33,10 +33,8 @@ const {
 } = require('../templates/constants');
 const { getBucketNames, parseName } = require('../util/helpers');
 
-const start = async (
-  directory,
-  { projectName, bucketName, gitUrl, cloudFrontOriginId },
-) => {
+// write CF ID into config, then upload to DDB
+const start = async (directory, { projectName, bucketName, gitUrl }) => {
   let bucketNames = [];
   const jadePath = getJadePath(directory);
   if (await exists(join(jadePath, `${s3BucketName}.json`))) {
@@ -50,7 +48,7 @@ const start = async (
   await createBuckets(bucketName);
 
   const lambdaArn = await initJadeLambdas(bucketName);
-  await createCloudFrontDistribution(bucketName, cloudFrontOriginId);
+  await createCloudFrontDistribution(bucketName);
   // await setBucketNotificationConfig(bucketName, lambdaArn);
   // await build(bucketName);
 };
@@ -59,7 +57,11 @@ const init = async (directory) => {
   try {
     let config = [];
     // use a validation here
-    if (!awsCredentialsConfigured()) return;
+    const invalidUser = await validateUserPermissions();
+    if (invalidUser) {
+      jadeWarn(invalidUser);
+      return;
+    }
     const jadePath = join(directory, '.jade');
     if (!(await exists(jadePath))) {
       await createDirectory('.jade', directory);

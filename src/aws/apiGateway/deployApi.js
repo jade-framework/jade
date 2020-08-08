@@ -11,8 +11,7 @@ const {
   asyncCreateDeployment,
 } = require('../awsAsyncFunctions');
 
-const { getJadePath, readJSONFile } = require('../../util/fileUtils');
-const { cwd } = require('../../templates/constants');
+const { getGithubIp } = require('../../util/getGithubIp');
 
 const deployApiForGitHooks = async (resourceName) => {
   const region = getRegion();
@@ -85,4 +84,5 @@ const deployApiForGitHooks = async (resourceName) => {
 module.exports = {
   deployApiForGitHooks,
 };
-deployApiForGitHooks('jadeTriggerBuild');
+
+deployApiForGitHooks('hello');
