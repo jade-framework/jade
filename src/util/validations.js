@@ -126,34 +126,33 @@ const hasRequiredPermissions = async () => {
     'CloudFrontFullAccess',
     'AmazonAPIGatewayAdministrator',
   ];
-  let numberOfPoliciesNeeded = requiredPolicies.length;
-  const currentUserPolicies = {};
 
   try {
+    // grab user Policies
     const userName = await getUserName();
     const data = await asyncListAttachedUserPolicy({
       UserName: userName,
     });
+    const currentUserPolicies = data.AttachedPolicies;
 
-    data.AttachedPolicies.forEach((policy) => {
-      let policyName = policy.PolicyName;
-      currentUserPolicies[policyName] = true;
-    });
-
-    requiredPolicies.forEach((policy) => {
-      if (currentUserPolicies[policy]) {
-        numberOfPoliciesNeeded -= 1;
-      }
-    });
-
+    // check if user has Administrator Access permission
     if (
-      currentUserPolicies['AdministratorAccess'] ||
-      numberOfPoliciesNeeded === 0
+      currentUserPolicies.find((policy) => {
+        return policy.PolicyName === 'AdministratorAccess';
+      })
     ) {
       return true;
-    } else {
-      return false;
     }
+
+    // check user has all the required Policies
+    for (let i = 0; i < requiredPolicies.length; i += 1) {
+      let policy = currentUserPolicies.find((policy) => {
+        return policy.PolicyName === requiredPolicies[i];
+      });
+      if (!policy) return false;
+    }
+
+    return true;
   } catch (err) {
     console.log(err);
   }
@@ -341,7 +340,7 @@ const validateUserPermissions = async () => {
       validation: hasRequiredPermissions,
       invalidBoolean: false,
       invalidMessage:
-        'User does not have the necesary permissions for one or more of the following: S3, Cloudfront, Lambdas, DynamoDB, EC2, API Gateway. Please elevate user permissions',
+        'User requires one or more of the following permissions: AmazonEC2FullAccess, AWSLambdaFullAccess, CloudFrontFullAccess, AmazonAPIGatewayAdministrator. Please add the required permissions or add the AdministratorAccess permission',
     },
   ];
 
