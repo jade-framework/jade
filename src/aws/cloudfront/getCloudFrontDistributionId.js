@@ -1,11 +1,13 @@
 const { asyncListCloudFrontDistributions } = require('../awsAsyncFunctions');
 
-const getCloudFrontDistributionId = async (bucketName) => {
+const getCloudFrontDistributionId = async (originId) => {
   let id;
   try {
     const list = await asyncListCloudFrontDistributions();
+    const length = list.DistributionList.Items.length;
+    console.log(list.DistributionList.Items[length - 1]);
     const targetDistribution = list.DistributionList.Items.find(
-      (el) => el.DefaultCacheBehavior.TargetOriginId === bucketName,
+      (el) => el.DefaultCacheBehavior.TargetOriginId === originId,
     );
     id = targetDistribution.Id;
   } catch (error) {

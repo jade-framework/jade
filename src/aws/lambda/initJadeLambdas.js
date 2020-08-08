@@ -3,12 +3,10 @@ const path = require('path');
 const { lambdaIamRoleName, lambdaNames } = require('../../templates/constants');
 const { zipit } = require('../../util/zipit');
 const { sleep, join } = require('../../util/fileUtils');
-const {
-  createLambdaFunction,
-  createLambdaPermission,
-  createLambdaRole,
-  lambdaExists,
-} = require('./index');
+const { createLambdaFunction } = require('./createLambdaFunction');
+const { createLambdaPermission } = require('./createLambdaPermission');
+const { createLambdaRole } = require('./createLambdaRole');
+const { lambdaExists } = require('./lambdaExists');
 const { uploadToBucket } = require('../s3');
 const { roleExists } = require('../iam');
 const {

@@ -25,10 +25,18 @@ const {
   awsCredentialsConfigured,
   validateBucketCreation,
 } = require('../util/validations');
-const { lambdaNames, s3BucketName } = require('../templates/constants');
+const {
+  lambdaNames,
+  s3BucketName,
+  cloudFrontOriginId,
+  cloudFrontOriginDomain,
+} = require('../templates/constants');
 const { getBucketNames, parseName } = require('../util/helpers');
 
-const start = async (directory, { projectName, bucketName, gitUrl }) => {
+const start = async (
+  directory,
+  { projectName, bucketName, gitUrl, cloudFrontOriginId },
+) => {
   let bucketNames = [];
   const jadePath = getJadePath(directory);
   if (await exists(join(jadePath, `${s3BucketName}.json`))) {
@@ -42,9 +50,9 @@ const start = async (directory, { projectName, bucketName, gitUrl }) => {
   await createBuckets(bucketName);
 
   const lambdaArn = await initJadeLambdas(bucketName);
-  await createCloudFrontDistribution(bucketName);
-  await setBucketNotificationConfig(bucketName, lambdaArn);
-  await build(bucketName);
+  await createCloudFrontDistribution(bucketName, cloudFrontOriginId);
+  // await setBucketNotificationConfig(bucketName, lambdaArn);
+  // await build(bucketName);
 };
 
 const init = async (directory) => {
@@ -74,6 +82,8 @@ const init = async (directory) => {
           bucketName,
           bucketNames: getBucketNames(bucketName),
           lambdaNames,
+          cloudFrontOriginId: cloudFrontOriginId(bucketName),
+          cloudFrontOriginDomain: cloudFrontOriginDomain(bucketName),
           createdOn: new Date(),
         };
         const newConfig = [...config, projectData];
@@ -83,7 +93,7 @@ const init = async (directory) => {
           jadeLog('Thank you! The Jade framework will now be setup.');
           await start(directory, projectData);
         } else {
-          jadeLog('Please run this `jade init` again to restart.');
+          jadeLog('Please run `jade init` again to restart.');
         }
       } else {
         jadeLog(
