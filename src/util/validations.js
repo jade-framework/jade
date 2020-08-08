@@ -1,7 +1,11 @@
-const { credentials } = require('./getCredentials');
+const { credentials, getUserName } = require('./getCredentials');
 const { jadeErr } = require('./logger.js');
 const { exists, readFile } = require('./fileUtils');
-const { asyncGetCallerIdentity } = require('../aws/awsAsyncFunctions');
+
+const {
+  asyncGetCallerIdentity,
+  asyncListAttachedUserPolicy,
+} = require('../aws/awsAsyncFunctions');
 
 const {
   asyncHeadBucket,
@@ -112,6 +116,46 @@ const roleExistsOnAws = async (name) => {
     return true;
   } catch (error) {
     return false;
+  }
+};
+
+const hasRequiredPermissions = async () => {
+  const requiredPolicies = [
+    'AmazonEC2FullAccess',
+    'AWSLambdaFullAccess',
+    'CloudFrontFullAccess',
+    'AmazonAPIGatewayAdministrator',
+  ];
+  let numberOfPoliciesNeeded = requiredPolicies.length;
+  const currentUserPolicies = {};
+
+  try {
+    const userName = await getUserName();
+    const data = await asyncListAttachedUserPolicy({
+      UserName: userName,
+    });
+
+    data.AttachedPolicies.forEach((policy) => {
+      let policyName = policy.PolicyName;
+      currentUserPolicies[policyName] = true;
+    });
+
+    requiredPolicies.forEach((policy) => {
+      if (currentUserPolicies[policy]) {
+        numberOfPoliciesNeeded -= 1;
+      }
+    });
+
+    if (
+      currentUserPolicies['AdministratorAccess'] ||
+      numberOfPoliciesNeeded === 0
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (err) {
+    console.log(err);
   }
 };
 
@@ -290,6 +334,22 @@ const validateAwsCredentials = async () => {
   return status;
 };
 
+// Validate User Permissions
+const validateUserPermissions = async () => {
+  const validations = [
+    {
+      validation: hasRequiredPermissions,
+      invalidBoolean: false,
+      invalidMessage:
+        'User does not have the necesary permissions for one or more of the following: S3, Cloudfront, Lambdas, DynamoDB, EC2, API Gateway. Please elevate user permissions',
+    },
+  ];
+
+  const status = await validateResource(null, validations);
+
+  return status;
+};
+
 // Validations helper method
 const validateResource = async (resourceData, validations) => {
   let msg;
@@ -318,4 +378,5 @@ module.exports = {
   promptProjectName,
   promptGitUrl,
   validateAwsCredentials,
+  validateUserPermissions,
 };

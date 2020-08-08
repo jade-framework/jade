@@ -81,6 +81,9 @@ const asyncAddRoleToProfile = promisify(iam.addRoleToInstanceProfile.bind(iam));
 const asyncGetRole = promisify(iam.getRole.bind(iam));
 const asyncIamWaitFor = promisify(iam.waitFor.bind(iam));
 const asyncDetachRolePolicy = promisify(iam.detachRolePolicy.bind(iam));
+const asyncListAttachedUserPolicy = promisify(
+  iam.listAttachedUserPolicies.bind(iam),
+);
 
 // EC2
 const asyncCreateSecurityGroup = promisify(ec2.createSecurityGroup.bind(ec2));
@@ -179,4 +182,5 @@ module.exports = {
   asyncPutMethod,
   asyncPutIntegration,
   asyncCreateDeployment,
+  asyncListAttachedUserPolicy,
 };
