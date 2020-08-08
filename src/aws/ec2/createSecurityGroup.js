@@ -18,7 +18,7 @@ const {
   securityGroupName,
 } = require('../../templates/constants');
 
-const getGithubIp = require('../../github/getGithubIp');
+const { getGithubIp } = require('../../util/getGithubIp');
 
 // default data
 const securityGroupParams = {

@@ -1,7 +1,7 @@
-const { suffixes } = require('../templates/constants');
+const { bucketSuffixes } = require('../templates/constants');
 
 const getBucketNames = (bucketName) => {
-  return suffixes.map((suffix) => `${bucketName}-${suffix}`);
+  return bucketSuffixes.map((suffix) => `${bucketName}-${suffix}`);
 };
 
 const parseName = (name) => {
@@ -11,4 +11,11 @@ const parseName = (name) => {
     .replace(/[^a-z0-9]/gi, '');
 };
 
-module.exports = { getBucketNames, parseName };
+const getGitFolder = (url) => {
+  const parts = url.split('/');
+  const part = parts.find((part) => /\.com/.test(part));
+  const index = parts.indexOf(part);
+  return parts[index + 2];
+};
+
+module.exports = { getBucketNames, parseName, getGitFolder };
