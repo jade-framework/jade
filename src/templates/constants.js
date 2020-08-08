@@ -23,7 +23,7 @@ const lambdaRolePolicies = [
 const s3BucketName = 's3BucketName';
 const gitRepos = ['GitHub', 'GitLab', 'Bitbucket'];
 const projectNameLength = 24;
-const bucketSuffixes = ['prod', 'builds', 'lambda']; // production/live is always first, builds/history is always second
+const bucketSuffixes = ['prod', 'builds', 'lambda', 'stage']; // production/live is always first, builds/history is always second
 const cloudFrontOriginId = (name) => `S3-${name}`;
 const cloudFrontOriginDomain = (name) => {
   return `${name}-${bucketSuffixes[0]}.s3.amazonaws.com`;
