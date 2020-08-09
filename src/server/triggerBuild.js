@@ -23,7 +23,8 @@ module.exports = async function triggerBuild(webhook) {
       join(userDir, 'server', 's3BucketName.json'),
     );
 
-    const { bucketName } = JSON.parse(bucketJSON);
+    // need to change to find the right bucketName for multiple apps
+    const { bucketName } = JSON.parse(bucketJSON)[0];
     const pull = await exec(`git -C ${repoDir} pull ${cloneUrl}`);
 
     if (/Already up to date/.test(pull.stdout)) {
@@ -34,15 +35,19 @@ module.exports = async function triggerBuild(webhook) {
     }
 
     (async () => {
-      if (branch === 'master') {
-        await exec(`yarn --cwd ${repoDir} build`);
-        await exec(`aws s3 sync public s3://${bucketName}-${prodBucket}`);
-        await exec(
-          `aws s3 sync public s3://${bucketName}-${buildsBucket}/${Date.now()}`,
-        );
-      } else if (branch === 'staging') {
-        await exec(`yarn --cwd ${repoDir} build`);
-        await exec(`aws s3 sync public s3://${bucketName}-${stageBucket}`);
+      try {
+        if (branch === 'master') {
+          await exec(`yarn --cwd ${repoDir} build`);
+          await exec(`aws s3 sync public s3://${bucketName}-${prodBucket}`);
+          await exec(
+            `aws s3 sync public s3://${bucketName}-${buildsBucket}/${Date.now()}`,
+          );
+        } else if (branch === 'staging') {
+          await exec(`yarn --cwd ${repoDir} build`);
+          await exec(`aws s3 sync public s3://${bucketName}-${stageBucket}`);
+        }
+      } catch (err) {
+        console.log(err); // convert to logger later
       }
     })();
 
