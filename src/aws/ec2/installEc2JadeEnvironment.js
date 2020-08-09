@@ -139,4 +139,3 @@ async function installEc2JadeEnvironment(bucketName) {
 }
 
 module.exports = { installEc2JadeEnvironment };
-installEc2JadeEnvironment('myjadeproject-d7f36419-cc78-46c4-a33d-ce1f28eb0243');
