@@ -4,8 +4,8 @@ const fs = require('fs');
 
 const readFile = promisify(fs.readFile);
 const { join } = require('path');
-const { bucketSuffixes } = require('../templates/constants');
 
+const bucketSuffixes = ['prod', 'builds', 'lambda', 'stage'];
 const userDir = join('/', 'home', 'ec2-user');
 const prodBucket = bucketSuffixes[0];
 const buildsBucket = bucketSuffixes[1];
