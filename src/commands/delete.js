@@ -2,38 +2,49 @@ const { deleteBucket } = require('../aws/s3/deleteBucket');
 const {
   deleteCloudFrontDistribution,
 } = require('../aws/cloudfront/deleteCloudFrontDistribution');
-const {
-  getCloudFrontDistribution,
-} = require('../aws/cloudfront/getCloudFrontDistributionId');
 
 const { writeConfig, getJadePath, readJSONFile } = require('../util/fileUtils');
+const { jadeErr, jadeWarn, jadeLog } = require('../util/logger');
 
-const deleteApp = async (path, apps) => {
-  const jadePath = getJadePath(path);
+const deleteApp = async (path, appName) => {
+  if (!appName) {
+    jadeWarn(
+      'App name missing. Please re-run the command in the following format: jade delete <appName>',
+    );
+    return;
+  }
 
-  for (let i = 0; i < apps.length; i += 1) {
-    try {
-      let config = await readJSONFile('config', jadePath);
-      const appConfig = config.find((app) => {
-        app.projectName === appName;
-      });
-      const bucketName = appConfig.bucketName;
-      deleteBucket(bucketName);
-      deleteBucket(`${bucketName}-builds`);
-      deleteBucket(`${bucketName}-lambda`);
+  try {
+    const jadePath = getJadePath(path);
+    const config = await readJSONFile('config', jadePath);
 
-      const cloudFrontId = await getCloudFrontDistribution(bucketName);
-      await deleteCloudFrontDistribution(cloudFrontId);
+    const targetAppConfig = config.find((app) => {
+      return app.projectName === appName;
+    });
 
-      config = config.filter((app) => {
-        return app.projectName !== appName;
-      });
-
-      await writeConfig(path, config);
-    } catch (err) {
-      console.log(err);
+    if (!targetAppConfig) {
+      jadeWarn(
+        `Cannot delete ${appName}. App does not exist or was not deployed using Jade`,
+      );
+      return;
     }
-    27;
+
+    const { bucketNames, cloudFrontOriginId } = targetAppConfig;
+    await Promise.all(
+      bucketNames.forEach((bucket) => {
+        deleteBucket(bucket);
+      }),
+    );
+
+    await deleteCloudFrontDistribution(cloudFrontOriginId);
+    const newConfig = config.filter((app) => {
+      return app.projectName !== appName;
+    });
+
+    await writeConfig(path, newConfig);
+    jadeLog(`${appName} has been successully deleted`);
+  } catch (err) {
+    jadeErr(err);
   }
 };
 
