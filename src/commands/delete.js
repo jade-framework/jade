@@ -2,6 +2,12 @@ const { deleteBucket } = require('../aws/s3/deleteBucket');
 const {
   deleteCloudFrontDistribution,
 } = require('../aws/cloudfront/deleteCloudFrontDistribution');
+const {
+  getCloudFrontDistributionId,
+} = require('../aws/cloudfront/getCloudFrontDistributionId');
+const {
+  asyncGetCloudFrontDistributionConfig,
+} = require('../aws/awsAsyncFunctions');
 
 const { writeConfig, getJadePath, readJSONFile } = require('../util/fileUtils');
 const { jadeErr, jadeWarn, jadeLog } = require('../util/logger');
@@ -30,19 +36,23 @@ const deleteApp = async (path, appName) => {
     }
 
     const { bucketNames, cloudFrontOriginId } = targetAppConfig;
-    await Promise.all(
-      bucketNames.forEach((bucket) => {
-        deleteBucket(bucket);
-      }),
-    );
+    const CFDId = await getCloudFrontDistributionId(cloudFrontOriginId);
+    const cloudFrontConfig = await asyncGetCloudFrontDistributionConfig({
+      Id: CFDId,
+    });
+    const ETag = cloudFrontConfig.ETag;
 
-    await deleteCloudFrontDistribution(cloudFrontOriginId);
+    for (let i = 0; i < bucketNames.length; i += 1) {
+      await deleteBucket(bucketNames[i]);
+    }
+
+    await deleteCloudFrontDistribution(CFDId, ETag);
     const newConfig = config.filter((app) => {
       return app.projectName !== appName;
     });
 
     await writeConfig(path, newConfig);
-    jadeLog(`${appName} has been successully deleted`);
+    jadeLog(`"${appName}" has been successully deleted`);
   } catch (err) {
     jadeErr(err);
   }
