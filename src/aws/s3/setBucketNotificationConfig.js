@@ -9,10 +9,12 @@
 const {
   asyncPutBucketNotificationConfiguration,
 } = require('../awsAsyncFunctions');
+const { bucketSuffixes } = require('../../templates/constants');
 
 const setBucketNotificationConfig = async (bucketName, lambdaArn) => {
+  const lambdaBucketName = `${bucketName}-${bucketSuffixes[2]}`;
   const params = {
-    Bucket: bucketName,
+    Bucket: lambdaBucketName,
     NotificationConfiguration: {
       LambdaFunctionConfigurations: [
         {
@@ -28,13 +30,13 @@ const setBucketNotificationConfig = async (bucketName, lambdaArn) => {
     const response = await asyncPutBucketNotificationConfiguration(params);
     console.log(
       'Successfully set bucket notification configuration.',
-      response
+      response,
     );
   } catch (error) {
     console.log(
       'Error setting bucket notification configuration',
       error,
-      error.stack
+      error.stack,
     );
   }
 };

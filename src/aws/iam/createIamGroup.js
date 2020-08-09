@@ -2,9 +2,11 @@ const {
   asyncCreateGroup,
   asyncAttachGroupPolicy,
   asyncListAttachedGroupPolicies,
+  asyncAddUserToGroup,
 } = require('../awsAsyncFunctions');
-const { groupExists } = require('./exists');
 const { jadeIamGroup } = require('../../templates/constants');
+const { groupExists } = require('./exists');
+const { getUserName } = require('../../util/getCredentials');
 
 const createGroup = async (groupName) => {
   try {
@@ -66,6 +68,14 @@ const createIamGroup = async (groupName, policies) => {
   }
 };
 
+const addUserToGroup = async (user, group) => {
+  try {
+    await asyncAddUserToGroup({ UserName: user, GroupName: group });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 const createJadeIamGroup = async () => {
   const requiredPolicies = [
     'arn:aws:iam::aws:policy/AmazonEC2FullAccess',
@@ -80,4 +90,13 @@ const createJadeIamGroup = async () => {
   }
 };
 
-module.exports = { createIamGroup, createJadeIamGroup };
+const addUserToJadeGroup = async () => {
+  try {
+    const userName = await getUserName();
+    await addUserToGroup(userName, jadeIamGroup);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports = { createJadeIamGroup, addUserToJadeGroup };

@@ -93,6 +93,7 @@ const asyncAttachGroupPolicy = promisify(iam.attachGroupPolicy.bind(iam));
 const asyncDeleteGroup = promisify(iam.deleteGroup.bind(iam));
 const asyncDetachGroupPolicy = promisify(iam.detachGroupPolicy.bind(iam));
 const asyncAddUserToGroup = promisify(iam.addUserToGroup.bind(iam));
+const asyncRemoveUserFromGroup = promisify(iam.removeUserFromGroup.bind(iam));
 
 // EC2
 const asyncCreateSecurityGroup = promisify(ec2.createSecurityGroup.bind(ec2));
@@ -166,6 +167,7 @@ module.exports = {
   asyncDeleteGroup,
   asyncDetachGroupPolicy,
   asyncAddUserToGroup,
+  asyncRemoveUserFromGroup,
   asyncCreateInstanceProfile,
   asyncGetInstanceProfile,
   asyncAddRoleToProfile,

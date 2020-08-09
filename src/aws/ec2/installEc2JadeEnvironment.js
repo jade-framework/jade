@@ -56,37 +56,36 @@ const deployCommands = (bucketName) => [
 
 const sendSetupCommands = async (
   host,
-  { bucketName, gitUrl, gitFolder },
+  project,
   maxRetries = 10,
   attempts = 0,
 ) => {
-  if (attempts >= maxRetries) return Promise.reject('Too many attempts.');
-  await getConnection(host)
-    .then(async (conn) => {
-      await conn.asyncShell(
-        [
-          ...linuxCommands,
-          ...nodeCommands,
-          ...gitCommands(gitUrl),
-          ...buildCommands(gitFolder),
-          ...webhookCommands,
-          ...deployCommands(bucketName),
-          'exit\n',
-        ].join('\n'),
-      );
-      return conn;
-    })
-    .catch(async (err) => {
-      jadeErr(err);
-      await sleep(5000);
-      await sendSetupCommands(
-        host,
-        bucketName,
-        gitUrl,
-        maxRetries,
-        attempts + 1,
-      );
-    });
+  try {
+    if (attempts >= maxRetries) return Promise.reject('Too many attempts.');
+    const { bucketName, gitUrl, gitFolder } = project;
+    await getConnection(host)
+      .then(async (conn) => {
+        await conn.asyncShell(
+          [
+            ...linuxCommands,
+            ...nodeCommands,
+            ...gitCommands(gitUrl),
+            ...buildCommands(gitFolder),
+            ...webhookCommands,
+            ...deployCommands(bucketName),
+            'exit\n',
+          ].join('\n'),
+        );
+        return conn;
+      })
+      .catch(async (err) => {
+        jadeErr(err);
+        await sleep(5000);
+        await sendSetupCommands(host, project, maxRetries, attempts + 1);
+      });
+  } catch (err) {
+    jadeErr(err);
+  }
 };
 
 const sendSetupFiles = async (host, maxRetries = 10, attempts = 0) => {
@@ -101,7 +100,6 @@ const sendSetupFiles = async (host, maxRetries = 10, attempts = 0) => {
           join(localDir, 'sysmon.conf'),
           join(jadePath, 's3BucketName.json'),
         );
-        return conn;
       })
       .catch(async (err) => {
         jadeErr(err);
@@ -129,7 +127,7 @@ async function installEc2JadeEnvironment(bucketName) {
 
     const config = await readConfig(cwd);
     const project = config.find((obj) => obj.bucketName === bucketName);
-    project.gitFolder = getGitFolder(project.gitUrl);
+    project.gitFolder = await getGitFolder(project.gitUrl);
     jadeLog('Beginning connection to EC2 server...');
 
     await sendSetupFiles(host);
@@ -141,3 +139,4 @@ async function installEc2JadeEnvironment(bucketName) {
 }
 
 module.exports = { installEc2JadeEnvironment };
+installEc2JadeEnvironment('myjadeproject-d7f36419-cc78-46c4-a33d-ce1f28eb0243');

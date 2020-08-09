@@ -25,6 +25,7 @@ const {
 const {
   validateBucketCreation,
   validateUserPermissions,
+  validateUserInitInput,
 } = require('../util/validations');
 const {
   lambdaNames,
@@ -61,7 +62,7 @@ const validateUser = async () => {
     jadeWarn(invalidUser);
     return false;
   } else {
-    jadeLog('AWS permissions ready.');
+    jadeLog('AWS account is correctly setup.');
     return true;
   }
 };
@@ -88,40 +89,44 @@ const init = async (directory) => {
 
     const config = await setupConfig(directory);
     const initialAns = await initialQuestions(config);
+    const invalidInitialAns = await validateUserInitInput(initialAns);
 
-    if (initialAns.gitExists) {
-      const gitAns = await gitQuestions(initialAns);
-      const bucketName = `${parseName(initialAns.projectName)}-${uuid.v4()}`;
-      const invalidBucketName = await validateBucketCreation(bucketName);
-      if (invalidBucketName) {
-        jadeWarn(invalidBucketName);
-      } else {
-        const projectData = {
-          ...initialAns,
-          ...gitAns,
-          bucketName,
-          bucketNames: getBucketNames(bucketName),
-          lambdaNames,
-          cloudFrontOriginId: cloudFrontOriginId(bucketName),
-          cloudFrontOriginDomain: cloudFrontOriginDomain(bucketName),
-          createdOn: new Date(),
-        };
-        const proceed = await confirmResponses(projectData);
-
-        if (proceed) {
-          jadeLog('Thank you! The Jade framework will now be setup.');
-          const newConfig = [...config, projectData];
-          await writeConfig(directory, newConfig);
-          await createJadeIamGroup();
-          await addUserToJadeGroup();
-          await start(directory, projectData);
-        } else {
-          jadeLog('Please run `jade init` again to restart Jade setup.');
-        }
-      }
-    } else {
-      await noGitAlert();
+    if (invalidInitialAns) {
+      jadeWarn(invalidInitialAns);
+      return;
     }
+
+    const gitAns = await gitQuestions(initialAns);
+    const bucketName = `${parseName(initialAns.projectName)}-${uuid.v4()}`;
+    const invalidBucketName = await validateBucketCreation(bucketName);
+    if (invalidBucketName) {
+      jadeWarn(invalidBucketName);
+      return;
+    }
+
+    const projectData = {
+      ...initialAns,
+      ...gitAns,
+      bucketName,
+      bucketNames: getBucketNames(bucketName),
+      lambdaNames,
+      cloudFrontOriginId: cloudFrontOriginId(bucketName),
+      cloudFrontOriginDomain: cloudFrontOriginDomain(bucketName),
+      createdOn: new Date(),
+    };
+    const proceed = await confirmResponses(projectData);
+
+    if (!proceed) {
+      jadeLog('Please run `jade init` again to restart Jade setup.');
+      return;
+    }
+
+    jadeLog('Thank you! The Jade framework will now be setup.');
+    const newConfig = [...config, projectData];
+    await writeConfig(directory, newConfig);
+    await createJadeIamGroup();
+    await addUserToJadeGroup();
+    await start(directory, projectData);
   } catch (err) {
     jadeErr(err);
   }

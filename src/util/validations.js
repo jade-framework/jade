@@ -1,14 +1,13 @@
 const { credentials, getUserName } = require('./getCredentials');
 const { jadeErr } = require('./logger.js');
 const { exists, readFile } = require('./fileUtils');
-const { projectNameLength, jadeIamGroup } = require('../templates/constants');
+const { projectNameLength } = require('../templates/constants');
 const { groupExists, deleteIamGroup } = require('../aws/iam');
 
 const {
   asyncGetCallerIdentity,
   asyncListAttachedUserPolicy,
   asyncCreateGroup,
-  asyncDeleteGroup,
   asyncHeadBucket,
   asyncGetRole,
   asyncGetFunction,
@@ -252,7 +251,12 @@ const promptGitUrl = (gitUrl) => {
   return valid;
 };
 
+const validateGitExists = ({ gitExists }) => {
+  return gitExists;
+};
+
 const validateUserInitInput = async (input) => {
+  const { projectName } = input;
   const validations = [
     {
       validation: validateProjectName,
@@ -260,9 +264,9 @@ const validateUserInitInput = async (input) => {
       invalidMessage: `Project name ${projectName} is invalid. Please make sure it is between 1 and ${projectNameLength} characters.`,
     },
     {
-      validation: validateGitUrl,
+      validation: validateGitExists,
       invalidBoolean: false,
-      invalidMessage: `URL should have the following format:\nhttps://github.com/user/root`,
+      invalidMessage: `Thank you for using Jade. To continue, please setup a public GitHub repository.`,
     },
   ];
 
@@ -270,6 +274,20 @@ const validateUserInitInput = async (input) => {
 
   return status;
 };
+
+// const validateGitInput = async (input) => {
+//   const validations = [
+//     {
+//       validation: validateGitUrl,
+//       invalidBoolean: false,
+//       invalidMessage: `URL should have the following format:\nhttps://github.com/user/root`,
+//     },
+//   ];
+
+//   const status = await validateResource(input, validations);
+
+//   return status;
+// };
 
 // Validate User Permissions
 const hasRequiredPermissions = async () => {
@@ -306,14 +324,15 @@ const hasRequiredPermissions = async () => {
   }
 };
 
-const hasIamPermission = async (groupName) => {
+const hasIamPermission = async () => {
   try {
-    const group = await groupExists(groupName);
+    const testGroup = 'testGroup';
+    const group = await groupExists(testGroup);
 
     if (!group) {
-      await asyncCreateGroup({ GroupName: groupName });
+      await asyncCreateGroup({ GroupName: testGroup });
     }
-    await deleteIamGroup(groupName);
+    await deleteIamGroup(testGroup);
 
     return true;
   } catch (err) {
@@ -347,7 +366,7 @@ const validateUserPermissions = async () => {
     },
   ];
 
-  const status = await validateResource(jadeIamGroup, validations);
+  const status = await validateResource(null, validations);
 
   return status;
 };
