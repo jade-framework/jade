@@ -12,7 +12,7 @@ const {
 const { bucketSuffixes } = require('../../templates/constants');
 
 const setBucketNotificationConfig = async (bucketName, lambdaArn) => {
-  const lambdaBucketName = `${bucketName}-${bucketSuffixes[2]}`;
+  const lambdaBucketName = `${bucketName}-${bucketSuffixes[0]}`;
   const params = {
     Bucket: lambdaBucketName,
     NotificationConfiguration: {
