@@ -16,7 +16,6 @@ const {
 
 const {
   join,
-  exists,
   getJadePath,
   createJSONFile,
   readJSONFile,
@@ -24,6 +23,10 @@ const {
 
 const path = require('path');
 const jadePath = getJadePath(cwd);
+
+const validateRoleAdded = async (instanceProfileRes) => {
+  return instanceProfileRes.InstanceProfile.Roles.length > 0;
+};
 
 async function configEc2IamRole() {
   try {
@@ -54,25 +57,32 @@ async function configEc2IamRole() {
     let instanceProfileResponse = await instanceProfileExists(
       ec2InstanceProfile,
     );
+
     if (!instanceProfileResponse) {
       console.log('Creating instance profile...');
       instanceProfileResponse = await asyncCreateInstanceProfile({
         InstanceProfileName: ec2InstanceProfile,
       });
+    } else {
+      console.log('Using existing Jade instance profile.');
+    }
+
+    const roleAdded = await validateRoleAdded(instanceProfileResponse);
+    if (!roleAdded) {
       console.log('Adding role to instance profile...');
       await asyncAddRoleToProfile({
         InstanceProfileName: ec2InstanceProfile,
         RoleName: ec2IamRoleName,
       });
-      console.log('Jade instance profile for EC2 created.');
-    } else {
-      console.log('Using existing Jade instance profile.');
+      instanceProfileResponse = await instanceProfileExists(ec2InstanceProfile);
     }
+
     await createJSONFile(
       'ec2InstanceProfile',
       jadePath,
       instanceProfileResponse,
     );
+    console.log('Jade instance profile for EC2 created.');
   } catch (err) {
     console.log(err);
   }

@@ -50,7 +50,7 @@ const putFiles = async (localPaths, remotePath, sftp, conn) => {
   console.log('Uploading files...');
   await Promise.all(promises)
     .then(() => {
-      console.log('Files uploaded');
+      console.log('Files uploaded.');
       conn.end();
     })
     .catch((err) => {
@@ -68,7 +68,6 @@ const promisifyConnection = (conn) => {
           console.log(err);
           reject(err);
         } else {
-          let data = [];
           stream
             .on('error', (err) => {
               reject(err);
@@ -76,7 +75,7 @@ const promisifyConnection = (conn) => {
             .on('close', (err) => {
               console.log('SSH shell commands ended.');
               conn.end();
-              err ? reject(err) : resolve(data);
+              err ? reject(err) : resolve();
             })
             .on('data', (d) => {
               console.log(`OUTPUT: ${d}`);
@@ -103,13 +102,16 @@ const promisifyConnection = (conn) => {
                 sftp.mkdir(remotePath, {}, async (err) => {
                   if (err) throw err;
                   await putFiles(localPaths, remotePath, sftp, conn);
+                  resolve();
                 });
               } else {
                 await putFiles(localPaths, remotePath, sftp, conn);
+                resolve();
               }
             });
           } catch (err) {
             console.log(err);
+            reject(err);
           }
         }
       });

@@ -68,7 +68,7 @@ const createEc2Instance = async () => {
       InstanceId,
     });
 
-    console.log('Jade EC2 instance successfully setup.');
+    console.log('Jade EC2 instance successfully configured.');
   } catch (err) {
     console.log(err);
   }

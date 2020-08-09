@@ -3,13 +3,16 @@ const { addAppQuestions } = require('../util/questions');
 
 const add = async (directory) => {
   try {
-    if (!awsCredentialsConfigured()) return;
     const jadePath = getJadePath(directory);
-    if (!(await exists(jadePath))) {
+    // will be changed to check if Jade services are already setup
+    if (
+      !(await exists(jadePath)) ||
+      !(await exists(join(jadePath, 'config.json')))
+    ) {
       console.log(`You need to use "jade init" to setup your AWS instance.`);
       return;
     }
-    const answers = addAppQuestions();
+    const addAppAnswers = addAppQuestions();
   } catch (err) {
     console.log(err);
   }
