@@ -25,7 +25,14 @@ module.exports = async function triggerBuild(webhook) {
 
     // need to change to find the right bucketName for multiple apps
     const { bucketName } = JSON.parse(bucketJSON)[0];
-    const pull = await exec(`git -C ${repoDir} pull ${cloneUrl}`);
+    let pull;
+
+    if (branch === 'master') {
+      pull = await exec(`git -C ${repoDir} pull ${cloneUrl}`);
+    } else if (branch === 'staging') {
+      await exec(`git checkout -b staging`);
+      pull = await exec(`git -C ${repoDir} pull ${cloneUrl}`);
+    }
 
     if (/Already up to date/.test(pull.stdout)) {
       return {
