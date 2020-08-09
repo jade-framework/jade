@@ -34,6 +34,7 @@ const nodeCommands = [
 const gitCommands = (gitUrl) => [
   'sudo yum install git -y',
   `git clone ${gitUrl}`,
+  `git branch staging`,
 ];
 
 const buildCommands = (folder) => [

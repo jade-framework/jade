@@ -30,7 +30,7 @@ module.exports = async function triggerBuild(webhook) {
     if (branch === 'master') {
       pull = await exec(`git -C ${repoDir} pull ${cloneUrl}`);
     } else if (branch === 'staging') {
-      await exec(`git checkout -b staging`);
+      await exec(`git checkout staging`);
       pull = await exec(`git -C ${repoDir} pull ${cloneUrl}`);
     }
 
