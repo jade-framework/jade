@@ -11,16 +11,11 @@ const {
   asyncCreateDeployment,
 } = require('../awsAsyncFunctions');
 
-const { getGithubIp } = require('../../util/getGithubIp');
-
-const deployApiForGitHooks = async (resourceName) => {
+const deployApi = async (resourceName, whiteListIps, stageName) => {
   const region = getRegion();
-  const jadePath = getJadePath(cwd);
-  const stageName = 'webhook';
+  const stageName = stageName || 'jade';
 
   try {
-    const githubApi = await readJSONFile('githubApi', jadePath);
-    const githubApiHooks = githubApi.hooks;
     const resourcePolicyParams = {
       Version: '2012-10-17',
       Statement: [
@@ -37,7 +32,7 @@ const deployApiForGitHooks = async (resourceName) => {
           Resource: 'execute-api:/*/*/*',
           Condition: {
             NotIpAddress: {
-              'aws:SourceIp': githubApiHooks,
+              'aws:SourceIp': whiteListIps,
             },
           },
         },
@@ -82,7 +77,5 @@ const deployApiForGitHooks = async (resourceName) => {
 };
 
 module.exports = {
-  deployApiForGitHooks,
+  deployApi,
 };
-
-deployApiForGitHooks('hello');
