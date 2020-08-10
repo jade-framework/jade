@@ -43,13 +43,19 @@ const deleteApp = async (path, appName) => {
     const cloudFrontConfig = await asyncGetCloudFrontDistributionConfig({
       Id: CFDId,
     });
-    const ETag = cloudFrontConfig.ETag;
+    let ETag = cloudFrontConfig.ETag;
 
     for (let i = 0; i < bucketNames.length; i += 1) {
       await deleteBucket(bucketNames[i]);
     }
 
-    await disableCloudFrontDistribution(CFDId, cloudFrontConfig, ETag);
+    let data = await disableCloudFrontDistribution(
+      CFDId,
+      cloudFrontConfig,
+      ETag,
+    );
+
+    ETag = data.ETag;
     await deleteCloudFrontDistribution(CFDId, ETag);
     const newConfig = config.filter((app) => {
       return app.projectName !== appName;
