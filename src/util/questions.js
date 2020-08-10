@@ -3,12 +3,12 @@ const { promptProjectName, promptGitUrl } = require('./validations');
 const { gitRepos } = require('../templates/constants');
 
 // questions used for jade init
-const initialQuestions = async (config) => {
+const initialInitQuestions = async () => {
   const questions = [
     {
       message: 'What is your project name?\n',
       name: 'projectName',
-      default: config.projectName || 'My Jade Project',
+      default: 'My Jade Project',
       validate: (input) => {
         return promptProjectName(input);
       },
@@ -18,17 +18,49 @@ const initialQuestions = async (config) => {
       message: "What's your favorite Git collaboration tool?\n",
       name: 'gitProvider',
       choices: gitRepos,
-      default: config.gitProvider || 'GitHub',
+      default: 'GitHub',
     },
     {
       type: 'confirm',
       message: (answers) => {
-        return `Do you currently have a ${answers.gitProvider} repo?\n`;
+        return `Do you currently have a public ${answers.gitProvider} repo?\n`;
       },
       name: 'gitExists',
       default: true,
     },
   ];
+  const answers = await prompt(questions);
+  return answers;
+};
+
+// questions used for jade add
+const initialAddQuestions = async () => {
+  const questions = [
+    {
+      name: 'projectName',
+      message: 'What is your new project name?\n',
+      default: 'My New Jade Project',
+      validate: (input) => {
+        return promptProjectName(input);
+      },
+    },
+    {
+      type: 'list',
+      message: 'What Git collaboration tool will you be using?\n',
+      name: 'gitProvider',
+      choices: gitRepos,
+      default: 'GitHub',
+    },
+    {
+      type: 'confirm',
+      message: (answers) => {
+        return `Do you currently have a public ${answers.gitProvider} repo?\n`;
+      },
+      name: 'gitExists',
+      default: true,
+    },
+  ];
+
   const answers = await prompt(questions);
   return answers;
 };
@@ -47,17 +79,6 @@ const gitQuestions = async (initialAns) => {
   return answers;
 };
 
-const noGitAlert = async () => {
-  await prompt([
-    {
-      name: 'noGit',
-      message: `Thank you for using Jade. To continue, please setup a Git repository with one of these providers: ${gitRepos.join(
-        ' | ',
-      )}\n\x1b[30;0mPress enter to continue...`,
-    },
-  ]);
-};
-
 const confirmResponses = async ({ projectName, gitUrl }) => {
   const message = `Your project name is: | ${projectName} |\nYour Git URL is: | ${gitUrl} |\nIs this correct?`;
   const answer = await prompt([
@@ -67,16 +88,41 @@ const confirmResponses = async ({ projectName, gitUrl }) => {
       message,
     },
   ]);
-  return answer;
+  return answer.confirmed;
 };
 
-// questions used for jade add
-const addAppQuestions = async () => {};
+// questions used to handle key pairs
+const confirmOverwriteKeyPair = async () => {
+  const questions = [
+    {
+      type: 'confirm',
+      name: 'overwrite',
+      message:
+        'You currently have a key pair. Would you like to create a new one?',
+    },
+  ];
+  const answers = await prompt(questions);
+  return answers.overwrite;
+};
+
+const confirmDeleteKeyPair = async () => {
+  const questions = [
+    {
+      type: 'confirm',
+      name: 'delete',
+      message:
+        'Jade cannot find a ".jade" folder in the current directory with the Jade private key. Would you like to make a new key pair (note: this will prevent you from accessing the old EC2 instance)?',
+    },
+  ];
+  const answers = await prompt(questions);
+  return answers.delete;
+};
 
 module.exports = {
-  initialQuestions,
+  initialInitQuestions,
   gitQuestions,
-  noGitAlert,
   confirmResponses,
-  addAppQuestions,
+  initialAddQuestions,
+  confirmOverwriteKeyPair,
+  confirmDeleteKeyPair,
 };

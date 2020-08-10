@@ -10,7 +10,6 @@ const {
   getJadePath,
   writeFile,
   chmod,
-  readdir,
   unlink,
 } = require('../../util/fileUtils');
 const {
@@ -19,7 +18,11 @@ const {
   keyPair,
   jadeKeyPair,
 } = require('../../templates/constants');
-const { prompt } = require('../../util/prompt');
+const {
+  confirmOverwriteKeyPair,
+  confirmDeleteKeyPair,
+} = require('../../util/questions');
+const { jadeErr } = require('../../util/logger');
 
 // default data
 const keyPairParams = {
@@ -28,19 +31,6 @@ const keyPairParams = {
 const jadePath = getJadePath(cwd);
 const privateKeyPath = join(jadePath, privateKeyFilename);
 const keyPairJson = `${keyPair}.json`;
-
-const confirmOverwriteKeyPair = async () => {
-  const questions = [
-    {
-      type: 'confirm',
-      name: 'overwrite',
-      message:
-        'You currently have a key pair. Would you like to create a new one?',
-    },
-  ];
-  const answers = await prompt(questions);
-  return answers.overwrite;
-};
 
 const createJadeKeyPair = async () => {
   console.log('Creating Jade key pair and .pem file...');
@@ -81,6 +71,9 @@ const createKeyPair = async () => {
         (await exists(privateKeyPath))
       ) {
         create = await confirmOverwriteKeyPair();
+      } else {
+        deleteKeyPair = await confirmDeleteKeyPair();
+        if (!deleteKeyPair) return;
       }
       if (create) {
         await deleteJadeKeyPair();

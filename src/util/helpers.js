@@ -5,10 +5,12 @@ const getBucketNames = (bucketName) => {
 };
 
 const parseName = (name) => {
-  return name
+  name = name
     .replace(/\s+/gi, '-')
     .toLowerCase()
     .replace(/[^a-z0-9]/gi, '');
+  if (name.length === 0) name = 'jade-framework';
+  return name;
 };
 
 const getGitFolder = (url) => {
