@@ -1,132 +1,29 @@
-const uuid = require('uuid');
-const { createBuckets, setBucketNotificationConfig } = require('../aws/s3');
-const { initJadeLambdas } = require('../aws/lambda');
-const { createCloudFrontDistribution } = require('../aws/cloudfront');
-const { addUserToJadeGroup, createJadeIamGroup } = require('../aws/iam');
-
+const { jadeLog, jadeErr } = require('../util/logger');
 const {
-  createDirectory,
-  exists,
-  join,
-  createJSONFile,
-  readJSONFile,
-  readConfig,
-  writeConfig,
-  getJadePath,
-} = require('../util/fileUtils');
-const { jadeLog, jadeErr, jadeWarn } = require('../util/logger');
-const { build } = require('./build');
-const {
-  initialQuestions,
-  gitQuestions,
-  noGitAlert,
-  confirmResponses,
-} = require('../util/questions');
-const {
-  validateBucketCreation,
-  validateUserPermissions,
-  validateUserInitInput,
-} = require('../util/validations');
-const {
-  lambdaNames,
-  s3BucketName,
-  cloudFrontOriginId,
-  cloudFrontOriginDomain,
-} = require('../templates/constants');
-const { getBucketNames, parseName } = require('../util/helpers');
-
-// write CF ID into config, then upload to DDB
-const start = async (directory, { projectName, bucketName, gitUrl }) => {
-  let bucketNames = [];
-  const jadePath = getJadePath(directory);
-  if (await exists(join(jadePath, `${s3BucketName}.json`))) {
-    bucketNames = await readJSONFile(s3BucketName, jadePath);
-  }
-  await createJSONFile(s3BucketName, jadePath, [
-    ...bucketNames,
-    { projectName, bucketName, gitUrl },
-  ]);
-
-  await createBuckets(bucketName);
-
-  const lambdaArn = await initJadeLambdas(bucketName);
-  await createCloudFrontDistribution(bucketName);
-  await setBucketNotificationConfig(bucketName, lambdaArn);
-  await build(bucketName);
-};
-
-const validateUser = async () => {
-  jadeLog('Checking if your AWS account is correctly setup...');
-  const invalidUser = await validateUserPermissions();
-  if (invalidUser) {
-    jadeWarn(invalidUser);
-    return false;
-  } else {
-    jadeLog('AWS account is correctly setup.');
-    return true;
-  }
-};
-
-const setupConfig = async (directory) => {
-  const jadePath = join(directory, '.jade');
-  let config = [];
-
-  if (!(await exists(jadePath))) {
-    await createDirectory('.jade', directory);
-  }
-  if (!(await exists(join(jadePath, 'config.json')))) {
-    await writeConfig(directory, config);
-  } else {
-    config = await readConfig(directory);
-  }
-  return config;
-};
+  getUserProjectData,
+  validateUser,
+  setupApp,
+  setupConfig,
+  setupAwsInfra,
+} = require('../util/setup');
 
 const init = async (directory) => {
   try {
-    const isValid = await validateUser();
-    if (!isValid) return;
+    const isUserValid = await validateUser();
+    if (!isUserValid) return;
 
-    const config = await setupConfig(directory);
-    const initialAns = await initialQuestions(config);
-    const invalidInitialAns = await validateUserInitInput(initialAns);
-
-    if (invalidInitialAns) {
-      jadeWarn(invalidInitialAns);
-      return;
-    }
-
-    const gitAns = await gitQuestions(initialAns);
-    const bucketName = `${parseName(initialAns.projectName)}-${uuid.v4()}`;
-    const invalidBucketName = await validateBucketCreation(bucketName);
-    if (invalidBucketName) {
-      jadeWarn(invalidBucketName);
-      return;
-    }
-
-    const projectData = {
-      ...initialAns,
-      ...gitAns,
-      bucketName,
-      bucketNames: getBucketNames(bucketName),
-      lambdaNames,
-      cloudFrontOriginId: cloudFrontOriginId(bucketName),
-      cloudFrontOriginDomain: cloudFrontOriginDomain(bucketName),
-      createdOn: new Date(),
-    };
-    const proceed = await confirmResponses(projectData);
-
-    if (!proceed) {
-      jadeLog('Please run `jade init` again to restart Jade setup.');
-      return;
-    }
+    const projectData = await getUserProjectData('init');
+    if (!projectData) return;
 
     jadeLog('Thank you! The Jade framework will now be setup.');
-    const newConfig = [...config, projectData];
-    await writeConfig(directory, newConfig);
-    await createJadeIamGroup();
-    await addUserToJadeGroup();
-    await start(directory, projectData);
+    const isConfigSetup = await setupConfig(directory, projectData);
+    if (!isConfigSetup) return;
+
+    const { bucketName } = projectData;
+    const isAppSetup = await setupApp(directory, projectData);
+    if (!isAppSetup) return;
+
+    await setupAwsInfra(bucketName);
   } catch (err) {
     jadeErr(err);
   }
