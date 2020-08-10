@@ -25,14 +25,22 @@ module.exports = async function triggerBuild(webhook) {
 
     // need to change to find the right bucketName for multiple apps
     const { bucketName } = JSON.parse(bucketJSON)[0];
-    const pull = await exec(`git -C ${repoDir} pull ${cloneUrl}`);
+    let pull;
 
-    if (/Already up to date/.test(pull.stdout)) {
-      return {
-        statusCode: 202,
-        msg: 'Repo has not changed, build not triggered.',
-      };
+    if (branch === 'master') {
+      await exec(`git -C ${repoDir} checkout master`);
+      pull = await exec(`git -C ${repoDir} pull ${cloneUrl}`);
+    } else if (branch === 'staging') {
+      await exec(`git checkout staging`);
+      pull = await exec(`git -C ${repoDir} pull ${cloneUrl}`);
     }
+
+    // if (/Already up to date/.test(pull.stdout)) {
+    //   return {
+    //     statusCode: 202,
+    //     msg: 'Repo has not changed, build not triggered.',
+    //   };
+    // }
 
     (async () => {
       try {
@@ -59,7 +67,8 @@ module.exports = async function triggerBuild(webhook) {
     console.log(err);
     return {
       statusCode: 202,
-      msg: 'Error in processing your webhook, please contact Jade team.',
+      msg: 'Error in processing your webhook, please contact Jade team...',
+      error: err,
     };
   }
 };
