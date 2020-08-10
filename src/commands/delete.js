@@ -6,6 +6,9 @@ const {
   getCloudFrontDistributionId,
 } = require('../aws/cloudfront/getCloudFrontDistributionId');
 const {
+  disableCloudFrontDistribution,
+} = require('../aws/cloudfront/disableCloudFrontDistribution');
+const {
   asyncGetCloudFrontDistributionConfig,
 } = require('../aws/awsAsyncFunctions');
 
@@ -46,6 +49,7 @@ const deleteApp = async (path, appName) => {
       await deleteBucket(bucketNames[i]);
     }
 
+    await disableCloudFrontDistribution(CFDId, cloudFrontConfig, ETag);
     await deleteCloudFrontDistribution(CFDId, ETag);
     const newConfig = config.filter((app) => {
       return app.projectName !== appName;
