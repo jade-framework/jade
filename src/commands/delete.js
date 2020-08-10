@@ -53,9 +53,7 @@ const deleteApp = async (path, appName) => {
 
     await disableCloudFrontDistribution(CFDId, cloudFrontConfig, ETag);
     await deleteCloudFrontDistribution(CFDId, ETag);
-    const newConfig = config.filter((app) => {
-      return app.projectName !== appName;
-    });
+    const newConfig = config.filter((app) => app.projectName !== appName);
 
     await writeConfig(path, newConfig);
     jadeLog(`"${appName}" has been successully deleted`);
