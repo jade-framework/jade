@@ -17,6 +17,7 @@ module.exports = async function triggerBuild(webhook) {
   const cloneUrl = repository.clone_url;
   const repoDir = join(userDir, repoName);
   const branch = webhook.ref.replace('refs/heads/', '');
+  const currentDate = Date.now();
 
   try {
     const bucketJSON = await readFile(
@@ -51,11 +52,11 @@ module.exports = async function triggerBuild(webhook) {
             `aws s3 sync ${repoDir}/public s3://${bucketName}-${prodBucket}`,
           );
           await exec(
-            `aws s3 sync ${repoDir}/public s3://${bucketName}-${buildsBucket}/${Date.now()}`,
+            `aws s3 sync ${repoDir}/public s3://${bucketName}-${buildsBucket}/${currentDate}`,
           );
           console.log(`Upload to s3://${bucketName}-${prodBucket} complete`);
           console.log(
-            `Upload to s3://${bucketName}-${buildsBucket}/${Date.now()} complete`,
+            `Upload to s3://${bucketName}-${buildsBucket}/${currentDate} complete`,
           );
         } else if (branch === 'staging') {
           await exec(`yarn --cwd ${repoDir} build`);
