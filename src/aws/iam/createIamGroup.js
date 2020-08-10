@@ -61,6 +61,7 @@ const assignGroupPolicies = async (groupName, policies) => {
 
 const createIamGroup = async (groupName, policies) => {
   try {
+    if (await groupExists(groupName)) return true;
     await createGroup(groupName);
     await assignGroupPolicies(groupName, policies);
   } catch (err) {

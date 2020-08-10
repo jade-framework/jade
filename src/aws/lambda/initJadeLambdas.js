@@ -38,7 +38,7 @@ const initJadeLambdas = async (bucketName) => {
       lambdaRoleResponse = await createLambdaRole(lambdaIamRoleName);
       console.log('Waiting for Lambda role to be ready...');
       await asyncIamWaitFor('roleExists', { RoleName: lambdaIamRoleName });
-      await sleep(5000);
+      await sleep(10000);
       console.log('Lambda role ready.');
     }
     let lambdaResponse = await lambdaExists(functionName);

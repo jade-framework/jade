@@ -1,6 +1,6 @@
 const { credentials, getUserName } = require('./getCredentials');
-const { jadeErr } = require('./logger.js');
 const { exists, readFile } = require('./fileUtils');
+const { getGitFolder } = require('./helpers');
 const { projectNameLength } = require('../templates/constants');
 const { groupExists, deleteIamGroup } = require('../aws/iam');
 
@@ -237,6 +237,40 @@ const promptProjectName = (projectName) => {
   return valid;
 };
 
+// change to take config as input and remove awaits
+const validateUniqueProjectName = async ({ projectName, config }) => {
+  return (
+    config.filter((project) => project.projectName === projectName).length === 0
+  );
+};
+
+const validateGitExists = ({ gitExists }) => gitExists;
+
+const validateInitialInput = async (input) => {
+  const { projectName } = input;
+  const validations = [
+    {
+      validation: validateProjectName,
+      invalidBoolean: false,
+      invalidMessage: `Project name "${projectName}" is invalid. Please make sure it is between 1 and ${projectNameLength} characters.`,
+    },
+    {
+      validation: validateUniqueProjectName,
+      invalidBoolean: false,
+      invalidMessage: `Project name "${projectName}" has already been used. Please key in a different project name.`,
+    },
+    {
+      validation: validateGitExists,
+      invalidBoolean: false,
+      invalidMessage: `Thank you for using Jade. To continue, please setup a public GitHub repository.`,
+    },
+  ];
+
+  const status = await validateResource(input, validations);
+
+  return status;
+};
+
 const validateGitUrl = ({ gitUrl }) => {
   return /(http(s)?)(:(\/\/))(www\.)?(github|gitlab|bitbucket).com([\w\.@\:/\-~]+)(\.git)?(\/)?/.test(
     gitUrl,
@@ -251,22 +285,42 @@ const promptGitUrl = (gitUrl) => {
   return valid;
 };
 
-const validateGitExists = ({ gitExists }) => {
-  return gitExists;
+const validateUniqueGitUrl = ({ gitUrl, config }) => {
+  return (
+    config.filter((project) => {
+      const projectUrl = project.gitUrl;
+      return projectUrl.includes(gitUrl) || gitUrl.includes(projectUrl);
+    }).length === 0
+  );
 };
 
-const validateUserInitInput = async (input) => {
-  const { projectName } = input;
+const validateUniqueGitFolder = ({ gitUrl, config }) => {
+  const folder = getGitFolder(gitUrl);
+  return (
+    config.filter((project) => getGitFolder(project.gitUrl) === folder)
+      .length === 0
+  );
+};
+
+const validateGitInput = async (input) => {
+  const { gitUrl } = input;
   const validations = [
     {
-      validation: validateProjectName,
+      validation: validateGitUrl,
       invalidBoolean: false,
-      invalidMessage: `Project name ${projectName} is invalid. Please make sure it is between 1 and ${projectNameLength} characters.`,
+      invalidMessage: `Please enter a valid public Git repo.`,
     },
     {
-      validation: validateGitExists,
+      validation: validateUniqueGitUrl,
       invalidBoolean: false,
-      invalidMessage: `Thank you for using Jade. To continue, please setup a public GitHub repository.`,
+      invalidMessage: `Project Git URL "${gitUrl}" has already been used. Please use a different Git URL.`,
+    },
+    {
+      validation: validateUniqueGitFolder,
+      invalidBoolean: false,
+      invalidMessage: `You already have a project that uses the folder name ${getGitFolder(
+        gitUrl,
+      )}. Please change the folder name of your repo.`,
     },
   ];
 
@@ -395,7 +449,8 @@ module.exports = {
   validateLambdaDeployment,
   validateLambdaDeletion,
   validateBucketUpload,
-  validateUserInitInput,
+  validateInitialInput,
+  validateGitInput,
   promptProjectName,
   promptGitUrl,
   validateUserPermissions,
