@@ -12,7 +12,7 @@ const {
   asyncGetCloudFrontDistributionConfig,
 } = require('../aws/awsAsyncFunctions');
 
-const { writeConfig, getJadePath, readJSONFile } = require('../util/fileUtils');
+const { writeConfig, readConfig } = require('../util/fileUtils');
 const { jadeErr, jadeWarn, jadeLog } = require('../util/logger');
 
 const deleteApp = async (path, appName) => {
@@ -24,8 +24,7 @@ const deleteApp = async (path, appName) => {
   }
 
   try {
-    const jadePath = getJadePath(path);
-    const config = await readJSONFile('config', jadePath);
+    const config = await readConfig(path);
 
     const targetAppConfig = config.find((app) => {
       return app.projectName === appName;
@@ -33,7 +32,7 @@ const deleteApp = async (path, appName) => {
 
     if (!targetAppConfig) {
       jadeWarn(
-        `Cannot delete ${appName}. App does not exist or was not deployed using Jade`,
+        `Cannot delete ${appName}. App does not exist or was not deployed using Jade.`,
       );
       return;
     }
@@ -45,9 +44,12 @@ const deleteApp = async (path, appName) => {
     });
     const ETag = cloudFrontConfig.ETag;
 
-    for (let i = 0; i < bucketNames.length; i += 1) {
-      await deleteBucket(bucketNames[i]);
-    }
+    const promises = bucketNames.map((bucketName) => {
+      return (async () => {
+        await deleteBucket(bucketName);
+      })();
+    });
+    await Promise.all(promises);
 
     await disableCloudFrontDistribution(CFDId, cloudFrontConfig, ETag);
     await deleteCloudFrontDistribution(CFDId, ETag);

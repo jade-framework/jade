@@ -1,5 +1,10 @@
 const { exists, getJadePath } = require('../util/fileUtils');
-const { getUserProjectData, validateUser, setupApp } = require('../util/setup');
+const {
+  getUserProjectData,
+  validateUser,
+  setupApp,
+  setupConfig,
+} = require('../util/setup');
 const { sendBuildCommands } = require('../util/connect');
 const { jadeLog } = require('../util/logger');
 const { join } = require('path');
@@ -23,6 +28,9 @@ const add = async (directory) => {
     if (!projectData) return;
 
     jadeLog('Thank you! Your new Jade app will now be setup.');
+    const isConfigSetup = await setupConfig(directory, projectData);
+    if (!isConfigSetup) return;
+
     const isAppSetup = await setupApp(directory, projectData);
     if (!isAppSetup) return;
 
