@@ -47,24 +47,25 @@ module.exports = async function triggerBuild(webhook) {
       try {
         if (branch === 'master') {
           await exec(`yarn --cwd ${repoDir} build`);
-          console.log('Build suceeded', repoDir);
+          console.log('Built', repoDir);
           await exec(
             `aws s3 sync ${repoDir}/public s3://${bucketName}-${prodBucket}`,
           );
+          await exec(`zip -r ${repoDir}/${currentDate} ${repoDir}/public`);
           await exec(
-            `aws s3 sync ${repoDir}/public s3://${bucketName}-${buildsBucket}/${currentDate}`,
+            `aws s3api put-object --bucket ${bucketName}-${buildsBucket} --key ${currentDate}.zip --body ${repoDir}/${currentDate}.zip`,
           );
           console.log(`Upload to s3://${bucketName}-${prodBucket} complete`);
           console.log(
             `Upload to s3://${bucketName}-${buildsBucket}/${currentDate} complete`,
           );
+          await exec(`rm ${repoDir}/${currentDate}.zip`);
         } else if (branch === 'staging') {
           await exec(`yarn --cwd ${repoDir} build`);
-          console.log('Build suceeded', repoDir);
           await exec(
             `aws s3 sync ${repoDir}/public s3://${bucketName}-${stageBucket}`,
           );
-          console.log(`Upload to s3://${bucketName}-${stageBucket} complete.`);
+          console.log(`Upload to s3://${bucketName}-${stageBucket} complete`);
         }
       } catch (err) {
         console.log(err); // convert to logger later
