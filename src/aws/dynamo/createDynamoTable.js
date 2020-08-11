@@ -1,7 +1,3 @@
-// @TODO: Need to wait for table to be created before putting items
-
-const uuid = require('uuid');
-
 const {
   asyncDynamoCreateTable,
   asyncDynamoDescribeTable,
@@ -17,13 +13,21 @@ const createDynamoTable = async (tableName) => {
     TableName: tableName,
     KeySchema: [
       {
-        AttributeName: 'AppId',
+        AttributeName: 'versionId',
         KeyType: 'HASH',
+      },
+      {
+        AttributeName: 'projectName',
+        KeyType: 'RANGE',
       },
     ],
     AttributeDefinitions: [
       {
-        AttributeName: 'AppId',
+        AttributeName: 'versionId',
+        AttributeType: 'S',
+      },
+      {
+        AttributeName: 'projectName',
         AttributeType: 'S',
       },
     ],
