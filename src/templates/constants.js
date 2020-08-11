@@ -11,15 +11,11 @@ const ec2IamRoleName = 'jade-ec2-role';
 const ec2InstanceProfile = 'jade-ec2-instance-profile';
 const s3FullAccessPolicyArn = 'arn:aws:iam::aws:policy/AmazonS3FullAccess';
 const lambdaIamRoleName = 'jade-lambda-role';
-const awsLambdaExecutePolicyArn = 'arn:aws:iam::aws:policy/AWSLambdaExecute';
-const awsLambdaRolePolicyArn =
-  'arn:aws:iam::aws:policy/service-role/AWSLambdaRole';
 const jadePrefix = '\x1b[32;1m💎\x1b[32;0m';
 const lambdaNames = 'jadeInvalidateCloudFrontFile';
 const lambdaRolePolicies = [
   'arn:aws:iam::aws:policy/CloudFrontFullAccess',
-  'arn:aws:iam::aws:policy/AWSLambdaExecute',
-  'arn:aws:iam::aws:policy/service-role/AWSLambdaRole',
+  'arn:aws:iam::aws:policy/AWSLambdaFullAccess',
 ];
 const s3BucketName = 's3BucketName';
 const gitRepos = ['GitHub', 'GitLab', 'Bitbucket'];
