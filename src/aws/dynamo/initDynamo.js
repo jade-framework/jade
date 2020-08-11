@@ -5,7 +5,43 @@ const { createDynamoTable } = require('./createDynamoTable');
 const { putDynamoItem } = require('./putDynamoItems');
 const { jadeLog } = require('../../util/logger');
 
-const appItemToPut = async () => {
+const appsItemToPut = async () => {
+  const jsonItems = await readConfig(process.cwd());
+  const formattedItem = jsonItems.map(
+    ({
+      projectName,
+      gitProvider,
+      gitUrl,
+      bucketName,
+      cloudFrontOriginId,
+      cloudFrontOriginDomain,
+    }) => ({
+      projectId: {
+        S: uuid.v4(),
+      },
+      projectName: {
+        S: projectName,
+      },
+      gitProvider: {
+        S: gitProvider,
+      },
+      gitUrl: {
+        S: gitUrl,
+      },
+      bucketName: {
+        S: bucketName,
+      },
+      cloudFrontOriginId: {
+        S: cloudFrontOriginId,
+      },
+      cloudFrontOriginDomain: {
+        S: cloudFrontOriginDomain,
+      },
+    }),
+  )[0];
+  return formattedItem;
+};
+const versionsItemToPut = async () => {
   const jsonItems = await readConfig(process.cwd());
   const formattedItem = jsonItems.map(
     ({
@@ -54,19 +90,36 @@ const appItemToPut = async () => {
   return formattedItem;
 };
 
-const initDynamo = async (tableName) => {
+const initDynamo = async (appsTableName, versionsTableName) => {
   try {
-    await createDynamoTable(tableName);
-    const item = await appItemToPut();
-    await putDynamoItem(tableName, item);
+    // Create Jade Projects Summary Table
+    const createPromise1 = createDynamoTable(
+      appsTableName,
+      'projectId',
+      'projectName',
+    );
+    // Create App Versions Table
+    const createPromise2 = await createDynamoTable(
+      versionsTableName,
+      'versionId',
+      'projectName',
+    );
+    await Promise.all([createPromise1, createPromise2]);
+
+    // Put initial app items to tables
+    const appsItem = await appsItemToPut();
+    const versionsItem = await versionsItemToPut();
+    const putPromise1 = putDynamoItem(appsTableName, appsItem);
+    const putPromise2 = putDynamoItem(versionsTableName, versionsItem);
+    await Promise.all([putPromise1, putPromise2]);
     jadeLog('DynamoDB setup complete.');
   } catch (error) {
     console.log(error);
   }
 };
 
-// module.exports = { initDynamo };
-initDynamo('MyJadeProject4');
+module.exports = { initDynamo };
+// initDynamo('JadeProjects', 'JadeProjectVersions');
 
 /*
 CREATE RESPONSE
