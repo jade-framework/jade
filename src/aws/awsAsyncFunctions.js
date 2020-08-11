@@ -122,6 +122,11 @@ const asyncDynamoCreateTable = promisify(dynamo.createTable.bind(dynamo));
 const asyncDynamoPutItem = promisify(dynamo.putItem.bind(dynamo));
 const asyncDynamoWaitFor = promisify(dynamo.waitFor.bind(dynamo));
 const asyncDynamoDescribeTable = promisify(dynamo.describeTable.bind(dynamo));
+const asyncDynamoDeleteTable = promisify(dynamo.deleteTable.bind(dynamo));
+const asyncDynamoListTables = promisify(dynamo.listTables.bind(dynamo));
+const asyncDynamoListTagsOfResource = promisify(
+  dynamo.listTagsOfResource.bind(dynamo),
+);
 
 // ApiGateway
 const asyncCreateRestApi = promisify(apigateway.createRestApi.bind(apigateway));
@@ -189,7 +194,6 @@ module.exports = {
   asyncGetCallerIdentity,
   asyncPutBucketTagging,
   asyncGetBucketTagging,
-  asyncDeleteLambdaFunction,
   asyncDynamoCreateTable,
   asyncDynamoPutItem,
   asyncDynamoWaitFor,
@@ -200,4 +204,7 @@ module.exports = {
   asyncPutMethod,
   asyncPutIntegration,
   asyncCreateDeployment,
+  asyncDynamoDeleteTable,
+  asyncDynamoListTables,
+  asyncDynamoListTagsOfResource,
 };
