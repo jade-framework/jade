@@ -2,6 +2,12 @@ const {
   asyncDetachRolePolicy,
   asyncDeleteRole,
 } = require('../awsAsyncFunctions');
+const {
+  lambdaRolePolicies,
+  lambdaIamRoleName,
+  ec2IamRoleName,
+} = require('../../templates/constants');
+const { jadeErr, jadeLog } = require('../../util/logger');
 
 /**
  * Delete an AWS IAM role
@@ -10,7 +16,7 @@ const {
  */
 const deleteIamRole = async (iamRoleName, iamPolicyArns) => {
   try {
-    await iamPolicyArns.forEach(async (policy) => {
+    iamPolicyArns.forEach(async (policy) => {
       await asyncDetachRolePolicy({ RoleName: iamRoleName, PolicyArn: policy });
     });
 
@@ -20,4 +26,13 @@ const deleteIamRole = async (iamRoleName, iamPolicyArns) => {
   }
 };
 
-module.exports = { deleteIamRole };
+const deleteJadeIamRoles = async () => {
+  try {
+    await deleteIamRole(lambdaIamRoleName, lambdaRolePolicies);
+    await deleteIamRole(ec2IamRoleName);
+  } catch (err) {
+    jadeErr(err);
+  }
+};
+
+module.exports = { deleteJadeIamRoles };

@@ -3,9 +3,9 @@ const {
   asyncListBuckets,
   asyncGetBucketTagging,
 } = require('../awsAsyncFunctions');
-
+const { jadeErr, jadeLog } = require('../../util/logger');
 const deleteAllBuckets = async () => {
-  console.log('Deleting ALL Buckets...');
+  jadeLog('Deleting ALL Buckets deployed by Jade...');
 
   try {
     const allBuckets = await asyncListBuckets();
@@ -17,13 +17,11 @@ const deleteAllBuckets = async () => {
           deleteBucket(bucket.Name);
         }
       } catch (error) {
-        console.log(
-          `Bucket ${bucket.Name} not tagged with jade project. Moving on...`,
-        );
+        if (error.code !== 'NoSuchTagSet') jadeErr(error);
       }
     });
   } catch (error) {
-    console.log('Error deleting S3 Bucket', error);
+    jadeErr('Error deleting S3 Bucket', error);
   }
 };
 
