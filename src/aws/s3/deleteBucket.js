@@ -3,8 +3,6 @@ const { asyncDeleteBucketObjects } = require('../awsAsyncFunctions');
 const { listBucketObjects } = require('./listBucketObjects');
 
 const deleteBucket = async (bucketName) => {
-  console.log('Deleting S3 Bucket...');
-
   try {
     const objects = await listBucketObjects(bucketName);
     let objectKeys;

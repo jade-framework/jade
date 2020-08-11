@@ -16,6 +16,15 @@ const {
 
 const cwd = process.cwd();
 
+// Command argument provided
+const commandArgProvided = ({ projectName }) => {
+  if (projectName && projectName.trim()) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 // AWS Credentials helper methods
 const awsCredentialsConfigured = () => {
   // console.log('Looking for AWS Credentials...');
@@ -425,6 +434,28 @@ const validateUserPermissions = async () => {
   return status;
 };
 
+// Validate delete command argument
+const validateDeleteArg = async (input) => {
+  const { projectName } = input;
+  const validations = [
+    {
+      validation: commandArgProvided,
+      invalidBoolean: false,
+      invalidMessage:
+        'Argument is missing. Please re-run the command in the following format: jade delete <appName>.',
+    },
+    {
+      validation: validateUniqueProjectName, //check is app exists in config
+      invalidBoolean: true,
+      invalidMessage: `App "${projectName}" does not exist or was not deployed using Jade.`,
+    },
+  ];
+
+  const status = await validateResource(input, validations);
+
+  return status;
+};
+
 // Validations helper method
 const validateResource = async (resourceData, validations) => {
   let msg;
@@ -454,4 +485,5 @@ module.exports = {
   promptProjectName,
   promptGitUrl,
   validateUserPermissions,
+  validateDeleteArg,
 };

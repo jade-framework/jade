@@ -1,7 +1,7 @@
 const { init } = require('./init');
 const { add } = require('./add');
 const { deleteApp } = require('./delete');
-// const { destroy } = require('./destroy');
+const { destroy } = require('./destroy');
 const { list } = require('./list');
 
 const commandIsBlank = (cmd) => cmd === undefined || cmd === '';
@@ -15,7 +15,7 @@ const executeCommand = async (command, args, homedir) => {
   } else if (command === 'delete') {
     await deleteApp(homedir, args[0]);
   } else if (command === 'destroy') {
-    console.log('destroy entire app');
+    await destroy(homedir);
   } else if (command === 'list') {
     await list(homedir);
   } else if (commandIsHelp(command) || commandIsBlank(command)) {
