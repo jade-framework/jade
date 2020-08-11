@@ -16,12 +16,12 @@ const init = async (directory) => {
     if (!projectData) return;
 
     jadeLog('Thank you! The Jade framework will now be setup.');
-    const isConfigSetup = await setupConfig(directory, projectData);
-    if (!isConfigSetup) return;
-
     const { bucketName } = projectData;
     const isAppSetup = await setupApp(directory, projectData);
     if (!isAppSetup) return;
+
+    const isConfigSetup = await setupConfig(directory, projectData);
+    if (!isConfigSetup) return;
 
     await setupAwsInfra(bucketName);
   } catch (err) {

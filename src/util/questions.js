@@ -1,6 +1,5 @@
 const { prompt } = require('./prompt');
 const { promptProjectName, promptGitUrl } = require('./validations');
-const { gitRepos } = require('../templates/constants');
 
 // questions used for jade init
 const initialInitQuestions = async () => {
@@ -12,13 +11,6 @@ const initialInitQuestions = async () => {
       validate: (input) => {
         return promptProjectName(input);
       },
-    },
-    {
-      type: 'list',
-      message: "What's your favorite Git collaboration tool?\n",
-      name: 'gitProvider',
-      choices: gitRepos,
-      default: 'GitHub',
     },
     {
       type: 'confirm',
@@ -45,17 +37,8 @@ const initialAddQuestions = async () => {
       },
     },
     {
-      type: 'list',
-      message: 'What Git collaboration tool will you be using?\n',
-      name: 'gitProvider',
-      choices: gitRepos,
-      default: 'GitHub',
-    },
-    {
       type: 'confirm',
-      message: (answers) => {
-        return `Do you currently have a public ${answers.gitProvider} repo?\n`;
-      },
+      message: `Do you currently have a public GitHub repo?\n`,
       name: 'gitExists',
       default: true,
     },
@@ -65,14 +48,28 @@ const initialAddQuestions = async () => {
   return answers;
 };
 
-const gitQuestions = async (initialAns) => {
+const appConfigQuestions = async () => {
   const questions = [
     {
       name: 'gitUrl',
-      message: `Please enter your ${initialAns.gitProvider} URL here. Note that Jade will use the root folder for deployment (https://github.com/user/root):\n`,
+      message: `Please enter your GitHub URL here. Note that Jade will use the root folder for deployment (https://github.com/user/root):\n`,
       validate: (input) => {
         return promptGitUrl(input);
       },
+    },
+    {
+      name: 'configNeeded',
+      message: `We'd now like to know your basic build settings. For more information, please visit https://github.com/jade-framework/jade.`,
+    },
+    {
+      name: 'userInstallationCommands',
+      message: `Please enter the command to install your project's environment. This will be run once in your EC2 instance to include the right packages for your app (ex. "yarn install"):\n`,
+      default: `yarn install`,
+    },
+    {
+      name: 'userBuildCommand',
+      message: `Please enter the command to build your project files. This will be run each time a commit is made to your GitHub repo, (ex. "yarn build"):\n`,
+      default: `yarn build`,
     },
   ];
   const answers = await prompt(questions);
@@ -80,7 +77,7 @@ const gitQuestions = async (initialAns) => {
 };
 
 const confirmResponses = async ({ projectName, gitUrl }) => {
-  const message = `Your project name is: | ${projectName} |\nYour Git URL is: | ${gitUrl} |\nIs this correct?`;
+  const message = `Your project name is: >>> ${projectName}\nYour Git URL is: >>> ${gitUrl}\nIs this correct?`;
   const answer = await prompt([
     {
       type: 'confirm',
@@ -120,7 +117,7 @@ const confirmDeleteKeyPair = async () => {
 
 module.exports = {
   initialInitQuestions,
-  gitQuestions,
+  appConfigQuestions,
   confirmResponses,
   initialAddQuestions,
   confirmOverwriteKeyPair,

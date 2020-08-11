@@ -2,7 +2,10 @@ const uuid = require('uuid');
 
 const { createBuckets, setBucketNotificationConfig } = require('../aws/s3');
 const { initJadeLambdas } = require('../aws/lambda');
-const { createCloudFrontDistribution } = require('../aws/cloudfront');
+const {
+  createCloudFrontDistribution,
+  getCloudFrontDistributionId,
+} = require('../aws/cloudfront');
 const {
   addUserToJadeGroup,
   configEc2IamRole,
@@ -17,7 +20,7 @@ const { printBuildSuccess } = require('./printBuildSuccess');
 const {
   initialInitQuestions,
   initialAddQuestions,
-  gitQuestions,
+  appConfigQuestions,
   confirmResponses,
 } = require('./questions');
 const {
@@ -66,11 +69,14 @@ const getUserProjectData = async (command) => {
       return false;
     }
 
-    const gitAns = await gitQuestions(initialAns);
+    const appConfigAns = await appConfigQuestions(initialAns);
 
-    const invalidGitAns = await validateGitInput({ ...gitAns, config });
-    if (invalidGitAns) {
-      jadeWarn(invalidGitAns);
+    const invalidAppConfig = await validateGitInput({
+      ...appConfigAns,
+      config,
+    });
+    if (invalidAppConfig) {
+      jadeWarn(invalidAppConfig);
       return false;
     }
 
@@ -83,7 +89,7 @@ const getUserProjectData = async (command) => {
 
     const projectData = {
       ...initialAns,
-      ...gitAns,
+      ...appConfigAns,
       bucketName,
       bucketNames: getBucketNames(bucketName),
       lambdaNames,
@@ -154,7 +160,13 @@ const setupApp = async (directory, projectData) => {
     await createBuckets(bucketName);
 
     const lambdaArn = await initJadeLambdas(bucketName);
-    await createCloudFrontDistribution(bucketName);
+    const originId = await createCloudFrontDistribution(bucketName);
+
+    const cloudFrontDistributionId = await getCloudFrontDistributionId(
+      originId,
+    );
+    projectData.cloudFrontDistributionId = cloudFrontDistributionId;
+
     await setBucketNotificationConfig(bucketName, lambdaArn);
     return true;
   } catch (err) {

@@ -22,7 +22,6 @@ const lambdaRolePolicies = [
   'arn:aws:iam::aws:policy/service-role/AWSLambdaRole',
 ];
 const s3BucketName = 's3BucketName';
-const gitRepos = ['GitHub', 'GitLab', 'Bitbucket'];
 const projectNameLength = 24;
 const bucketSuffixes = ['prod', 'builds', 'lambda', 'stage']; // production/live is always first, builds/history is always second
 const cloudFrontOriginId = (name) => `S3-${name}`;
@@ -49,7 +48,6 @@ module.exports = {
   lambdaNames,
   lambdaRolePolicies,
   s3BucketName,
-  gitRepos,
   projectNameLength,
   bucketSuffixes,
   cloudFrontOriginId,

@@ -11,8 +11,8 @@ const { join } = require('path');
 
 const add = async (directory) => {
   try {
-    const isValid = await validateUser();
-    if (!isValid) return;
+    const isUserValid = await validateUser();
+    if (!isUserValid) return;
 
     // will be changed to check if Jade services are already setup
     const jadePath = getJadePath(directory);
@@ -28,11 +28,11 @@ const add = async (directory) => {
     if (!projectData) return;
 
     jadeLog('Thank you! Your new Jade app will now be setup.');
-    const isConfigSetup = await setupConfig(directory, projectData);
-    if (!isConfigSetup) return;
-
     const isAppSetup = await setupApp(directory, projectData);
     if (!isAppSetup) return;
+
+    const isConfigSetup = await setupConfig(directory, projectData);
+    if (!isConfigSetup) return;
 
     await sendBuildCommands(projectData);
   } catch (err) {

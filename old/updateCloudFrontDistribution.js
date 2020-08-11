@@ -3,7 +3,7 @@ const {
   asyncGetCloudFrontDistributionConfig,
   asyncCreateCloudFrontInvalidation,
   asyncListCloudFrontDistributions,
-} = require('../awsAsyncFunctions');
+} = require('../src/aws/awsAsyncFunctions');
 
 const getCloudFrontDistributionId = async (bucketName) => {
   let id;

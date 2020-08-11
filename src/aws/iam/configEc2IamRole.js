@@ -28,7 +28,7 @@ const validateRoleAdded = async (instanceProfileRes) => {
   return instanceProfileRes.InstanceProfile.Roles.length > 0;
 };
 
-async function configEc2IamRole() {
+const configEc2IamRole = async () => {
   try {
     let ec2RoleResponse = await roleExists(ec2IamRoleName);
     if (!ec2RoleResponse) {
@@ -86,6 +86,6 @@ async function configEc2IamRole() {
   } catch (err) {
     console.log(err);
   }
-}
+};
 
 module.exports = { configEc2IamRole };
