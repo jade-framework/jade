@@ -39,8 +39,6 @@ module.exports = {
   ec2InstanceProfile,
   s3FullAccessPolicyArn,
   lambdaIamRoleName,
-  awsLambdaExecutePolicyArn,
-  awsLambdaRolePolicyArn,
   jadePrefix,
   lambdaNames,
   lambdaRolePolicies,
