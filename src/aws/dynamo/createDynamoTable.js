@@ -1,3 +1,5 @@
+const { jadeLog } = require('../../util/logger');
+
 const {
   asyncDynamoCreateTable,
   asyncDynamoDescribeTable,
@@ -7,8 +9,6 @@ const {
 // to discuss: AWS.config.update({endpoint: "http://localhost:8000"})
 
 const createDynamoTable = async (tableName) => {
-  console.log('Creating DynamoDB table...');
-
   const params = {
     TableName: tableName,
     KeySchema: [
@@ -40,15 +40,20 @@ const createDynamoTable = async (tableName) => {
     ],
   };
 
+  let tableInfo;
   try {
-    const createResponse = await asyncDynamoCreateTable(params);
-
+    jadeLog('Creating DynamoDB table...');
+    await asyncDynamoCreateTable(params);
+    jadeLog(`DynamoDB table ${tableName} created.`);
+    jadeLog(`Waiting for table to be activated...`);
     await asyncDynamoWaitFor('tableExists', { TableName: tableName });
-    console.log(await asyncDynamoDescribeTable({ TableName: tableName }));
-    console.log(`DynamoDB table ${tableName} created.`, createResponse);
+    jadeLog(`DynamoDB table ready.`);
+
+    tableInfo = await asyncDynamoDescribeTable({ TableName: tableName });
   } catch (error) {
     console.log('Error creating DynamoDB table', error);
   }
+  return tableInfo;
 };
 
 module.exports = { createDynamoTable };
