@@ -8,26 +8,30 @@ const {
 
 // to discuss: AWS.config.update({endpoint: "http://localhost:8000"})
 
-const createDynamoTable = async (tableName) => {
+const createDynamoTable = async (
+  tableName,
+  primaryKeyName,
+  secondaryKeyName,
+) => {
   const params = {
     TableName: tableName,
     KeySchema: [
       {
-        AttributeName: 'versionId',
+        AttributeName: primaryKeyName,
         KeyType: 'HASH',
       },
       {
-        AttributeName: 'projectName',
+        AttributeName: secondaryKeyName,
         KeyType: 'RANGE',
       },
     ],
     AttributeDefinitions: [
       {
-        AttributeName: 'versionId',
+        AttributeName: primaryKeyName,
         AttributeType: 'S',
       },
       {
-        AttributeName: 'projectName',
+        AttributeName: secondaryKeyName,
         AttributeType: 'S',
       },
     ],
