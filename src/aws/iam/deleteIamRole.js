@@ -5,7 +5,6 @@ const {
 const {
   lambdaRolePolicies,
   lambdaIamRoleName,
-  ec2IamRoleName,
 } = require('../../templates/constants');
 const { jadeErr, jadeLog } = require('../../util/logger');
 
@@ -14,25 +13,21 @@ const { jadeErr, jadeLog } = require('../../util/logger');
  * @param {string} iamRoleName
  * @param {array} iamPolicyArns
  */
-const deleteIamRole = async (iamRoleName, iamPolicyArns) => {
+const deleteIamRole = async () => {
   try {
-    iamPolicyArns.forEach(async (policy) => {
-      await asyncDetachRolePolicy({ RoleName: iamRoleName, PolicyArn: policy });
+    jadeLog('Deleting "jade-lambda-role"...');
+    lambdaRolePolicies.forEach(async (policy) => {
+      await asyncDetachRolePolicy({
+        RoleName: lambdaIamRoleName,
+        PolicyArn: policy,
+      });
     });
 
-    await asyncDeleteRole({ RoleName: iamRoleName });
+    await asyncDeleteRole({ RoleName: lambdaIamRoleName });
+    jadeLog('Role successfully deleted.');
   } catch (error) {
-    console.log(error);
+    jadeErr(error);
   }
 };
 
-const deleteJadeIamRoles = async () => {
-  try {
-    await deleteIamRole(lambdaIamRoleName, lambdaRolePolicies);
-    await deleteIamRole(ec2IamRoleName);
-  } catch (err) {
-    jadeErr(err);
-  }
-};
-
-module.exports = { deleteJadeIamRoles };
+module.exports = { deleteIamRole };
