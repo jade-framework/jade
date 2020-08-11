@@ -1,13 +1,14 @@
 const { asyncDeleteLambdaFunction } = require('../awsAsyncFunctions');
+const { jadeErr, jadeLog } = require('../../util/logger');
 
 const deleteLambdaFunction = async (functionName) => {
   try {
-    console.log(`Deleting lambda function ${functionName}`);
+    jadeLog(`Deleting lambda function ${functionName}`);
     await asyncDeleteLambdaFunction({ FunctionName: functionName });
-    console.log('Successfully deleted lambda function');
+    jadeLog('Successfully deleted lambda function');
   } catch (error) {
-    console.log('Could not delete lambda function: ', error);
+    jadeErr(error);
   }
 };
 
-module.exports = deleteLambdaFunction;
+module.exports = { deleteLambdaFunction };

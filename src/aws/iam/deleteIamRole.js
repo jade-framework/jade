@@ -2,10 +2,6 @@ const {
   asyncDetachRolePolicy,
   asyncDeleteRole,
 } = require('../awsAsyncFunctions');
-const {
-  lambdaRolePolicies,
-  lambdaIamRoleName,
-} = require('../../templates/constants');
 const { jadeErr, jadeLog } = require('../../util/logger');
 
 /**
@@ -13,17 +9,17 @@ const { jadeErr, jadeLog } = require('../../util/logger');
  * @param {string} iamRoleName
  * @param {array} iamPolicyArns
  */
-const deleteIamRole = async () => {
+const deleteIamRole = async (iamRoleName, iamPolicyArns) => {
   try {
     jadeLog('Deleting "jade-lambda-role"...');
-    lambdaRolePolicies.forEach(async (policy) => {
+    iamPolicyArns.forEach(async (policy) => {
       await asyncDetachRolePolicy({
-        RoleName: lambdaIamRoleName,
+        RoleName: iamRoleName,
         PolicyArn: policy,
       });
     });
 
-    await asyncDeleteRole({ RoleName: lambdaIamRoleName });
+    await asyncDeleteRole({ RoleName: iamRoleName });
     jadeLog('Role successfully deleted.');
   } catch (error) {
     jadeErr(error);
