@@ -1,29 +1,12 @@
-const { jadeLog, jadeErr } = require('../util/logger');
-const {
-  getUserProjectData,
-  validateUser,
-  setupApp,
-  setupConfig,
-  setupAwsInfra,
-} = require('../util/setup');
+const { jadeErr } = require('../util/logger');
+const { validateUser, launchApp } = require('../util/setup');
 
 const init = async (directory) => {
   try {
     const isUserValid = await validateUser();
     if (!isUserValid) return;
 
-    const projectData = await getUserProjectData('init');
-    if (!projectData) return;
-
-    jadeLog('Thank you! The Jade framework will now be setup.');
-    const { bucketName } = projectData;
-    const isAppSetup = await setupApp(directory, projectData);
-    if (!isAppSetup) return;
-
-    const isConfigSetup = await setupConfig(directory, projectData);
-    if (!isConfigSetup) return;
-
-    await setupAwsInfra(bucketName);
+    await launchApp('init', directory);
   } catch (err) {
     jadeErr(err);
   }

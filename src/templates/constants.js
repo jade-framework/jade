@@ -10,6 +10,8 @@ const securityGroupName = 'jade-security-group';
 const ec2IamRoleName = 'jade-ec2-role';
 const ec2InstanceProfile = 'jade-ec2-instance-profile';
 const s3FullAccessPolicyArn = 'arn:aws:iam::aws:policy/AmazonS3FullAccess';
+const dynamoDbFullAccessPolicyArn =
+  'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess';
 const lambdaIamRoleName = 'jade-lambda-role';
 const jadePrefix = '\x1b[32;1m💎\x1b[32;0m';
 const lambdaNames = 'jadeInvalidateCloudFrontFile';
@@ -21,9 +23,8 @@ const s3BucketName = 's3BucketName';
 const projectNameLength = 24;
 const bucketSuffixes = ['prod', 'builds', 'lambda', 'stage']; // production/live is always first, builds/history is always second
 const cloudFrontOriginId = (name) => `S3-${name}`;
-const cloudFrontOriginDomain = (name) => {
-  return `${name}-${bucketSuffixes[0]}.s3.amazonaws.com`;
-};
+const cloudFrontOriginDomain = (name) =>
+  `${name}-${bucketSuffixes[0]}.s3.amazonaws.com`;
 
 module.exports = {
   cwd,
@@ -37,6 +38,7 @@ module.exports = {
   ec2IamRoleName,
   ec2InstanceProfile,
   s3FullAccessPolicyArn,
+  dynamoDbFullAccessPolicyArn,
   lambdaIamRoleName,
   jadePrefix,
   lambdaNames,

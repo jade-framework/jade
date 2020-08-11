@@ -31,13 +31,22 @@ const setupCommands = [
   'sudo yum install git -y',
 ];
 
-const buildCommands = ({ gitUrl, gitFolder, bucketName }) => [
+const buildCommands = ({
+  gitUrl,
+  gitFolder,
+  bucketName,
+  userInstallCommand,
+  userBuildCommand,
+  publishDirectory,
+}) => [
   `git clone ${gitUrl}`,
   `cd ${remoteHomeDir}/${gitFolder}`,
-  'yarn install',
-  'yarn build',
-  `aws s3 sync public s3://${bucketName}-${bucketSuffixes[0]}`,
-  `aws s3 sync public s3://${bucketName}-${bucketSuffixes[1]}/${Date.now()}`,
+  userInstallCommand,
+  userBuildCommand,
+  `aws s3 sync ${publishDirectory} s3://${bucketName}-${bucketSuffixes[0]}`,
+  `aws s3 sync ${publishDirectory} s3://${bucketName}-${
+    bucketSuffixes[1]
+  }/${Date.now()}`,
 ];
 
 const checkConnError = (err) => {
@@ -127,17 +136,17 @@ const sendSetupAndBuildCommands = async (projectData) => {
   }
 };
 
-const sendBuildCommands = async (projectData) => {
-  try {
-    const host = await getHost();
-    if (!host) return;
+// const sendBuildCommands = async (projectData) => {
+//   try {
+//     const host = await getHost();
+//     if (!host) return;
 
-    await sendCommands(host, buildCommands(projectData));
-    return true;
-  } catch (err) {
-    jadeErr(err);
-    return false;
-  }
-};
+//     await sendCommands(host, buildCommands(projectData));
+//     return true;
+//   } catch (err) {
+//     jadeErr(err);
+//     return false;
+//   }
+// };
 
-module.exports = { sendSetupAndBuildCommands, sendBuildCommands };
+module.exports = { sendSetupAndBuildCommands };

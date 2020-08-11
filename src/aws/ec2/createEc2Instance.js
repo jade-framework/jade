@@ -19,7 +19,7 @@ const {
 
 const { getAmi } = require('./getAmi');
 
-const runInstancesParams = {
+const runInstancesParams = (projectName) => ({
   InstanceType: instanceType,
   MaxCount: 1,
   MinCount: 1,
@@ -28,15 +28,27 @@ const runInstancesParams = {
       ResourceType: 'instance',
       Tags: [
         {
+          Key: 'project',
+          Value: 'jade',
+        },
+        {
           Key: 'Name',
-          Value: 'Jade EC2 Instance',
+          Value: `${projectName}'s Jade EC2 Instance`,
         },
       ],
     },
   ],
+});
+
+const getInstanceData = async (instanceId) => {
+  const describeInstancesResponse = await asyncDescribeInstances({
+    InstanceIds: [instanceId],
+  });
+
+  return describeInstancesResponse.Reservations[0].Instances[0];
 };
 
-const createEc2Instance = async () => {
+const createEc2Instance = async (projectName) => {
   const jadePath = getJadePath(cwd);
   try {
     const securityGroupData = await readJSONFile(securityGroup, jadePath);
@@ -48,27 +60,30 @@ const createEc2Instance = async () => {
 
     console.log('Creating EC2 instance...');
     const runInstancesResponse = await asyncRunInstances({
-      ...runInstancesParams,
+      ...runInstancesParams(projectName),
       ImageId: await getAmi(),
       KeyName: keyPairData.KeyName,
       SecurityGroupIds: [securityGroupData.SecurityGroups[0].GroupId],
     });
 
     await createJSONFile('ec2Instance', jadePath, runInstancesResponse);
-    const InstanceId = runInstancesResponse.Instances[0].InstanceId;
+    const instanceId = runInstancesResponse.Instances[0].InstanceId;
 
     console.log('Waiting for EC2 instance to start running...');
-    await asyncEc2WaitFor('instanceRunning', { InstanceIds: [InstanceId] });
+    await asyncEc2WaitFor('instanceRunning', { InstanceIds: [instanceId] });
 
     console.log('Associating IAM instance profile with EC2 instance...');
     await asyncAssociateIamInstanceProfile({
       IamInstanceProfile: {
         Arn: instanceProfileArn,
       },
-      InstanceId,
+      InstanceId: instanceId,
     });
 
     console.log('Jade EC2 instance successfully configured.');
+    const instanceData = await getInstanceData(instanceId);
+    console.log('EC2 public IP fetched.');
+    return instanceData;
   } catch (err) {
     console.log(err);
   }

@@ -1,8 +1,8 @@
 const uuid = require('uuid');
 const { asyncCreateCloudFrontDistribution } = require('../awsAsyncFunctions');
 const {
-  cloudFrontOriginDomain,
   cloudFrontOriginId,
+  cloudFrontOriginDomain,
 } = require('../../templates/constants');
 
 const createCloudFrontDistribution = async (bucketName) => {
@@ -79,10 +79,11 @@ const createCloudFrontDistribution = async (bucketName) => {
     console.log(
       `CloudFront distribution created at ${response.Distribution.DomainName}`,
     );
+    return { ...response, originId };
   } catch (error) {
     console.log('Error creating CloudFront distribution', error);
+    return false;
   }
-  return originId;
 };
 
 module.exports = {

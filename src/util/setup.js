@@ -125,47 +125,55 @@ const validateUser = async () => {
     }
   } catch (err) {
     jadeErr(err);
-    throw err;
+    return false;
   }
 };
 
 const updateBucketData = async (directory, projectData) => {
   let bucketData = [];
+
   try {
-    if (await exists(join(directory, `${s3BucketName}.json`))) {
-      bucketData = await readJSONFile(s3BucketName, directory);
+    await createDirectory('.jade', directory);
+    const jadePath = getJadePath(directory);
+
+    if (await exists(join(jadePath, `${s3BucketName}.json`))) {
+      bucketData = await readJSONFile(s3BucketName, jadePath);
       bucketData = bucketData.filter(
         (bucket) => bucket.projectName !== projectData.projectName,
       );
     }
-    await createJSONFile(s3BucketName, directory, [...bucketData, projectData]);
+    await createJSONFile(s3BucketName, jadePath, [...bucketData, projectData]);
     return true;
   } catch (err) {
     jadeErr(err);
-    throw err;
+    return false;
   }
 };
 
 const setupApp = async (directory, projectData) => {
   try {
-    const jadePath = getJadePath(directory);
     const { bucketName } = projectData;
 
     await createJadeIamGroup();
     await addUserToJadeGroup();
 
-    const bucketData = await updateBucketData(jadePath, projectData);
+    const bucketData = await updateBucketData(directory, projectData);
     if (!bucketData) return false;
 
     await createBuckets(bucketName);
 
     const lambdaArn = await initJadeLambdas(bucketName);
-    const originId = await createCloudFrontDistribution(bucketName);
+    const cfd = await createCloudFrontDistribution(bucketName);
+    if (!cfd) return;
+
+    const { originId } = cfd;
+    const { DomainName } = cfd.Distribution;
 
     const cloudFrontDistributionId = await getCloudFrontDistributionId(
       originId,
     );
     projectData.cloudFrontDistributionId = cloudFrontDistributionId;
+    projectData.cloudFrontDomainName = DomainName;
 
     await setBucketNotificationConfig(bucketName, lambdaArn);
     return true;
@@ -180,9 +188,6 @@ const setupConfig = async (directory, projectData) => {
   let config = [];
 
   try {
-    if (!(await exists(jadePath))) {
-      await createDirectory('.jade', directory);
-    }
     if (!(await exists(join(jadePath, 'config.json')))) {
       await writeConfig(directory, config);
     } else {
@@ -206,12 +211,29 @@ const getConfig = async (directory = cwd) => {
   return config;
 };
 
-const setupAwsInfra = async (bucketName) => {
+// const getConfigByBucketName = async (bucketName) => {
+//   try {
+//     let config = [];
+//     if (await exists(join(getJadePath(directory), 'config.json'))) {
+//       config = await readConfig(directory);
+//     }
+//     return config.find((proj) => proj.bucketName === bucketName)[0];
+//   } catch (err) {
+//     jadeErr(err);
+//     return false;
+//   }
+// };
+
+const setupAwsInfra = async ({
+  bucketName,
+  projectName,
+  cloudFrontDomainName,
+}) => {
   try {
     await configEc2IamRole();
-    await createAndConfigEc2();
+    await createAndConfigEc2(projectName, bucketName);
     await installEc2JadeEnvironment(bucketName);
-    await printBuildSuccess();
+    await printBuildSuccess(cloudFrontDomainName);
     return true;
   } catch (err) {
     jadeErr(err);
@@ -219,10 +241,29 @@ const setupAwsInfra = async (bucketName) => {
   }
 };
 
+const userMsg = (command) => {
+  if (command === 'add') {
+    return 'Thank you! Your new Jade app will now be setup.';
+  } else if (command === 'init') {
+    return 'Thank you! The Jade framework will now be setup.';
+  }
+};
+
+const launchApp = async (command, directory) => {
+  const projectData = await getUserProjectData(command);
+  if (!projectData) return;
+
+  jadeLog(userMsg(command));
+  const isAppSetup = await setupApp(directory, projectData);
+  if (!isAppSetup) return;
+
+  const isConfigSetup = await setupConfig(directory, projectData);
+  if (!isConfigSetup) return;
+
+  await setupAwsInfra(projectData);
+};
+
 module.exports = {
-  getUserProjectData,
   validateUser,
-  setupApp,
-  setupConfig,
-  setupAwsInfra,
+  launchApp,
 };

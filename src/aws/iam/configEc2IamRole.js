@@ -12,6 +12,7 @@ const {
   ec2InstanceProfile,
   cwd,
   s3FullAccessPolicyArn,
+  dynamoDbFullAccessPolicyArn,
 } = require('../../templates/constants');
 
 const {
@@ -49,6 +50,13 @@ const configEc2IamRole = async () => {
         PolicyArn: s3FullAccessPolicyArn,
         RoleName: ec2IamRoleName,
       });
+
+      console.log('Attaching DynamoDB role policy...');
+      await asyncAttachRolePolicy({
+        PolicyArn: dynamoDbFullAccessPolicyArn,
+        RoleName: ec2IamRoleName,
+      });
+      ec2RoleResponse = await roleExists(ec2IamRoleName);
     } else {
       console.log('Using existing Jade EC2 role.');
     }

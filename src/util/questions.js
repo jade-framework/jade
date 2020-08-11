@@ -1,5 +1,6 @@
 const { prompt } = require('./prompt');
 const { promptProjectName, promptGitUrl } = require('./validations');
+const { jadePrefix } = require('../templates/constants');
 
 // questions used for jade init
 const initialInitQuestions = async () => {
@@ -14,9 +15,7 @@ const initialInitQuestions = async () => {
     },
     {
       type: 'confirm',
-      message: (answers) => {
-        return `Do you currently have a public ${answers.gitProvider} repo?\n`;
-      },
+      message: `Do you currently have a public GitHub repo?\n`,
       name: 'gitExists',
       default: true,
     },
@@ -52,37 +51,58 @@ const appConfigQuestions = async () => {
   const questions = [
     {
       name: 'gitUrl',
-      message: `Please enter your GitHub URL here. Note that Jade will use the root folder for deployment (https://github.com/user/root):\n`,
+      message: `Please enter your GitHub URL here. Note that Jade will use the "root" folder for deployment (https://github.com/user/root):\n`,
       validate: (input) => {
         return promptGitUrl(input);
       },
+      filter: (input) => {
+        return input.replace(/\s/gi, '');
+      },
     },
     {
-      name: 'configNeeded',
-      message: `We'd now like to know your basic build settings. For more information, please visit https://github.com/jade-framework/jade.`,
-    },
-    {
-      name: 'userInstallationCommands',
-      message: `Please enter the command to install your project's environment. This will be run once in your EC2 instance to include the right packages for your app (ex. "yarn install"):\n`,
+      name: 'userInstallCommand',
+      message: `Please enter the command to install your project's environment:\n`,
       default: `yarn install`,
     },
     {
       name: 'userBuildCommand',
-      message: `Please enter the command to build your project files. This will be run each time a commit is made to your GitHub repo, (ex. "yarn build"):\n`,
+      message: `Please enter the command to build your project files:\n`,
       default: `yarn build`,
+    },
+    {
+      name: 'publishDirectory',
+      message: `Please specify the publish directory. Jade will take files in this directory and deploy them to the CDN:\n`,
+      default: `public\/`,
     },
   ];
   const answers = await prompt(questions);
   return answers;
 };
 
-const confirmResponses = async ({ projectName, gitUrl }) => {
-  const message = `Your project name is: >>> ${projectName}\nYour Git URL is: >>> ${gitUrl}\nIs this correct?`;
+const confirmResponses = async (projectData) => {
+  const {
+    projectName,
+    gitUrl,
+    userInstallCommand,
+    userBuildCommand,
+    publishDirectory,
+  } = projectData;
+
+  const message = [
+    'Your project details are:',
+    `Project name         >>> ${projectName}`,
+    `Git URL              >>> ${gitUrl}`,
+    `Installation command >>> ${userInstallCommand}`,
+    `Build command        >>> ${userBuildCommand}`,
+    `Publish directory    >>> ${publishDirectory}`,
+    'Is this correct?',
+  ];
+
   const answer = await prompt([
     {
       type: 'confirm',
       name: 'confirmed',
-      message,
+      message: message.join(`\n${jadePrefix} `),
     },
   ]);
   return answer.confirmed;
