@@ -25,16 +25,11 @@ const createLambdaRole = async (roleName) => {
   };
 
   const lambdaPolicyParam1 = {
-    PolicyArn: 'arn:aws:iam::aws:policy/service-role/AWSLambdaRole',
+    PolicyArn: 'arn:aws:iam::aws:policy/AWSLambdaFullAccess',
     RoleName: roleName,
   };
 
   const lambdaPolicyParam2 = {
-    PolicyArn: 'arn:aws:iam::aws:policy/AWSLambdaExecute',
-    RoleName: roleName,
-  };
-
-  const lambdaPolicyParam3 = {
     PolicyArn: 'arn:aws:iam::aws:policy/CloudFrontFullAccess',
     RoleName: roleName,
   };
@@ -44,10 +39,8 @@ const createLambdaRole = async (roleName) => {
     console.log('Successfully created Lambda role.');
 
     await asyncAttachRolePolicy(lambdaPolicyParam1);
-    console.log('Successfully attached Lambda Role policy.');
+    console.log('Successfully attached Lambda policy.');
     await asyncAttachRolePolicy(lambdaPolicyParam2);
-    console.log('Successfully attached Lambda Execute policy.');
-    await asyncAttachRolePolicy(lambdaPolicyParam3);
     console.log('Successfully attached CloudFront policy.');
     return createResponse;
   } catch (error) {

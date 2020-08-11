@@ -115,6 +115,19 @@ const confirmDeleteKeyPair = async () => {
   return answers.delete;
 };
 
+const confirmDestroy = async () => {
+  const questions = [
+    {
+      type: 'confirm',
+      name: 'destroy',
+      message:
+        'Are you sure? This will remove all apps deployed with Jade and their provisioned resources from AWS.',
+    },
+  ];
+  const answers = await prompt(questions);
+  return answers.destroy;
+};
+
 module.exports = {
   initialInitQuestions,
   appConfigQuestions,
@@ -122,4 +135,5 @@ module.exports = {
   initialAddQuestions,
   confirmOverwriteKeyPair,
   confirmDeleteKeyPair,
+  confirmDestroy,
 };
