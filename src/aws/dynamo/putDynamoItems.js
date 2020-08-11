@@ -33,4 +33,4 @@ const putDynamoItems = async (tableName, items) => {
   }
 };
 
-return { putDynamoItem, putDynamoItems };
+module.exports = { putDynamoItem, putDynamoItems };
