@@ -17,6 +17,7 @@ module.exports = async function triggerBuild(webhook) {
   const cloneUrl = repository.clone_url;
   const repoDir = join(userDir, repoName);
   const branch = webhook.ref.replace('refs/heads/', '');
+  const currentDate = Date.now();
 
   try {
     const bucketJSON = await readFile(
@@ -31,28 +32,40 @@ module.exports = async function triggerBuild(webhook) {
       await exec(`git -C ${repoDir} checkout master`);
       pull = await exec(`git -C ${repoDir} pull ${cloneUrl}`);
     } else if (branch === 'staging') {
-      await exec(`git checkout staging`);
-      pull = await exec(`git -C ${repoDir} pull ${cloneUrl}`);
+      await exec(`git -C ${repoDir} checkout staging`);
+      pull = await exec(`git -C ${repoDir} pull -X theirs --no-edit`);
     }
 
-    // if (/Already up to date/.test(pull.stdout)) {
-    //   return {
-    //     statusCode: 202,
-    //     msg: 'Repo has not changed, build not triggered.',
-    //   };
-    // }
+    if (/Already up to date/.test(pull.stdout)) {
+      return {
+        statusCode: 202,
+        msg: 'Repo has not changed, build not triggered.',
+      };
+    }
 
     (async () => {
       try {
         if (branch === 'master') {
           await exec(`yarn --cwd ${repoDir} build`);
-          await exec(`aws s3 sync public s3://${bucketName}-${prodBucket}`);
+          console.log('Built', repoDir);
           await exec(
-            `aws s3 sync public s3://${bucketName}-${buildsBucket}/${Date.now()}`,
+            `aws s3 sync ${repoDir}/public s3://${bucketName}-${prodBucket}`,
           );
+          await exec(`zip -r ${repoDir}/${currentDate} ${repoDir}/public`);
+          await exec(
+            `aws s3api put-object --bucket ${bucketName}-${buildsBucket} --key ${currentDate}.zip --body ${repoDir}/${currentDate}.zip`,
+          );
+          console.log(`Upload to s3://${bucketName}-${prodBucket} complete`);
+          console.log(
+            `Upload to s3://${bucketName}-${buildsBucket}/${currentDate} complete`,
+          );
+          await exec(`rm ${repoDir}/${currentDate}.zip`);
         } else if (branch === 'staging') {
           await exec(`yarn --cwd ${repoDir} build`);
-          await exec(`aws s3 sync public s3://${bucketName}-${stageBucket}`);
+          await exec(
+            `aws s3 sync ${repoDir}/public s3://${bucketName}-${stageBucket}`,
+          );
+          console.log(`Upload to s3://${bucketName}-${stageBucket} complete`);
         }
       } catch (err) {
         console.log(err); // convert to logger later
