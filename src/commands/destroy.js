@@ -15,9 +15,9 @@ const destroy = async () => {
     const answer = await confirmDestroy();
     if (!answer) return false;
 
-    //deleteAllBuckets();
+    deleteAllBuckets();
     deleteLambdaFunction(lambdaNames);
-    //deleteIamRole(lambdaIamRoleName, lambdaRolePolicies);
+    deleteIamRole(lambdaIamRoleName, lambdaRolePolicies);
   } catch (err) {
     jadeErr(err);
   }
