@@ -77,7 +77,7 @@ const createCloudFrontDistribution = async (bucketName) => {
   try {
     const response = await asyncCreateCloudFrontDistribution(distParams);
     console.log(
-      `CloudFront distribution created at ${response.Distribution.DomainName}`,
+      `CloudFront distribution created at "${response.Distribution.DomainName}".`,
     );
     return { ...response, originId };
   } catch (error) {

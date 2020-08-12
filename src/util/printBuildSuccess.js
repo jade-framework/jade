@@ -1,13 +1,6 @@
-const { getJadePath, readJSONFile } = require('./fileUtils');
-const { cwd } = require('../templates/constants');
 const { jadeLog } = require('./logger');
 
-const printBuildSuccess = async (cloudFrontDomainName) => {
-  const jadePath = getJadePath(cwd);
-
-  const ec2Data = await readJSONFile('ec2Instance', jadePath);
-  const publicIp = ec2Data.Instances[0].PublicIpAddress;
-
+const printBuildSuccess = async ({ publicIp, cloudFrontDomainName }) => {
   jadeLog('Your deployment is ready.');
   jadeLog(
     'To synchronize your Github commits with new builds, follow these instructions:',

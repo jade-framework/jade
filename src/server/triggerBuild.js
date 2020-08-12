@@ -17,7 +17,7 @@ module.exports = async function triggerBuild(webhook) {
   const cloneUrl = repository.clone_url;
   const repoDir = join(userDir, repoName);
   const branch = webhook.ref.replace('refs/heads/', '');
-  const currentDate = Date.now();
+  const versionId = Date.now();
 
   try {
     const bucketJSON = await readFile(
@@ -51,15 +51,18 @@ module.exports = async function triggerBuild(webhook) {
           await exec(
             `aws s3 sync ${repoDir}/public s3://${bucketName}-${prodBucket}`,
           );
-          await exec(`zip -r ${repoDir}/${currentDate} ${repoDir}/public`);
+          await exec(`zip -r ${repoDir}/${versionId} ${repoDir}/public`);
           await exec(
-            `aws s3api put-object --bucket ${bucketName}-${buildsBucket} --key ${currentDate}.zip --body ${repoDir}/${currentDate}.zip`,
+            `aws s3api put-object --bucket ${bucketName}-${buildsBucket} --key ${versionId}.zip --body ${repoDir}/${versionId}.zip`,
           );
           console.log(`Upload to s3://${bucketName}-${prodBucket} complete`);
           console.log(
-            `Upload to s3://${bucketName}-${buildsBucket}/${currentDate} complete`,
+            `Upload to s3://${bucketName}-${buildsBucket}/${versionId} complete`,
           );
-          await exec(`rm ${repoDir}/${currentDate}.zip`);
+          // update Apps table with versionId
+          // update Version row with versionId
+
+          await exec(`rm ${repoDir}/${versionId}.zip`);
         } else if (branch === 'staging') {
           await exec(`yarn --cwd ${repoDir} build`);
           await exec(

@@ -11,10 +11,8 @@ const {
   configEc2IamRole,
   createJadeIamGroup,
 } = require('../aws/iam');
-const { createAndConfigEc2 } = require('../aws/ec2');
-const {
-  installEc2JadeEnvironment,
-} = require('../aws/ec2/installEc2JadeEnvironment');
+const { createAndConfigEc2, installEc2JadeEnvironment } = require('../aws/ec2');
+const { initDynamo, addAppToDynamo } = require('../aws/dynamo');
 
 const { printBuildSuccess } = require('./printBuildSuccess');
 const {
@@ -224,16 +222,12 @@ const getConfig = async (directory = cwd) => {
 //   }
 // };
 
-const setupAwsInfra = async ({
-  bucketName,
-  projectName,
-  cloudFrontDomainName,
-}) => {
+const setupAwsInfra = async (projectData) => {
   try {
-    await configEc2IamRole();
-    await createAndConfigEc2(projectName, bucketName);
-    await installEc2JadeEnvironment(bucketName);
-    await printBuildSuccess(cloudFrontDomainName);
+    await configEc2IamRole(projectData);
+    await createAndConfigEc2(projectData);
+    await installEc2JadeEnvironment(projectData);
+    await printBuildSuccess(projectData);
     return true;
   } catch (err) {
     jadeErr(err);
@@ -257,10 +251,13 @@ const launchApp = async (command, directory) => {
   const isAppSetup = await setupApp(directory, projectData);
   if (!isAppSetup) return;
 
-  const isConfigSetup = await setupConfig(directory, projectData);
-  if (!isConfigSetup) return;
-
   await setupAwsInfra(projectData);
+  console.log(projectData);
+  if (command === 'init') {
+    await initDynamo(projectData);
+  } else if (command === 'add') {
+    await addAppToDynamo(projectData);
+  }
 };
 
 module.exports = {

@@ -4,19 +4,10 @@ const {
   asyncAuthorizeSecurityGroupIngress,
 } = require('../awsAsyncFunctions');
 
-const {
-  exists,
-  join,
-  createJSONFile,
-  readJSONFile,
-  getJadePath,
-} = require('../../util/fileUtils');
+const { getJadePath } = require('../../util/fileUtils');
+const { jadeLog, jadeErr } = require('../../util/logger');
 
-const {
-  cwd,
-  securityGroup,
-  securityGroupName,
-} = require('../../templates/constants');
+const { cwd, securityGroupName } = require('../../templates/constants');
 
 const { getGithubIp } = require('../../util/getGithubIp');
 
@@ -61,12 +52,12 @@ const setIngressSshRule = (policy) => {
   policy.IpPermissions.push(permission);
 };
 
-const createSecurityGroup = async () => {
+const createSecurityGroup = async (projectData) => {
   const jadePath = getJadePath(cwd);
   let ingressRules = { IpPermissions: [] };
 
   try {
-    const Filters = [{ Name: 'tag:Name', Values: [`${securityGroupName}`] }];
+    const Filters = [{ Name: 'tag:Name', Values: [securityGroupName] }];
     let jadeSecurityGroups = await asyncDescribeSecurityGroups({
       Filters,
     });
@@ -74,18 +65,17 @@ const createSecurityGroup = async () => {
       jadeSecurityGroups.SecurityGroups &&
       jadeSecurityGroups.SecurityGroups.length > 0
     ) {
-      console.log('Jade security group already exists.');
+      jadeLog('Jade security group already exists.');
     } else {
-      console.log('Creating Jade security group...');
+      jadeLog('Creating Jade security group...');
       const securityGroupResponse = await asyncCreateSecurityGroup(
         securityGroupParams,
       );
 
-      console.log('Whitelisting Github IP addresses...');
+      jadeLog('Whitelisting Github IP addresses...');
       const githubIps = await getGithubIp();
-      await createJSONFile('githubApi', jadePath, githubIps);
-      const githubIpAddresses = await readJSONFile('githubApi', jadePath);
-      const githubHookIps = githubIpAddresses.hooks;
+      console.log(`githubIps are ${githubIps}`);
+      const githubHookIps = githubIps.hooks;
       const githubRuleDesc = 'Github hook address';
       setIngressSshRule(ingressRules);
       setIngressHookRules(ingressRules, githubHookIps, githubRuleDesc);
@@ -95,18 +85,19 @@ const createSecurityGroup = async () => {
         GroupId: securityGroupResponse.GroupId,
       };
 
-      console.log('Setting security group ingress rules...');
+      jadeLog('Setting security group ingress rules...');
       await asyncAuthorizeSecurityGroupIngress(ingressRules);
 
       jadeSecurityGroups = await asyncDescribeSecurityGroups({
         Filters,
       });
     }
-    console.log('Saving security group data as JSON...');
-    await createJSONFile(securityGroup, jadePath, jadeSecurityGroups);
-    console.log('Jade security group done.');
+    projectData.securityGroup = jadeSecurityGroups;
+    jadeLog('Jade security group done.');
+    return true;
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
+    return false;
   }
 };
 

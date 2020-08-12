@@ -25,6 +25,8 @@ const bucketSuffixes = ['prod', 'builds', 'lambda', 'stage']; // production/live
 const cloudFrontOriginId = (name) => `S3-${name}`;
 const cloudFrontOriginDomain = (name) =>
   `${name}-${bucketSuffixes[0]}.s3.amazonaws.com`;
+const appsTableName = 'JadeProjects';
+const versionsTableName = 'JadeProjectsVersions';
 
 module.exports = {
   cwd,
@@ -48,4 +50,6 @@ module.exports = {
   bucketSuffixes,
   cloudFrontOriginId,
   cloudFrontOriginDomain,
+  appsTableName,
+  versionsTableName,
 };

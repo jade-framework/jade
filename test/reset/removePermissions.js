@@ -1,16 +1,17 @@
-const IAM = require("aws-sdk/clients/iam");
-const EC2 = require("aws-sdk/clients/ec2");
-const { getRegion } = require("../../src/util/getRegion");
+const IAM = require('aws-sdk/clients/iam');
+const EC2 = require('aws-sdk/clients/ec2');
+const { getRegion } = require('../../src/util/getRegion');
 const {
   securityGroupName,
   jadeKeyPair,
   ec2IamRoleName,
   ec2InstanceProfile,
   s3FullAccessPolicyArn,
-} = require("../../src/templates/constants");
-const { promisify } = require("util");
+  dynamoDbFullAccessPolicyArn,
+} = require('../../src/templates/constants');
+const { promisify } = require('util');
 
-const apiVersion = "latest";
+const apiVersion = 'latest';
 const region = getRegion();
 
 const iam = new IAM({ apiVersion, region });
@@ -32,18 +33,26 @@ async function removePermissions() {
     (err, data) => {
       if (err) console.log(err);
       console.log(data);
-    }
+    },
   );
 
   iam.detachRolePolicy(
     { RoleName: ec2IamRoleName, PolicyArn: s3FullAccessPolicyArn },
     (err, data) => {
       if (err) console.log(err);
-      iam.deleteRole({ RoleName: ec2IamRoleName }, (err, data) => {
-        if (err) console.log(err);
-        console.log(data);
-      });
-    }
+      iam.detachRolePolicy(
+        {
+          RoleName: ec2IamRoleName,
+          PolicyArn: dynamoDbFullAccessPolicyArn,
+        },
+        (err, data) => {
+          iam.deleteRole({ RoleName: ec2IamRoleName }, (err, data) => {
+            if (err) console.log(err);
+            console.log(data);
+          });
+        },
+      );
+    },
   );
 
   iam.deleteInstanceProfile(
@@ -51,7 +60,7 @@ async function removePermissions() {
     (err, data) => {
       if (err) console.log(err);
       console.log(data);
-    }
+    },
   );
 
   ec2.deleteKeyPair({ KeyName: jadeKeyPair }, (err, data) => {

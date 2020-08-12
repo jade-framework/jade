@@ -6,7 +6,6 @@ const {
 const {
   exists,
   join,
-  createJSONFile,
   getJadePath,
   writeFile,
   chmod,
@@ -15,14 +14,10 @@ const {
 const {
   cwd,
   privateKeyFilename,
-  keyPair,
   jadeKeyPair,
 } = require('../../templates/constants');
-const {
-  confirmOverwriteKeyPair,
-  confirmDeleteKeyPair,
-} = require('../../util/questions');
-const { jadeErr } = require('../../util/logger');
+const { confirmDeleteKeyPair } = require('../../util/questions');
+const { jadeLog, jadeErr } = require('../../util/logger');
 
 // default data
 const keyPairParams = {
@@ -30,62 +25,54 @@ const keyPairParams = {
 };
 const jadePath = getJadePath(cwd);
 const privateKeyPath = join(jadePath, privateKeyFilename);
-const keyPairJson = `${keyPair}.json`;
 
 const createJadeKeyPair = async () => {
-  console.log('Creating Jade key pair and .pem file...');
-  const keyPairResponse = await asyncCreateKeyPair(keyPairParams);
-  const { KeyMaterial, ...otherData } = keyPairResponse;
-  await writeFile(privateKeyPath, KeyMaterial);
-  await chmod(privateKeyPath, 0o400);
-  await createJSONFile(keyPair, jadePath, otherData);
-  console.log('Jade key pair successfully created.');
+  try {
+    jadeLog('Creating Jade key pair and .pem file...');
+    const keyPairResponse = await asyncCreateKeyPair(keyPairParams);
+    const { KeyMaterial } = keyPairResponse;
+    await writeFile(privateKeyPath, KeyMaterial);
+    await chmod(privateKeyPath, 0o400);
+    jadeLog('Jade key pair successfully created.');
+  } catch (err) {
+    jadeErr(err);
+  }
 };
 
 const deleteJadeKeyPair = async () => {
   try {
-    console.log('Removing old key pair data...');
+    jadeLog('Removing old key pair data...');
     await asyncDeleteKeyPair(keyPairParams);
     if (await exists(privateKeyPath)) await unlink(privateKeyPath);
-    if (await exists(join(jadePath, keyPairJson))) {
-      await unlink(join(jadePath, keyPairJson));
-    }
-    console.log('Old key pair removed.');
+    jadeLog('Old key pair removed.');
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 
 const createKeyPair = async () => {
   try {
-    console.log('Checking for existing key pair...');
+    jadeLog('Checking for existing key pair...');
     let jadeKeyExists = await asyncDescribeKeyPairs({
       Filters: [{ Name: 'key-name', Values: [jadeKeyPair] }],
     });
-    let create = true;
+
     // checking if Jade key pair exists in AWS
     if (jadeKeyExists.KeyPairs.length > 0) {
-      // checking if necessary key pair files are available
-      if (
-        (await exists(join(jadePath, keyPairJson))) &&
-        (await exists(privateKeyPath))
-      ) {
-        create = await confirmOverwriteKeyPair();
-      } else {
+      // checking if private key is available
+      if (!(await exists(privateKeyPath))) {
         deleteKeyPair = await confirmDeleteKeyPair();
         if (!deleteKeyPair) return;
-      }
-      if (create) {
         await deleteJadeKeyPair();
+        await createJadeKeyPair();
+      } else {
+        jadeLog('Using existing Jade key pair.');
       }
-    }
-    if (create) {
-      await createJadeKeyPair();
     } else {
-      console.log('Using existing Jade key pair.');
+      await createJadeKeyPair();
     }
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 

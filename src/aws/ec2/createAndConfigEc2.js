@@ -2,11 +2,10 @@ const { createKeyPair } = require('./createKeyPair');
 const { createSecurityGroup } = require('./createSecurityGroup');
 const { createEc2Instance } = require('./createEc2Instance');
 
-const createAndConfigEc2 = async (projectName) => {
+const createAndConfigEc2 = async (projectData) => {
   await createKeyPair();
-  await createSecurityGroup();
-  const ec2InstanceData = await createEc2Instance(projectName);
-  return ec2InstanceData;
+  await createSecurityGroup(projectData);
+  await createEc2Instance(projectData);
 };
 
 module.exports = { createAndConfigEc2 };

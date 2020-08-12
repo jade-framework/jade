@@ -15,21 +15,15 @@ const {
   dynamoDbFullAccessPolicyArn,
 } = require('../../templates/constants');
 
-const {
-  join,
-  getJadePath,
-  createJSONFile,
-  readJSONFile,
-} = require('../../util/fileUtils');
+const { join, getJadePath, readJSONFile } = require('../../util/fileUtils');
 
 const path = require('path');
-const jadePath = getJadePath(cwd);
 
 const validateRoleAdded = async (instanceProfileRes) => {
   return instanceProfileRes.InstanceProfile.Roles.length > 0;
 };
 
-const configEc2IamRole = async () => {
+const configEc2IamRole = async (projectData) => {
   try {
     let ec2RoleResponse = await roleExists(ec2IamRoleName);
     if (!ec2RoleResponse) {
@@ -42,7 +36,7 @@ const configEc2IamRole = async () => {
       ec2RoleResponse = await asyncCreateRole({
         AssumeRolePolicyDocument: JSON.stringify(rolePolicy),
         RoleName: ec2IamRoleName,
-        Tags: [{ Key: 'Name', Value: ec2IamRoleName }],
+        Tags: [{ Key: 'project', Value: 'jade' }],
       });
 
       console.log('Attaching S3 role policy...');
@@ -60,7 +54,6 @@ const configEc2IamRole = async () => {
     } else {
       console.log('Using existing Jade EC2 role.');
     }
-    await createJSONFile('ec2Role', jadePath, ec2RoleResponse);
 
     let instanceProfileResponse = await instanceProfileExists(
       ec2InstanceProfile,
@@ -84,12 +77,7 @@ const configEc2IamRole = async () => {
       });
       instanceProfileResponse = await instanceProfileExists(ec2InstanceProfile);
     }
-
-    await createJSONFile(
-      'ec2InstanceProfile',
-      jadePath,
-      instanceProfileResponse,
-    );
+    projectData.instanceProfile = instanceProfileResponse.InstanceProfile;
     console.log('Jade instance profile for EC2 created.');
   } catch (err) {
     console.log(err);

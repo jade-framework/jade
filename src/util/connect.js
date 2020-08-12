@@ -1,10 +1,4 @@
-const {
-  getJadePath,
-  readJSONFile,
-  readFile,
-  join,
-  sleep,
-} = require('./fileUtils');
+const { getJadePath, readFile, exists, join, sleep } = require('./fileUtils');
 const {
   cwd,
   bucketSuffixes,
@@ -56,12 +50,14 @@ const checkConnError = (err) => {
   jadeLog(`Retrying connection to EC2 server...`);
 };
 
-const getHost = async () => {
+const getHost = async ({ publicIp }) => {
   try {
-    jadeLog('Reading EC2 data...');
+    if (!(await exists(join(jadePath, privateKeyFilename)))) {
+      jadeErr('Your private key is not found, please run `jade init` again.');
+      return false;
+    }
+    jadeLog('Accessing private key...');
     const privateKey = await readFile(join(jadePath, privateKeyFilename));
-    const ec2Data = await readJSONFile('ec2Instance', jadePath);
-    const publicIp = ec2Data.Instances[0].PublicIpAddress;
 
     // check if host and key is valid
     const host = {
@@ -123,7 +119,7 @@ const sendCommands = async (host, commands, maxRetries = 10, attempts = 0) => {
 
 const sendSetupAndBuildCommands = async (projectData) => {
   try {
-    const host = await getHost();
+    const host = await getHost(projectData);
     if (!host) return;
 
     const commands = [...setupCommands, ...buildCommands(projectData)];
@@ -135,18 +131,5 @@ const sendSetupAndBuildCommands = async (projectData) => {
     return false;
   }
 };
-
-// const sendBuildCommands = async (projectData) => {
-//   try {
-//     const host = await getHost();
-//     if (!host) return;
-
-//     await sendCommands(host, buildCommands(projectData));
-//     return true;
-//   } catch (err) {
-//     jadeErr(err);
-//     return false;
-//   }
-// };
 
 module.exports = { sendSetupAndBuildCommands };

@@ -1,7 +1,6 @@
 const https = require('https');
 const { promisify } = require('util');
 
-// module.exports =
 let getGithubIp = (callback) => {
   https
     .get(

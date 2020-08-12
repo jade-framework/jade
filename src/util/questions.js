@@ -90,11 +90,11 @@ const confirmResponses = async (projectData) => {
 
   const message = [
     'Your project details are:',
-    `Project name         >>> ${projectName}`,
-    `Git URL              >>> ${gitUrl}`,
-    `Installation command >>> ${userInstallCommand}`,
-    `Build command        >>> ${userBuildCommand}`,
-    `Publish directory    >>> ${publishDirectory}`,
+    `Project name          >>>  ${projectName}`,
+    `Git URL               >>>  ${gitUrl}`,
+    `Installation command  >>>  ${userInstallCommand}`,
+    `Build command         >>>  ${userBuildCommand}`,
+    `Publish directory     >>>  ${publishDirectory}`,
     'Is this correct?',
   ];
 
@@ -109,26 +109,13 @@ const confirmResponses = async (projectData) => {
 };
 
 // questions used to handle key pairs
-const confirmOverwriteKeyPair = async () => {
-  const questions = [
-    {
-      type: 'confirm',
-      name: 'overwrite',
-      message:
-        'You currently have a key pair. Would you like to create a new one?',
-    },
-  ];
-  const answers = await prompt(questions);
-  return answers.overwrite;
-};
-
 const confirmDeleteKeyPair = async () => {
   const questions = [
     {
       type: 'confirm',
       name: 'delete',
       message:
-        'Jade cannot find a ".jade" folder in the current directory with the Jade private key. Would you like to make a new key pair (note: this will prevent you from accessing the old EC2 instance)?',
+        'Jade cannot find a ".jade" folder in the current directory with the Jade private key. Would you like to make a new key pair (note: this will prevent you from accessing existing EC2 instances)?',
     },
   ];
   const answers = await prompt(questions);
@@ -153,7 +140,6 @@ module.exports = {
   appConfigQuestions,
   confirmResponses,
   initialAddQuestions,
-  confirmOverwriteKeyPair,
   confirmDeleteKeyPair,
   confirmDestroy,
 };

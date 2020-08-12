@@ -1,21 +1,13 @@
 const {
   asyncRunInstances,
   asyncAssociateIamInstanceProfile,
+  asyncDescribeInstances,
   asyncEc2WaitFor,
 } = require('../awsAsyncFunctions');
 
-const {
-  createJSONFile,
-  getJadePath,
-  readJSONFile,
-} = require('../../util/fileUtils');
+const { createJSONFile, getJadePath } = require('../../util/fileUtils');
 
-const {
-  cwd,
-  instanceType,
-  securityGroup,
-  keyPair,
-} = require('../../templates/constants');
+const { cwd, instanceType, jadeKeyPair } = require('../../templates/constants');
 
 const { getAmi } = require('./getAmi');
 
@@ -44,29 +36,27 @@ const getInstanceData = async (instanceId) => {
   const describeInstancesResponse = await asyncDescribeInstances({
     InstanceIds: [instanceId],
   });
-
   return describeInstancesResponse.Reservations[0].Instances[0];
 };
 
-const createEc2Instance = async (projectName) => {
-  const jadePath = getJadePath(cwd);
+const createEc2Instance = async (projectData) => {
+  const { projectName, instanceProfile, securityGroup } = projectData;
   try {
-    const securityGroupData = await readJSONFile(securityGroup, jadePath);
-    const keyPairData = await readJSONFile(keyPair, jadePath);
+    // const securityGroup = await readJSONFile(securityGroup, jadePath);
+    // const keyPair = await readJSONFile(keyPair, jadePath);
 
     console.log('Reading IAM instance profile...');
-    const instanceProfile = await readJSONFile('ec2InstanceProfile', jadePath);
-    const instanceProfileArn = instanceProfile.InstanceProfile.Arn;
+    const instanceProfileArn = instanceProfile.Arn;
 
     console.log('Creating EC2 instance...');
     const runInstancesResponse = await asyncRunInstances({
       ...runInstancesParams(projectName),
       ImageId: await getAmi(),
-      KeyName: keyPairData.KeyName,
-      SecurityGroupIds: [securityGroupData.SecurityGroups[0].GroupId],
+      KeyName: jadeKeyPair,
+      SecurityGroupIds: [securityGroup.SecurityGroups[0].GroupId],
     });
 
-    await createJSONFile('ec2Instance', jadePath, runInstancesResponse);
+    // await createJSONFile('ec2Instance', jadePath, runInstancesResponse);
     const instanceId = runInstancesResponse.Instances[0].InstanceId;
 
     console.log('Waiting for EC2 instance to start running...');
@@ -83,7 +73,8 @@ const createEc2Instance = async (projectName) => {
     console.log('Jade EC2 instance successfully configured.');
     const instanceData = await getInstanceData(instanceId);
     console.log('EC2 public IP fetched.');
-    return instanceData;
+    projectData.publicIp = instanceData.PublicIpAddress;
+    return true;
   } catch (err) {
     console.log(err);
   }
