@@ -27,7 +27,7 @@ const getCloudFrontDistributionId = async (bucketName) => {
   return id;
 };
 
-exports.handler = async (event, context, callback) => {
+exports.handler = async (event) => {
   // Read options from the event parameter.
   console.log(
     'Reading options from event:\n',
@@ -35,9 +35,8 @@ exports.handler = async (event, context, callback) => {
   );
 
   const distId = await getCloudFrontDistributionId(
-    event.Records[0].s3.bucket.name,
+    event.Records[0].s3.bucket.name.replace('-builds', ''),
   );
-  console.log('distId', distId);
 
   const params = {
     DistributionId: distId,
