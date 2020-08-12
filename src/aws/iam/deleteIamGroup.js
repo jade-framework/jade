@@ -6,6 +6,7 @@ const {
 } = require('../awsAsyncFunctions');
 const { jadeIamGroup } = require('../../templates/constants');
 const { groupExists } = require('./exists');
+const { sleep } = require('../../util/fileUtils');
 
 const detachAllPolicies = async (groupName) => {
   try {
@@ -37,6 +38,7 @@ const deleteIamGroup = async (groupName) => {
         await removeUsersFromGroup(Users, groupName);
       }
       await detachAllPolicies(groupName);
+      await sleep(10000);
       await asyncDeleteGroup({ GroupName: groupName });
     }
   } catch (err) {

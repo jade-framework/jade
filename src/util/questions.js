@@ -1,6 +1,6 @@
 const { prompt } = require('./prompt');
 const { promptProjectName, promptGitUrl } = require('./validations');
-const { gitRepos } = require('../templates/constants');
+const { jadePrefix } = require('../templates/constants');
 
 // questions used for jade init
 const initialInitQuestions = async () => {
@@ -14,17 +14,8 @@ const initialInitQuestions = async () => {
       },
     },
     {
-      type: 'list',
-      message: "What's your favorite Git collaboration tool?\n",
-      name: 'gitProvider',
-      choices: gitRepos,
-      default: 'GitHub',
-    },
-    {
       type: 'confirm',
-      message: (answers) => {
-        return `Do you currently have a public ${answers.gitProvider} repo?\n`;
-      },
+      message: `Do you currently have a public GitHub repo?\n`,
       name: 'gitExists',
       default: true,
     },
@@ -45,17 +36,8 @@ const initialAddQuestions = async () => {
       },
     },
     {
-      type: 'list',
-      message: 'What Git collaboration tool will you be using?\n',
-      name: 'gitProvider',
-      choices: gitRepos,
-      default: 'GitHub',
-    },
-    {
       type: 'confirm',
-      message: (answers) => {
-        return `Do you currently have a public ${answers.gitProvider} repo?\n`;
-      },
+      message: `Do you currently have a public GitHub repo?\n`,
       name: 'gitExists',
       default: true,
     },
@@ -65,53 +47,75 @@ const initialAddQuestions = async () => {
   return answers;
 };
 
-const gitQuestions = async (initialAns) => {
+const appConfigQuestions = async () => {
   const questions = [
     {
       name: 'gitUrl',
-      message: `Please enter your ${initialAns.gitProvider} URL here. Note that Jade will use the root folder for deployment (https://github.com/user/root):\n`,
+      message: `Please enter your GitHub URL here. Note that Jade will use the "root" folder for deployment (https://github.com/user/root):\n`,
       validate: (input) => {
         return promptGitUrl(input);
       },
+      filter: (input) => {
+        return input.replace(/\s/gi, '');
+      },
+    },
+    {
+      name: 'userInstallCommand',
+      message: `Please enter the command to install your project's environment:\n`,
+      default: `yarn install`,
+    },
+    {
+      name: 'userBuildCommand',
+      message: `Please enter the command to build your project files:\n`,
+      default: `yarn build`,
+    },
+    {
+      name: 'publishDirectory',
+      message: `Please specify the publish directory. Jade will take files in this directory and deploy them to the CDN:\n`,
+      default: `public\/`,
     },
   ];
   const answers = await prompt(questions);
   return answers;
 };
 
-const confirmResponses = async ({ projectName, gitUrl }) => {
-  const message = `Your project name is: | ${projectName} |\nYour Git URL is: | ${gitUrl} |\nIs this correct?`;
+const confirmResponses = async (projectData) => {
+  const {
+    projectName,
+    gitUrl,
+    userInstallCommand,
+    userBuildCommand,
+    publishDirectory,
+  } = projectData;
+
+  const message = [
+    'Your project details are:',
+    `Project name          >>>  ${projectName}`,
+    `Git URL               >>>  ${gitUrl}`,
+    `Installation command  >>>  ${userInstallCommand}`,
+    `Build command         >>>  ${userBuildCommand}`,
+    `Publish directory     >>>  ${publishDirectory}`,
+    'Is this correct?',
+  ];
+
   const answer = await prompt([
     {
       type: 'confirm',
       name: 'confirmed',
-      message,
+      message: message.join(`\n${jadePrefix} `),
     },
   ]);
   return answer.confirmed;
 };
 
 // questions used to handle key pairs
-const confirmOverwriteKeyPair = async () => {
-  const questions = [
-    {
-      type: 'confirm',
-      name: 'overwrite',
-      message:
-        'You currently have a key pair. Would you like to create a new one?',
-    },
-  ];
-  const answers = await prompt(questions);
-  return answers.overwrite;
-};
-
 const confirmDeleteKeyPair = async () => {
   const questions = [
     {
       type: 'confirm',
       name: 'delete',
       message:
-        'Jade cannot find a ".jade" folder in the current directory with the Jade private key. Would you like to make a new key pair (note: this will prevent you from accessing the old EC2 instance)?',
+        'Jade cannot find a ".jade" folder in the current directory with the Jade private key. Would you like to make a new key pair (note: this will prevent you from accessing existing EC2 instances)?',
     },
   ];
   const answers = await prompt(questions);
@@ -133,10 +137,9 @@ const confirmDestroy = async () => {
 
 module.exports = {
   initialInitQuestions,
-  gitQuestions,
+  appConfigQuestions,
   confirmResponses,
   initialAddQuestions,
-  confirmOverwriteKeyPair,
   confirmDeleteKeyPair,
   confirmDestroy,
 };

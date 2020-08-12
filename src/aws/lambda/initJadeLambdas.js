@@ -13,6 +13,7 @@ const {
   asyncIamWaitFor,
   asyncGetCallerIdentity,
 } = require('../awsAsyncFunctions');
+const { bucketSuffixes } = require('../../templates/constants');
 
 const initJadeLambdas = async (bucketName) => {
   const functionName = lambdaNames;
@@ -31,7 +32,7 @@ const initJadeLambdas = async (bucketName) => {
         `${functionName}.js`,
       ),
     );
-    await uploadToBucket(functionFile, `${bucketName}-lambda`);
+    await uploadToBucket(functionFile, `${bucketName}-${bucketSuffixes[2]}`);
 
     let lambdaRoleResponse = await roleExists(lambdaIamRoleName);
     if (!lambdaRoleResponse) {
@@ -41,8 +42,9 @@ const initJadeLambdas = async (bucketName) => {
       await sleep(10000);
       console.log('Lambda role ready.');
     }
-    let lambdaResponse = await lambdaExists(functionName);
+
     let lambdaArn;
+    let lambdaResponse = await lambdaExists(functionName);
 
     if (!lambdaResponse) {
       lambdaResponse = await createLambdaFunction(

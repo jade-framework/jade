@@ -16,9 +16,9 @@ const { validateDeleteArg } = require('../util/validations');
 const { writeConfig, readConfig } = require('../util/fileUtils');
 const { jadeErr, jadeWarn, jadeLog } = require('../util/logger');
 
-const deleteApp = async (path, appName) => {
+const deleteApp = async (directory, appName) => {
   try {
-    const config = await readConfig(path);
+    const config = await readConfig(directory);
     let invalidMsg = await validateDeleteArg({ projectName: appName, config });
 
     if (invalidMsg) {
@@ -52,11 +52,9 @@ const deleteApp = async (path, appName) => {
 
     ETag = data.ETag;
     await deleteCloudFrontDistribution(CFDId, ETag);
-    const newConfig = config.filter((app) => {
-      return app.projectName !== appName;
-    });
+    const newConfig = config.filter((app) => app.projectName !== appName);
 
-    await writeConfig(path, newConfig);
+    await writeConfig(directory, newConfig);
     jadeLog(`"${appName}" has been successully deleted`);
   } catch (err) {
     jadeErr(err);

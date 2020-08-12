@@ -281,7 +281,7 @@ const validateInitialInput = async (input) => {
 };
 
 const validateGitUrl = ({ gitUrl }) => {
-  return /(http(s)?)(:(\/\/))(www\.)?(github|gitlab|bitbucket).com([\w\.@\:/\-~]+)(\.git)?(\/)?/.test(
+  return /(http(s)?)(:(\/\/))(www\.)?(github.com)([\w\.@\:/\-~]+)(\.git)?(\/)?/.test(
     gitUrl,
   );
 };

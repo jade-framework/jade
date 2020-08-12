@@ -1,114 +1,106 @@
 const uuid = require('uuid');
 
-const { readConfig } = require('../../util/fileUtils');
 const { createDynamoTable } = require('./createDynamoTable');
 const { putDynamoItem } = require('./putDynamoItems');
 const { jadeLog } = require('../../util/logger');
+const {
+  appsTableName,
+  versionsTableName,
+} = require('../../templates/constants');
 
-const appsItemToPut = async () => {
-  const jsonItems = await readConfig(process.cwd());
-  const formattedItem = jsonItems.map(
-    ({
-      projectName,
-      gitProvider,
-      gitUrl,
-      bucketName,
-      cloudFrontOriginId,
-      cloudFrontOriginDomain,
-    }) => ({
-      projectId: {
-        S: uuid.v4(),
-      },
-      projectName: {
-        S: projectName,
-      },
-      gitProvider: {
-        S: gitProvider,
-      },
-      gitUrl: {
-        S: gitUrl,
-      },
-      bucketName: {
-        S: bucketName,
-      },
-      cloudFrontOriginId: {
-        S: cloudFrontOriginId,
-      },
-      cloudFrontOriginDomain: {
-        S: cloudFrontOriginDomain,
-      },
-    }),
-  )[0];
-  return formattedItem;
-};
-const versionsItemToPut = async () => {
-  const jsonItems = await readConfig(process.cwd());
-  const formattedItem = jsonItems.map(
-    ({
-      projectName,
-      gitProvider,
-      gitExists,
-      gitUrl,
-      bucketName,
-      bucketNames,
-      lambdaNames,
-      cloudFrontOriginId,
-      cloudFrontOriginDomain,
-    }) => ({
-      versionId: {
-        S: uuid.v4(),
-      },
-      projectName: {
-        S: projectName,
-      },
-      gitProvider: {
-        S: gitProvider,
-      },
-      gitExists: {
-        BOOL: gitExists,
-      },
-      gitUrl: {
-        S: gitUrl,
-      },
-      bucketName: {
-        S: bucketName,
-      },
-      bucketNames: {
-        SS: bucketNames,
-      },
-      lambdaNames: {
-        S: lambdaNames,
-      },
-      cloudFrontOriginId: {
-        S: cloudFrontOriginId,
-      },
-      cloudFrontOriginDomain: {
-        S: cloudFrontOriginDomain,
-      },
-    }),
-  )[0];
-  return formattedItem;
-};
+const appsItemToPut = ({
+  projectName,
+  gitUrl,
+  bucketName,
+  cloudFrontOriginId,
+  cloudFrontOriginDomain,
+  cloudFrontDomainName,
+  publicIp,
+}) => ({
+  projectName: {
+    S: projectName,
+  },
+  gitUrl: {
+    S: gitUrl,
+  },
+  bucketName: {
+    S: bucketName,
+  },
+  cloudFrontOriginId: {
+    S: cloudFrontOriginId,
+  },
+  cloudFrontOriginDomain: {
+    S: cloudFrontOriginDomain,
+  },
+  cloudFrontDomainName: {
+    S: cloudFrontDomainName,
+  },
+  publicIp: {
+    S: publicIp,
+  },
+});
+const versionsItemToPut = ({
+  projectId,
+  gitUrl,
+  bucketName,
+  cloudFrontOriginId,
+  cloudFrontOriginDomain,
+  cloudFrontDomainName,
+  publicIp,
+  userInstallCommand,
+  userBuildCommand,
+  publishDirectory,
+}) => ({
+  projectId: {
+    S: projectId,
+  },
+  gitUrl: {
+    S: gitUrl,
+  },
+  bucketName: {
+    S: bucketName,
+  },
+  cloudFrontOriginId: {
+    S: cloudFrontOriginId,
+  },
+  cloudFrontOriginDomain: {
+    S: cloudFrontOriginDomain,
+  },
+  cloudFrontDomainName: {
+    S: cloudFrontDomainName,
+  },
+  publicIp: {
+    S: publicIp,
+  },
+  isLive: {
+    BOOL: true,
+  },
+  userInstallCommand: {
+    S: userInstallCommand,
+  },
+  userBuildCommand: {
+    S: userBuildCommand,
+  },
+  publishDirectory: {
+    S: publishDirectory,
+  },
+});
 
-const initDynamo = async (appsTableName, versionsTableName) => {
+const initDynamo = async (projectData) => {
   try {
     // Create Jade Projects Summary Table
-    const createPromise1 = createDynamoTable(
-      appsTableName,
-      'projectId',
-      'projectName',
-    );
+    const createPromise1 = createDynamoTable(appsTableName, 'projectName');
     // Create App Versions Table
     const createPromise2 = await createDynamoTable(
       versionsTableName,
-      'versionId',
-      'projectName',
+      'projectId',
     );
     await Promise.all([createPromise1, createPromise2]);
 
+    const projectId = `${projectData.projectName}-${uuid.v4()}`;
     // Put initial app items to tables
-    const appsItem = await appsItemToPut();
-    const versionsItem = await versionsItemToPut();
+    const appsItem = appsItemToPut(projectData);
+    const versionsItem = versionsItemToPut({ ...projectData, projectId });
     const putPromise1 = putDynamoItem(appsTableName, appsItem);
     const putPromise2 = putDynamoItem(versionsTableName, versionsItem);
     await Promise.all([putPromise1, putPromise2]);
@@ -118,8 +110,63 @@ const initDynamo = async (appsTableName, versionsTableName) => {
   }
 };
 
-module.exports = { initDynamo };
+const addAppToDynamo = async (projectData) => {
+  try {
+    const projectId = `${projectData.projectName}-${uuid.v4()}`;
+    // Put initial app items to tables
+
+    const appsItem = appsItemToPut(projectData);
+    const versionsItem = versionsItemToPut({ ...projectData, projectId });
+    const putPromise1 = putDynamoItem(appsTableName, appsItem);
+    const putPromise2 = putDynamoItem(versionsTableName, versionsItem);
+    await Promise.all([putPromise1, putPromise2]);
+    jadeLog('DynamoDB setup complete.');
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports = { initDynamo, addAppToDynamo };
 // initDynamo('JadeProjects', 'JadeProjectVersions');
+
+// test project data
+// const projectData = {
+//   projectName: 'My Jade Project',
+//   gitExists: true,
+//   gitUrl: 'https://github.com/jade-framework/gatsby-blog',
+//   userInstallCommand: 'yarn install',
+//   userBuildCommand: 'yarn build',
+//   publishDirectory: 'public/',
+//   bucketName: 'myjadeproject-898b9949-624b-48e9-86ef-a306ab9436ab',
+//   bucketNames: [
+//     'myjadeproject-898b9949-624b-48e9-86ef-a306ab9436ab-prod',
+//     'myjadeproject-898b9949-624b-48e9-86ef-a306ab9436ab-builds',
+//     'myjadeproject-898b9949-624b-48e9-86ef-a306ab9436ab-lambda',
+//     'myjadeproject-898b9949-624b-48e9-86ef-a306ab9436ab-stage',
+//   ],
+//   lambdaNames: 'jadeInvalidateCloudFrontFile',
+//   cloudFrontOriginId: 'S3-myjadeproject-898b9949-624b-48e9-86ef-a306ab9436ab',
+//   cloudFrontOriginDomain:
+//     'myjadeproject-898b9949-624b-48e9-86ef-a306ab9436ab-prod.s3.amazonaws.com',
+//   createdOn: '2020-08-12T03:21:13.714Z',
+//   gitFolder: 'gatsby-blog',
+//   cloudFrontDistributionId: 'EMYAVU3CFF0BM',
+//   cloudFrontDomainName: 'd1aciqbh9sfymb.cloudfront.net',
+//   instanceProfile: {
+//     Path: '/',
+//     InstanceProfileName: 'jade-ec2-instance-profile',
+//     InstanceProfileId: 'AIPA6RBS5P53GFXUFWHMO',
+//     Arn: 'arn:aws:iam::998686687094:instance-profile/jade-ec2-instance-profile',
+//     CreateDate: '2020-08-12T03:21:52.000Z',
+//     Roles: [[Object]],
+//   },
+//   securityGroup: { SecurityGroups: [[Object]] },
+//   publicIp: '3.10.24.2',
+// };
+
+// (async () => {
+//   await addAppToDynamo(projectData);
+// })();
 
 /*
 CREATE RESPONSE

@@ -17,7 +17,3 @@ const getCloudFrontDistributionId = async (originId) => {
 module.exports = {
   getCloudFrontDistributionId,
 };
-
-// getCloudFrontDistributionId(
-//   'S3-test-398e95ce-925e-4c10-99c3-7d94b837498b',
-// ).then((val) => console.log(val));

@@ -22,7 +22,7 @@ const uploadToBucket = async (fileName, bucketName) => {
     const response = await asyncUploadToBucket(uploadParams);
 
     console.log(
-      `File ${uploadKeyName} successfully uploaded to bucket ${bucketName}; ETag ${response.ETag}`
+      `File ${uploadKeyName} successfully uploaded to bucket ${bucketName}; ETag ${response.ETag}.`,
     );
   } catch (error) {
     console.log('Error uploading file', error);
