@@ -1,10 +1,10 @@
 const { jadeLog, jadeErr } = require('../../util/logger');
-const { sendSetupAndBuildCommands } = require('../../util/connect');
+const { sendFilesAndBuildCommands } = require('../../util/connect');
 
 const installEc2JadeEnvironment = async (projectData) => {
   try {
     jadeLog('Beginning connection to EC2 server...');
-    await sendSetupAndBuildCommands(projectData);
+    await sendFilesAndBuildCommands(projectData);
     jadeLog('EC2 server setup successfully.');
     return true;
   } catch (err) {

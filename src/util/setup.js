@@ -30,7 +30,7 @@ const {
 const {
   cwd,
   lambdaNames,
-  s3BucketName,
+  initialProjectData,
   cloudFrontOriginId,
   cloudFrontOriginDomain,
 } = require('../templates/constants');
@@ -78,7 +78,8 @@ const getUserProjectData = async (command) => {
       return false;
     }
 
-    const bucketName = `${parseName(initialAns.projectName)}-${uuid.v4()}`;
+    const uniqueId = uuid.v4();
+    const bucketName = `${parseName(initialAns.projectName)}-${uniqueId}`;
     const invalidBucketName = await validateBucketCreation(bucketName);
     if (invalidBucketName) {
       jadeWarn(invalidBucketName);
@@ -94,6 +95,7 @@ const getUserProjectData = async (command) => {
       cloudFrontOriginId: cloudFrontOriginId(bucketName),
       cloudFrontOriginDomain: cloudFrontOriginDomain(bucketName),
       createdOn: new Date(),
+      projectId: `${initialAns.projectName}-${uniqueId}`,
     };
     projectData.gitFolder = getGitFolder(projectData.gitUrl);
 
@@ -134,13 +136,16 @@ const updateBucketData = async (directory, projectData) => {
     await createDirectory('.jade', directory);
     const jadePath = getJadePath(directory);
 
-    if (await exists(join(jadePath, `${s3BucketName}.json`))) {
-      bucketData = await readJSONFile(s3BucketName, jadePath);
+    if (await exists(join(jadePath, `${initialProjectData}.json`))) {
+      bucketData = await readJSONFile(initialProjectData, jadePath);
       bucketData = bucketData.filter(
         (bucket) => bucket.projectName !== projectData.projectName,
       );
     }
-    await createJSONFile(s3BucketName, jadePath, [...bucketData, projectData]);
+    await createJSONFile(initialProjectData, jadePath, [
+      ...bucketData,
+      projectData,
+    ]);
     return true;
   } catch (err) {
     jadeErr(err);
@@ -151,7 +156,6 @@ const updateBucketData = async (directory, projectData) => {
 const setupApp = async (directory, projectData) => {
   try {
     const { bucketName } = projectData;
-
     await createJadeIamGroup();
     await addUserToJadeGroup();
 
@@ -181,25 +185,25 @@ const setupApp = async (directory, projectData) => {
   }
 };
 
-const setupConfig = async (directory, projectData) => {
-  const jadePath = getJadePath(directory);
-  let config = [];
+// const setupConfig = async (directory, projectData) => {
+//   const jadePath = getJadePath(directory);
+//   let config = [];
 
-  try {
-    if (!(await exists(join(jadePath, 'config.json')))) {
-      await writeConfig(directory, config);
-    } else {
-      config = await readConfig(directory);
-    }
+//   try {
+//     if (!(await exists(join(jadePath, 'config.json')))) {
+//       await writeConfig(directory, config);
+//     } else {
+//       config = await readConfig(directory);
+//     }
 
-    const newConfig = [...config, projectData];
-    await writeConfig(directory, newConfig);
-    return true;
-  } catch (err) {
-    jadeErr(err);
-    return false;
-  }
-};
+//     const newConfig = [...config, projectData];
+//     await writeConfig(directory, newConfig);
+//     return true;
+//   } catch (err) {
+//     jadeErr(err);
+//     return false;
+//   }
+// };
 
 const getConfig = async (directory = cwd) => {
   let config = [];
@@ -252,7 +256,6 @@ const launchApp = async (command, directory) => {
   if (!isAppSetup) return;
 
   await setupAwsInfra(projectData);
-  console.log(projectData);
   if (command === 'init') {
     await initDynamo(projectData);
   } else if (command === 'add') {
