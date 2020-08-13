@@ -138,7 +138,7 @@ const sendFilesAndBuildCommands = async (projectData) => {
     const host = await getHost(projectData);
     if (!host) return;
 
-    projectData.versionId = Date.now();
+    projectData.versionId = Date.now().toString();
 
     const commands = [...setupCommands, ...buildCommands(projectData)];
     await writeAwsConfig(region, jadePath);
