@@ -1,5 +1,5 @@
 const { credentials, getUserName } = require('./getCredentials');
-const { exists, readFile } = require('./fileUtils');
+const { exists, readFile, getJadePath } = require('./fileUtils');
 const { getGitFolder } = require('./helpers');
 const { projectNameLength } = require('../templates/constants');
 const { groupExists, deleteIamGroup } = require('../aws/iam');
@@ -12,6 +12,7 @@ const {
   asyncGetRole,
   asyncGetFunction,
   asyncListBuckets,
+  asyncDynamoListTables,
 } = require('../aws/awsAsyncFunctions');
 
 const cwd = process.cwd();
@@ -456,6 +457,63 @@ const validateDeleteArg = async (input) => {
   return status;
 };
 
+// validate Jade directory and AWS services exist
+const jadePathExists = async (directory) => {
+  const jadePath = getJadePath(directory);
+  try {
+    return await exists(jadePath);
+  } catch (err) {
+    return false;
+  }
+};
+
+const dynamoExists = async () => {
+  try {
+    const tables = await asyncDynamoListTables({});
+    return tables.TableNames.length > 0;
+  } catch (err) {
+    return false;
+  }
+};
+
+const validateAwsIsSetup = async (directory) => {
+  const validations = [
+    {
+      validation: jadePathExists,
+      invalidBoolean: false,
+      invalidMessage: `Your directory is not setup, please run "jade init" to initialize a new directory or change directory to where the ".jade" folder is located.`,
+    },
+    {
+      validation: dynamoExists,
+      invalidBoolean: false,
+      invalidMessage: `Your account does not have AWS services setup. Please run "jade init" to continue.`,
+    },
+  ];
+
+  const status = await validateResource(directory, validations);
+
+  return status;
+};
+
+const validateAwsIsNotSetup = async (directory) => {
+  const validations = [
+    {
+      validation: jadePathExists,
+      invalidBoolean: true,
+      invalidMessage: `Your directory is not setup, please run "jade init" to initialize your directory and AWS services.`,
+    },
+    {
+      validation: dynamoExists,
+      invalidBoolean: true,
+      invalidMessage: `Your account already has AWS setup. Please run "jade add" to add a new app.`,
+    },
+  ];
+
+  const status = await validateResource(directory, validations);
+
+  return status;
+};
+
 // Validations helper method
 const validateResource = async (resourceData, validations) => {
   let msg;
@@ -486,4 +544,6 @@ module.exports = {
   promptGitUrl,
   validateUserPermissions,
   validateDeleteArg,
+  validateAwsIsSetup,
+  validateAwsIsNotSetup,
 };

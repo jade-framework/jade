@@ -1,13 +1,13 @@
-const { clearJadeFolder } = require('./clearJadeFolder');
+const { deleteJadeFolder } = require('./deleteJadeFolder');
 const { terminateJadeEc2Instances } = require('./terminateJadeEc2Instances');
 const { removePermissions } = require('./removePermissions');
-const cleanup = require('../../src/commands/cleanup');
+const { cleanup } = require('../../commands/cleanup');
 
 async function resetJade() {
-  await clearJadeFolder();
+  await deleteJadeFolder();
   await terminateJadeEc2Instances();
   await removePermissions();
-  cleanup();
+  await cleanup();
 }
 
 resetJade();

@@ -1,4 +1,4 @@
-const uuid = require('uuid');
+const crypto = require('crypto');
 
 const { createBuckets, setBucketNotificationConfig } = require('../aws/s3');
 const { initJadeLambdas } = require('../aws/lambda');
@@ -78,7 +78,7 @@ const getUserProjectData = async (command) => {
       return false;
     }
 
-    const uniqueId = uuid.v4();
+    const uniqueId = crypto.randomBytes(16).toString('hex');
     const bucketName = `${parseName(initialAns.projectName)}-${uniqueId}`;
     const invalidBucketName = await validateBucketCreation(bucketName);
     if (invalidBucketName) {
@@ -95,7 +95,7 @@ const getUserProjectData = async (command) => {
       cloudFrontOriginId: cloudFrontOriginId(bucketName),
       cloudFrontOriginDomain: cloudFrontOriginDomain(bucketName),
       createdOn: new Date(),
-      projectId: `${initialAns.projectName}-${uniqueId}`,
+      projectId: `${parseName(initialAns.projectName)}-${uniqueId}`,
     };
     projectData.gitFolder = getGitFolder(projectData.gitUrl);
 
@@ -112,40 +112,12 @@ const getUserProjectData = async (command) => {
   }
 };
 
-const validateUser = async () => {
-  try {
-    jadeLog('Checking if your AWS account is correctly setup...');
-    const invalidUser = await validateUserPermissions();
-    if (invalidUser) {
-      jadeErr(invalidUser);
-      return false;
-    } else {
-      jadeLog('AWS account is correctly setup.');
-      return true;
-    }
-  } catch (err) {
-    jadeErr(err);
-    return false;
-  }
-};
-
 const updateBucketData = async (directory, projectData) => {
-  let bucketData = [];
-
   try {
     await createDirectory('.jade', directory);
     const jadePath = getJadePath(directory);
 
-    if (await exists(join(jadePath, `${initialProjectData}.json`))) {
-      bucketData = await readJSONFile(initialProjectData, jadePath);
-      bucketData = bucketData.filter(
-        (bucket) => bucket.projectName !== projectData.projectName,
-      );
-    }
-    await createJSONFile(initialProjectData, jadePath, [
-      ...bucketData,
-      projectData,
-    ]);
+    await createJSONFile(initialProjectData, jadePath, projectData);
     return true;
   } catch (err) {
     jadeErr(err);
@@ -231,7 +203,6 @@ const setupAwsInfra = async (projectData) => {
     await configEc2IamRole(projectData);
     await createAndConfigEc2(projectData);
     await installEc2JadeEnvironment(projectData);
-    await printBuildSuccess(projectData);
     return true;
   } catch (err) {
     jadeErr(err);
@@ -261,9 +232,9 @@ const launchApp = async (command, directory) => {
   } else if (command === 'add') {
     await addAppToDynamo(projectData);
   }
+  await printBuildSuccess(projectData);
 };
 
 module.exports = {
-  validateUser,
   launchApp,
 };
