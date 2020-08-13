@@ -1,8 +1,8 @@
-const { promisify } = require("util");
-const EC2 = require("aws-sdk/clients/ec2");
-const { getRegion } = require("../../src/util/getRegion");
+const { promisify } = require('util');
+const EC2 = require('aws-sdk/clients/ec2');
+const { getRegion } = require('../../src/util/getRegion');
 
-const apiVersion = "latest";
+const apiVersion = 'latest';
 const region = getRegion();
 
 const ec2 = new EC2({ apiVersion, region });
@@ -14,7 +14,7 @@ async function terminateJadeEc2Instances() {
     for (const item of data.Reservations) {
       for (const instance of item.Instances) {
         for (const tag of instance.Tags) {
-          if (tag.Key === "Name" && tag.Value === "Jade EC2 Instance") {
+          if (tag.Key === 'project' && tag.Value === 'jade') {
             toBeDeleted.push(instance.InstanceId);
           }
         }
