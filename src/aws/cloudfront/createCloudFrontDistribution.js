@@ -1,4 +1,4 @@
-const uuid = require('uuid');
+const crypto = require('crypto');
 const { asyncCreateCloudFrontDistribution } = require('../awsAsyncFunctions');
 const {
   cloudFrontOriginId,
@@ -6,7 +6,8 @@ const {
 } = require('../../templates/constants');
 
 const createCloudFrontDistribution = async (bucketName) => {
-  const callerReference = 'jade-' + uuid.v4();
+  const uniqueId = crypto.randomBytes(16).toString('hex');
+  const callerReference = `jade-${uniqueId}`;
   const originDomainName = cloudFrontOriginDomain(bucketName);
   const originId = cloudFrontOriginId(bucketName);
 

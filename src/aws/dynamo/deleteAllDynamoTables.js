@@ -34,4 +34,3 @@ const deleteAllDynamoTables = async () => {
   }
 };
 module.exports = { deleteAllDynamoTables };
-deleteAllDynamoTables();

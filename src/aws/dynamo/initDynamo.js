@@ -44,6 +44,7 @@ const appsItemToPut = ({
 
 const versionsItemToPut = ({
   projectId,
+  projectName,
   gitUrl,
   bucketName,
   cloudFrontOriginId,
@@ -57,6 +58,9 @@ const versionsItemToPut = ({
 }) => ({
   projectId: {
     S: projectId,
+  },
+  projectName: {
+    S: projectName,
   },
   gitUrl: {
     S: gitUrl,

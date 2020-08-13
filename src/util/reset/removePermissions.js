@@ -1,6 +1,6 @@
 const IAM = require('aws-sdk/clients/iam');
 const EC2 = require('aws-sdk/clients/ec2');
-const { getRegion } = require('../../src/util/getRegion');
+const { getRegion } = require('../getRegion');
 const {
   securityGroupName,
   jadeKeyPair,
@@ -8,7 +8,7 @@ const {
   ec2InstanceProfile,
   s3FullAccessPolicyArn,
   dynamoDbFullAccessPolicyArn,
-} = require('../../src/templates/constants');
+} = require('../../templates/constants');
 const { promisify } = require('util');
 
 const apiVersion = 'latest';

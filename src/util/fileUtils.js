@@ -54,6 +54,17 @@ const writeAwsConfig = async (region, path) => {
   await writeFile(join(path, `config`), data);
 };
 
+const removeFile = async (path, name) => {
+  const filePath = join(path, name);
+  try {
+    if (await exists(filePath)) {
+      await unlink(filePath);
+    }
+  } catch (err) {
+    jadeWarn(err);
+  }
+};
+
 module.exports = {
   join,
   exists,
@@ -70,4 +81,5 @@ module.exports = {
   readJSONFile,
   sleep,
   writeAwsConfig,
+  removeFile,
 };

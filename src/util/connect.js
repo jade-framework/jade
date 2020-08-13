@@ -4,6 +4,7 @@ const {
   exists,
   join,
   sleep,
+  removeFile,
   writeAwsConfig,
 } = require('./fileUtils');
 const {
@@ -101,6 +102,8 @@ const sendSetupFiles = async (host, maxRetries = 10, attempts = 0) => {
           join(jadePath, 'config'),
           join(jadePath, 'initialProjectData.json'),
         );
+        await removeFile(jadePath, 'config');
+        await removeFile(jadePath, 'initialProjectData.json');
         return true;
       })
       .catch(async (err) => {

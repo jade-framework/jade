@@ -15,7 +15,7 @@ const printBuildSuccess = async ({ publicIp, cloudFrontDomainName }) => {
   jadeLog(`8. Send just the push event`);
   jadeLog(`9. Add webhook`);
   jadeLog(
-    `10. Make a change to your repo and watch it get deployed on ${cloudFrontDomainName}!`,
+    `10. Make a change to your repo and watch it get deployed on ${cloudFrontDomainName}`,
   );
 };
 
