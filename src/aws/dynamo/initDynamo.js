@@ -127,7 +127,35 @@ const addAppToDynamo = async (projectData) => {
 };
 
 module.exports = { initDynamo, addAppToDynamo };
-// initDynamo('JadeProjects', 'JadeProjectVersions');
+
+/*
+    projectId,
+  gitUrl,
+  bucketName,
+  cloudFrontOriginId,
+  cloudFrontOriginDomain,
+  cloudFrontDomainName,
+  publicIp,
+  userInstallCommand,
+  userBuildCommand,
+  publishDirectory,
+*/
+// JC Test data
+// const data = {
+//   projectId: '1597122696347',
+//   projectName: 'My Jade Project',
+//   gitUrl: 'https://github.com/jade-framework/gatsby-blog',
+//   bucketName: 'myjadeproject-0e706840-a549-4a28-ac19-b73d80b1a64d',
+//   cloudFrontOriginId: 'S3-myjadeproject-0e706840-a549-4a28-ac19-b73d80b1a64d',
+//   cloudFrontOriginDomain:
+//     'myjadeproject-0e706840-a549-4a28-ac19-b73d80b1a64d-prod.s3.amazonaws.com',
+//   cloudFrontDomainName: 'd2vchf7s5500yn.cloudfront.net',
+//   publicIp: 'http://52.33.67.24',
+//   userInstallCommand: 'yarn install',
+//   userBuildCommand: 'yarn build',
+//   publishDirectory: 'public/',
+// };
+// initDynamo(data);
 
 // test project data
 // const projectData = {
