@@ -95,7 +95,7 @@ const getUserProjectData = async (command) => {
       cloudFrontOriginId: cloudFrontOriginId(bucketName),
       cloudFrontOriginDomain: cloudFrontOriginDomain(bucketName),
       createdOn: new Date(),
-      projectId: `${initialAns.projectName}-${uniqueId}`,
+      projectId: `${parseName(initialAns.projectName)}-${uniqueId}`,
     };
     projectData.gitFolder = getGitFolder(projectData.gitUrl);
 

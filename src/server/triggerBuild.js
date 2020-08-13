@@ -19,6 +19,15 @@ const prodBucket = bucketSuffixes[0];
 const buildsBucket = bucketSuffixes[1];
 const stageBucket = bucketSuffixes[3];
 
+const parseName = (name) => {
+  name = name
+    .replace(/\s+/gi, '-')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/gi, '');
+  if (name.length === 0) name = 'jade-framework';
+  return name;
+};
+
 const versionsItemToPut = ({
   projectId,
   gitUrl,
@@ -113,7 +122,7 @@ const updateAppsTable = async (initialData) => {
 const updateDynamo = async (webhook, initialData) => {
   console.log('Updating Dynamo...');
   const uniqueId = crypto.randomBytes(16).toString('hex');
-  initialData.projectId = `${initialData.projectName}-${uniqueId}`;
+  initialData.projectId = `${parseName(initialData.projectName)}-${uniqueId}`;
   initialData.commitUrl = webhook.head_commit.url;
   const versionsItem = versionsItemToPut(initialData);
   const promise1 = putDynamoItem(versionsTableName, versionsItem);

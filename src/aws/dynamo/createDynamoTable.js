@@ -8,7 +8,11 @@ const {
 
 // to discuss: AWS.config.update({endpoint: "http://localhost:8000"})
 
-const createDynamoTable = async (tableName, primaryKeyName) => {
+const createDynamoTable = async (
+  tableName,
+  primaryKeyName,
+  secondaryKeyName,
+) => {
   const params = {
     TableName: tableName,
     KeySchema: [
@@ -16,10 +20,18 @@ const createDynamoTable = async (tableName, primaryKeyName) => {
         AttributeName: primaryKeyName,
         KeyType: 'HASH',
       },
+      {
+        AttributeName: secondaryKeyName,
+        KeyType: 'RANGE',
+      },
     ],
     AttributeDefinitions: [
       {
         AttributeName: primaryKeyName,
+        AttributeType: 'S',
+      },
+      {
+        AttributeName: secondaryKeyName,
         AttributeType: 'S',
       },
     ],
