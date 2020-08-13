@@ -19,7 +19,7 @@ const lambdaRolePolicies = [
   'arn:aws:iam::aws:policy/CloudFrontFullAccess',
   'arn:aws:iam::aws:policy/AWSLambdaFullAccess',
 ];
-const s3BucketName = 's3BucketName';
+const initialProjectData = 'initialProjectData';
 const projectNameLength = 24;
 const bucketSuffixes = ['prod', 'builds', 'lambda', 'stage']; // production/live is always first, builds/history is always second
 const cloudFrontOriginId = (name) => `S3-${name}`;
@@ -45,7 +45,7 @@ module.exports = {
   jadePrefix,
   lambdaNames,
   lambdaRolePolicies,
-  s3BucketName,
+  initialProjectData,
   projectNameLength,
   bucketSuffixes,
   cloudFrontOriginId,

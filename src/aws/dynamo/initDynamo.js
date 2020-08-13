@@ -1,5 +1,3 @@
-const uuid = require('uuid');
-
 const { createDynamoTable } = require('./createDynamoTable');
 const { putDynamoItem } = require('./putDynamoItems');
 const { jadeLog } = require('../../util/logger');
@@ -16,6 +14,7 @@ const appsItemToPut = ({
   cloudFrontOriginDomain,
   cloudFrontDomainName,
   publicIp,
+  versionId,
 }) => ({
   projectName: {
     S: projectName,
@@ -38,7 +37,11 @@ const appsItemToPut = ({
   publicIp: {
     S: publicIp,
   },
+  activeVersion: {
+    S: versionId,
+  },
 });
+
 const versionsItemToPut = ({
   projectId,
   gitUrl,
@@ -50,6 +53,7 @@ const versionsItemToPut = ({
   userInstallCommand,
   userBuildCommand,
   publishDirectory,
+  versionId,
 }) => ({
   projectId: {
     S: projectId,
@@ -72,9 +76,6 @@ const versionsItemToPut = ({
   publicIp: {
     S: publicIp,
   },
-  isLive: {
-    BOOL: true,
-  },
   userInstallCommand: {
     S: userInstallCommand,
   },
@@ -83,6 +84,9 @@ const versionsItemToPut = ({
   },
   publishDirectory: {
     S: publishDirectory,
+  },
+  versionId: {
+    S: versionId,
   },
 });
 
@@ -96,11 +100,9 @@ const initDynamo = async (projectData) => {
       'projectId',
     );
     await Promise.all([createPromise1, createPromise2]);
-
-    const projectId = `${projectData.projectName}-${uuid.v4()}`;
     // Put initial app items to tables
     const appsItem = appsItemToPut(projectData);
-    const versionsItem = versionsItemToPut({ ...projectData, projectId });
+    const versionsItem = versionsItemToPut(projectData);
     const putPromise1 = putDynamoItem(appsTableName, appsItem);
     const putPromise2 = putDynamoItem(versionsTableName, versionsItem);
     await Promise.all([putPromise1, putPromise2]);
@@ -112,11 +114,9 @@ const initDynamo = async (projectData) => {
 
 const addAppToDynamo = async (projectData) => {
   try {
-    const projectId = `${projectData.projectName}-${uuid.v4()}`;
     // Put initial app items to tables
-
     const appsItem = appsItemToPut(projectData);
-    const versionsItem = versionsItemToPut({ ...projectData, projectId });
+    const versionsItem = versionsItemToPut(projectData);
     const putPromise1 = putDynamoItem(appsTableName, appsItem);
     const putPromise2 = putDynamoItem(versionsTableName, versionsItem);
     await Promise.all([putPromise1, putPromise2]);

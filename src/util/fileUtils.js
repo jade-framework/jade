@@ -49,6 +49,11 @@ const readJSONFile = async (fileName, path) => {
 
 const sleep = async (ms) => new Promise((r) => setTimeout(r, ms));
 
+const writeAwsConfig = async (region, path) => {
+  const data = `[default]\nregion=${region}`;
+  await writeFile(join(path, `config`), data);
+};
+
 module.exports = {
   join,
   exists,
@@ -64,4 +69,5 @@ module.exports = {
   createJSONFile,
   readJSONFile,
   sleep,
+  writeAwsConfig,
 };
