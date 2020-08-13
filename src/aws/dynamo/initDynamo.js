@@ -1,6 +1,7 @@
 const { createDynamoTable } = require('./createDynamoTable');
 const { putDynamoItem } = require('./putDynamoItems');
 const { jadeLog } = require('../../util/logger');
+const { parseName } = require('../../util/helpers');
 const {
   appsTableName,
   versionsTableName,
@@ -8,6 +9,7 @@ const {
 
 const appsItemToPut = ({
   projectName,
+  projectId,
   gitUrl,
   bucketName,
   cloudFrontOriginId,
@@ -18,6 +20,9 @@ const appsItemToPut = ({
 }) => ({
   projectName: {
     S: projectName,
+  },
+  projectId: {
+    S: projectId,
   },
   gitUrl: {
     S: gitUrl,
@@ -97,11 +102,16 @@ const versionsItemToPut = ({
 const initDynamo = async (projectData) => {
   try {
     // Create Jade Projects Summary Table
-    const createPromise1 = createDynamoTable(appsTableName, 'projectName');
+    const createPromise1 = createDynamoTable(
+      appsTableName,
+      'projectName',
+      'projectId',
+    );
     // Create App Versions Table
     const createPromise2 = await createDynamoTable(
       versionsTableName,
       'projectId',
+      'projectName',
     );
     await Promise.all([createPromise1, createPromise2]);
     // Put initial app items to tables

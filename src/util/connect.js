@@ -29,13 +29,16 @@ const setupCommands = [
   'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash',
   '. ~/.nvm/nvm.sh',
   'nvm install node',
-  'npm install -g yarn aws-sdk',
+  'npm install -g yarn',
   'sudo amazon-linux-extras install nginx1 -y',
   `sudo mv ${remoteServerDir}/sysmon.conf /etc/nginx/conf.d/sysmon.conf`,
   'sudo systemctl start nginx',
   `node ${remoteServerDir}/server.js &`,
   'sudo yum install git -y',
   `sudo mv /home/ec2-user/server/config /home/ec2-user/.aws/config `,
+  'cd /home/ec2-user/server',
+  'yarn add aws-sdk',
+  'cd /home/ec2-user',
 ];
 
 const buildCommands = ({
