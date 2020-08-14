@@ -1,6 +1,6 @@
 const IAM = require('aws-sdk/clients/iam');
 const EC2 = require('aws-sdk/clients/ec2');
-const { getRegion } = require('../getRegion');
+const { getRegion } = require('../../server/getRegion');
 const {
   securityGroupName,
   jadeKeyPair,
@@ -18,12 +18,18 @@ const iam = new IAM({ apiVersion, region });
 const ec2 = new EC2({ apiVersion, region });
 
 const deleteSecurityGroup = async (securityGroupName) => {
-  const asyncDeleteSecurityGroup = promisify(ec2.deleteSecurityGroup.bind(ec2));
-  const [err, data] = await asyncDeleteSecurityGroup({
-    GroupName: securityGroupName,
-  });
+  try {
+    const asyncDeleteSecurityGroup = promisify(
+      ec2.deleteSecurityGroup.bind(ec2),
+    );
+    const [err, data] = await asyncDeleteSecurityGroup({
+      GroupName: securityGroupName,
+    });
 
-  console.log(err, data);
+    console.log(err, data);
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 // TODO: add retries
@@ -68,7 +74,7 @@ async function removePermissions() {
     console.log(data);
   });
 
-  deleteSecurityGroup(securityGroupName);
+  await deleteSecurityGroup(securityGroupName);
 }
 
 module.exports = { removePermissions };

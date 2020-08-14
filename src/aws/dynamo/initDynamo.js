@@ -1,7 +1,6 @@
 const { createDynamoTable } = require('./createDynamoTable');
 const { putDynamoItem } = require('./putDynamoItems');
 const { jadeLog } = require('../../util/logger');
-const { parseName } = require('../../util/helpers');
 const {
   appsTableName,
   versionsTableName,
@@ -12,6 +11,7 @@ const appsItemToPut = ({
   projectId,
   gitUrl,
   bucketName,
+  cloudFrontDistributionId,
   cloudFrontOriginId,
   cloudFrontOriginDomain,
   cloudFrontDomainName,
@@ -21,14 +21,14 @@ const appsItemToPut = ({
   projectName: {
     S: projectName,
   },
-  projectId: {
-    S: projectId,
+  bucketName: {
+    S: bucketName,
   },
   gitUrl: {
     S: gitUrl,
   },
-  bucketName: {
-    S: bucketName,
+  cloudFrontDistributionId: {
+    S: cloudFrontDistributionId,
   },
   cloudFrontOriginId: {
     S: cloudFrontOriginId,
@@ -45,6 +45,9 @@ const appsItemToPut = ({
   activeVersion: {
     S: versionId,
   },
+  projectId: {
+    S: projectId,
+  },
 });
 
 const versionsItemToPut = ({
@@ -52,6 +55,7 @@ const versionsItemToPut = ({
   projectName,
   gitUrl,
   bucketName,
+  cloudFrontDistributionId,
   cloudFrontOriginId,
   cloudFrontOriginDomain,
   cloudFrontDomainName,
@@ -72,6 +76,9 @@ const versionsItemToPut = ({
   },
   bucketName: {
     S: bucketName,
+  },
+  cloudFrontDistributionId: {
+    S: cloudFrontDistributionId,
   },
   cloudFrontOriginId: {
     S: cloudFrontOriginId,
@@ -105,7 +112,7 @@ const initDynamo = async (projectData) => {
     const createPromise1 = createDynamoTable(
       appsTableName,
       'projectName',
-      'projectId',
+      'bucketName',
     );
     // Create App Versions Table
     const createPromise2 = await createDynamoTable(

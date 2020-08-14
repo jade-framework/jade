@@ -1,4 +1,4 @@
-const { getRegion } = require('../../util/getRegion');
+const { getRegion } = require('../../server/getRegion');
 const { createLambdaPermission } = require('../lambda/createLambdaPermission');
 
 const {

@@ -5,22 +5,25 @@ const {
   join,
   sleep,
   removeFile,
+  createJSONFile,
   writeAwsConfig,
 } = require('./fileUtils');
 const {
   cwd,
   bucketSuffixes,
   privateKeyFilename,
+  initialProjectData,
 } = require('../templates/constants');
-const { getRegion } = require('./getRegion');
+const { getRegion } = require('../server/getRegion');
 const { getConnection } = require('./sshConnection');
 const { jadeLog, jadeErr } = require('./logger');
+const { parseName } = require('./helpers');
 
 const region = getRegion();
 const jadePath = getJadePath(cwd);
 const remoteHomeDir = '/home/ec2-user';
 const remoteServerDir = `${remoteHomeDir}/server`;
-const localDir = join(cwd, 'src', 'server');
+const serverSourceDir = join(__dirname, '..', 'server');
 const prodBucket = bucketSuffixes[0];
 const buildsBucket = bucketSuffixes[1];
 
@@ -33,12 +36,13 @@ const setupCommands = [
   'sudo amazon-linux-extras install nginx1 -y',
   `sudo mv ${remoteServerDir}/sysmon.conf /etc/nginx/conf.d/sysmon.conf`,
   'sudo systemctl start nginx',
-  `node ${remoteServerDir}/server.js &`,
-  'sudo yum install git -y',
-  `sudo mv /home/ec2-user/server/config /home/ec2-user/.aws/config `,
-  'cd /home/ec2-user/server',
+  `sudo mkdir ${remoteHomeDir}/.aws`,
+  `sudo mv ${remoteServerDir}/config ${remoteHomeDir}/.aws/config`,
+  `cd ${remoteServerDir}`,
   'yarn add aws-sdk',
-  'cd /home/ec2-user',
+  `node ${remoteServerDir}/server.js > logger.log 2>&1 &`,
+  `cd ${remoteHomeDir}`,
+  'sudo yum install git -y',
 ];
 
 const buildCommands = ({
@@ -99,9 +103,10 @@ const sendSetupFiles = async (host, maxRetries = 10, attempts = 0) => {
       .then(async (conn) => {
         await conn.asyncSftp(
           remoteServerDir,
-          join(localDir, 'server.js'),
-          join(localDir, 'triggerBuild.js'),
-          join(localDir, 'sysmon.conf'),
+          join(serverSourceDir, 'server.js'),
+          join(serverSourceDir, 'triggerBuild.js'),
+          join(serverSourceDir, 'sysmon.conf'),
+          join(serverSourceDir, 'getRegion.js'),
           join(jadePath, 'config'),
           join(jadePath, 'initialProjectData.json'),
         );
@@ -141,10 +146,14 @@ const sendCommands = async (host, commands, maxRetries = 10, attempts = 0) => {
 
 const sendFilesAndBuildCommands = async (projectData) => {
   try {
+    const { projectName } = projectData;
     const host = await getHost(projectData);
     if (!host) return;
 
-    projectData.versionId = Date.now().toString();
+    const date = Date.now().toString();
+    projectData.versionId = date;
+    projectData.projectId = `${parseName(projectName)}-${date}`;
+    await createJSONFile(initialProjectData, jadePath, projectData);
 
     const commands = [...setupCommands, ...buildCommands(projectData)];
     await writeAwsConfig(region, jadePath);

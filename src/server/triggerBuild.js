@@ -1,15 +1,20 @@
-const crypto = require('crypto');
 const { promisify } = require('util');
-const exec = promisify(require('child_process').exec);
-const fs = require('fs');
-const Dynamo = require('aws-sdk/clients/dynamodb');
-const dynamo = new Dynamo();
-const asyncDynamoPutItem = promisify(dynamo.putItem.bind(dynamo));
-const asyncDynamoUpdateItem = promisify(dynamo.updateItem.bind(dynamo));
-
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
 const { join } = require('path');
+const fs = require('fs');
+const { getRegion } = require('./getRegion');
+const exec = promisify(require('child_process').exec);
+const readFile = promisify(fs.readFile);
+
+const AWS = require('aws-sdk');
+const region = getRegion();
+const apiVersion = 'latest';
+AWS.config.update({ region });
+const documentClient = new AWS.DynamoDB.DocumentClient({
+  apiVersion,
+});
+
+const asyncPut = promisify(documentClient.put.bind(documentClient));
+const asyncUpdate = promisify(documentClient.update.bind(documentClient));
 
 const appsTableName = 'JadeProjects';
 const versionsTableName = 'JadeProjectsVersions';
@@ -28,116 +33,61 @@ const parseName = (name) => {
   return name;
 };
 
-const versionsItemToPut = ({
-  projectId,
-  gitUrl,
-  bucketName,
-  cloudFrontOriginId,
-  cloudFrontOriginDomain,
-  cloudFrontDomainName,
-  publicIp,
-  userInstallCommand,
-  userBuildCommand,
-  publishDirectory,
-  versionId,
-  commitUrl,
-}) => ({
-  projectId: {
-    S: projectId,
-  },
-  gitUrl: {
-    S: gitUrl,
-  },
-  bucketName: {
-    S: bucketName,
-  },
-  cloudFrontOriginId: {
-    S: cloudFrontOriginId,
-  },
-  cloudFrontOriginDomain: {
-    S: cloudFrontOriginDomain,
-  },
-  cloudFrontDomainName: {
-    S: cloudFrontDomainName,
-  },
-  publicIp: {
-    S: publicIp,
-  },
-  userInstallCommand: {
-    S: userInstallCommand,
-  },
-  userBuildCommand: {
-    S: userBuildCommand,
-  },
-  publishDirectory: {
-    S: publishDirectory,
-  },
-  versionId: {
-    S: versionId,
-  },
-  commitUrl: {
-    S: commitUrl,
-  },
-});
-
-const putDynamoItem = async (tableName, items) => {
-  let putResponse;
-  try {
-    const putParams = {
-      TableName: tableName,
-      Item: items,
-    };
-    putResponse = await asyncDynamoPutItem(putParams);
-    console.log(`Put items to table ${tableName}.`);
-  } catch (err) {
-    console.log(err);
-  }
-  return putResponse;
-};
-
-const updateAppsTable = async (initialData) => {
-  const params = {
-    TableName: appsTableName,
-    Key: {
-      projectName: {
-        S: initialData.projectName,
-      },
-    },
-    ReturnValues: 'NONE',
-    ExpressionAttributeNames: {
-      '#AV': 'activeVersion',
-    },
-    ExpressionAttributeValues: {
-      ':av': initialData.versionId,
-    },
-    UpdateExpression: 'SET #AV = :av',
-  };
-  try {
-    await asyncDynamoUpdateItem(params);
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-const parseName = (name) => {
-  name = name
-    .replace(/\s+/gi, '-')
-    .toLowerCase()
-    .replace(/[^a-z0-9]/gi, '');
-  if (name.length === 0) name = 'jade-framework';
-  return name;
-};
-
-const updateDynamo = async (webhook, initialData) => {
+const updateDynamo = async (data) => {
   console.log('Updating Dynamo...');
-  const uniqueId = crypto.randomBytes(16).toString('hex');
-  initialData.projectId = `${parseName(initialData.projectName)}-${uniqueId}`;
-  initialData.commitUrl = webhook.head_commit.url;
-  const versionsItem = versionsItemToPut(initialData);
-  const promise1 = putDynamoItem(versionsTableName, versionsItem);
-  const promise2 = updateAppsTable(initialData);
-  await Promise.all([promise1, promise2]);
-  console.log('Dynamo tables updated.');
+
+  const {
+    projectId,
+    gitUrl,
+    bucketName,
+    cloudFrontDistributionId,
+    cloudFrontOriginId,
+    cloudFrontOriginDomain,
+    cloudFrontDomainName,
+    publicIp,
+    userInstallCommand,
+    userBuildCommand,
+    publishDirectory,
+    versionId,
+    commitUrl,
+    projectName,
+  } = data;
+
+  const item = {
+    projectId,
+    gitUrl,
+    bucketName,
+    cloudFrontDistributionId,
+    cloudFrontOriginId,
+    cloudFrontOriginDomain,
+    cloudFrontDomainName,
+    publicIp,
+    userInstallCommand,
+    userBuildCommand,
+    publishDirectory,
+    versionId,
+    commitUrl,
+    projectName,
+  };
+
+  try {
+    await asyncPut({
+      TableName: versionsTableName,
+      Item: item,
+    });
+    await asyncUpdate({
+      TableName: appsTableName,
+      Key: { projectName, bucketName },
+      UpdateExpression: 'SET activeVersion = :v',
+      ExpressionAttributeValues: {
+        ':v': versionId,
+      },
+    });
+
+    console.log('DynamoDB table updated.');
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 module.exports = async function triggerBuild(webhook) {
@@ -147,24 +97,24 @@ module.exports = async function triggerBuild(webhook) {
       msg: 'Webhook successfully received by EC2. Welcome to Jade!',
     };
   }
+  console.log('Webhook being processed...');
   const { repository } = webhook;
   const repoName = repository.name;
   const cloneUrl = repository.clone_url;
   const repoDir = join(userDir, repoName);
   const branch = webhook.ref.replace('refs/heads/', '');
-
   try {
     const initialProjectData = await readFile(
       join(userDir, 'server', 'initialProjectData.json'),
-    );
-
-    // need to change to find the right bucketName for multiple apps
-    const initialData = JSON.parse(initialProjectData)[0];
-    initialData.versionId = Date.now();
+    ); // need to change to find the right bucketName for multiple apps
+    const initialData = JSON.parse(initialProjectData);
+    const date = Date.now().toString();
+    initialData.versionId = date;
+    initialData.projectId = `${parseName(initialData.projectName)}-${date}`;
+    initialData.commitUrl = webhook.head_commit.url;
 
     const { bucketName } = initialData;
     let pull;
-
     if (branch === 'master') {
       await exec(`git -C ${repoDir} checkout master`);
       pull = await exec(`git -C ${repoDir} pull ${cloneUrl}`);
@@ -172,14 +122,12 @@ module.exports = async function triggerBuild(webhook) {
       await exec(`git -C ${repoDir} checkout staging`);
       pull = await exec(`git -C ${repoDir} pull -X theirs --no-edit`);
     }
-
     if (/Already up to date/.test(pull.stdout)) {
       return {
         statusCode: 202,
         msg: 'Repo has not changed, build not triggered.',
       };
     }
-
     (async () => {
       try {
         // need to get info from Dynamo, especially publish directory "public"
@@ -190,20 +138,15 @@ module.exports = async function triggerBuild(webhook) {
           await exec(
             `aws s3 sync ${repoDir}/public s3://${bucketName}-${prodBucket}`,
           );
-          await exec(`zip -r ${repoDir}/${versionId} ${repoDir}/public`);
+          await exec(`zip -r ${repoDir}/${date} ${repoDir}/public`);
           await exec(
-            `aws s3api put-object --bucket ${bucketName}-${buildsBucket} --key ${versionId}.zip --body ${repoDir}/${versionId}.zip`,
+            `aws s3api put-object --bucket ${bucketName}-${buildsBucket} --key ${date}.zip --body ${repoDir}/${date}.zip`,
           );
           console.log(`Upload to s3://${bucketName}-${prodBucket} complete`);
           console.log(
-            `Upload to s3://${bucketName}-${buildsBucket}/${versionId} complete`,
+            `Upload to s3://${bucketName}-${buildsBucket}/${date} complete`,
           );
-          await updateDynamo(webhook, initialData);
-          // update Apps table with activeVersion: versionId
-          // update Version row with versionId
-          // add commit URL
-
-          await exec(`rm ${repoDir}/${versionId}.zip`);
+          await updateDynamo(initialData);
         } else if (branch === 'staging') {
           await exec(`yarn --cwd ${repoDir} build`);
           await exec(
@@ -215,7 +158,6 @@ module.exports = async function triggerBuild(webhook) {
         console.log(err); // convert to logger later
       }
     })();
-
     return {
       statusCode: 200,
       msg: 'Webhook successfully processed, Jade build triggered.',

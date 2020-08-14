@@ -30,12 +30,10 @@ const {
 const {
   cwd,
   lambdaNames,
-  initialProjectData,
   cloudFrontOriginId,
   cloudFrontOriginDomain,
 } = require('../templates/constants');
 const {
-  createJSONFile,
   readJSONFile,
   createDirectory,
   exists,
@@ -95,7 +93,6 @@ const getUserProjectData = async (command) => {
       cloudFrontOriginId: cloudFrontOriginId(bucketName),
       cloudFrontOriginDomain: cloudFrontOriginDomain(bucketName),
       createdOn: new Date(),
-      projectId: `${parseName(initialAns.projectName)}-${uniqueId}`,
     };
     projectData.gitFolder = getGitFolder(projectData.gitUrl);
 
@@ -112,18 +109,16 @@ const getUserProjectData = async (command) => {
   }
 };
 
-const updateBucketData = async (directory, projectData) => {
-  try {
-    await createDirectory('.jade', directory);
-    const jadePath = getJadePath(directory);
+// const updateBucketData = async (directory, projectData) => {
+//   try {
+//     const jadePath = getJadePath(directory);
 
-    await createJSONFile(initialProjectData, jadePath, projectData);
-    return true;
-  } catch (err) {
-    jadeErr(err);
-    return false;
-  }
-};
+//     return true;
+//   } catch (err) {
+//     jadeErr(err);
+//     return false;
+//   }
+// };
 
 const setupApp = async (directory, projectData) => {
   try {
@@ -131,8 +126,10 @@ const setupApp = async (directory, projectData) => {
     await createJadeIamGroup();
     await addUserToJadeGroup();
 
-    const bucketData = await updateBucketData(directory, projectData);
-    if (!bucketData) return false;
+    await createDirectory('.jade', directory);
+
+    // const bucketData = await updateBucketData(directory, projectData);
+    // if (!bucketData) return false;
 
     await createBuckets(bucketName);
 

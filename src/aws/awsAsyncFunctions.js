@@ -8,7 +8,7 @@ const EC2 = require('aws-sdk/clients/ec2');
 const STS = require('aws-sdk/clients/sts');
 const Dynamo = require('aws-sdk/clients/dynamodb');
 const ApiGateway = require('aws-sdk/clients/apigateway');
-const { getRegion } = require('../util/getRegion');
+const { getRegion } = require('../server/getRegion');
 
 const region = getRegion();
 const apiVersion = 'latest';
