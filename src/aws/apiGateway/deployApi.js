@@ -1,5 +1,5 @@
 // const uuid = require('uuid');
-const { getRegion } = require('../../util/getRegion');
+const { getRegion } = require('../../server/getRegion');
 
 const {
   createApiGatewayIntegration,

@@ -1,5 +1,6 @@
 const { launchApp } = require('../util/setup');
 const { validateAwsIsSetup } = require('../util/validations');
+const { jadeErr, jadeLog } = require('../util/logger');
 
 const add = async (directory) => {
   try {

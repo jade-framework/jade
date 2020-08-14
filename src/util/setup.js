@@ -30,7 +30,6 @@ const {
 const {
   cwd,
   lambdaNames,
-  initialProjectData,
   cloudFrontOriginId,
   cloudFrontOriginDomain,
 } = require('../templates/constants');
@@ -95,7 +94,6 @@ const getUserProjectData = async (command) => {
       cloudFrontOriginId: cloudFrontOriginId(bucketName),
       cloudFrontOriginDomain: cloudFrontOriginDomain(bucketName),
       createdOn: new Date(),
-      projectId: `${parseName(initialAns.projectName)}-${uniqueId}`,
     };
     projectData.gitFolder = getGitFolder(projectData.gitUrl);
 
@@ -117,7 +115,6 @@ const updateBucketData = async (directory, projectData) => {
     await createDirectory('.jade', directory);
     const jadePath = getJadePath(directory);
 
-    await createJSONFile(initialProjectData, jadePath, projectData);
     return true;
   } catch (err) {
     jadeErr(err);
