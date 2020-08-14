@@ -1,6 +1,6 @@
 const { asyncPutBucketPolicy } = require('../awsAsyncFunctions');
 
-const updateBucketPolicy = async bucketName => {
+const updateBucketPolicy = async (bucketName) => {
   const readOnlyAnonUserPolicy = {
     Version: '2012-10-17',
     Statement: [
