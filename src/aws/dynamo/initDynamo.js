@@ -55,6 +55,7 @@ const versionsItemToPut = ({
   projectName,
   gitUrl,
   bucketName,
+  cloudFrontDistributionId,
   cloudFrontOriginId,
   cloudFrontOriginDomain,
   cloudFrontDomainName,

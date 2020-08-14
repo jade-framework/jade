@@ -74,7 +74,6 @@ const createSecurityGroup = async (projectData) => {
 
       jadeLog('Whitelisting Github IP addresses...');
       const githubIps = await getGithubIp();
-      console.log(`githubIps are ${githubIps}`);
       const githubHookIps = githubIps.hooks;
       const githubRuleDesc = 'Github hook address';
       setIngressSshRule(ingressRules);

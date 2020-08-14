@@ -5,6 +5,7 @@ const {
   join,
   sleep,
   removeFile,
+  createJSONFile,
   writeAwsConfig,
 } = require('./fileUtils');
 const {
@@ -35,13 +36,13 @@ const setupCommands = [
   'sudo amazon-linux-extras install nginx1 -y',
   `sudo mv ${remoteServerDir}/sysmon.conf /etc/nginx/conf.d/sysmon.conf`,
   'sudo systemctl start nginx',
+  `sudo mkdir ${remoteHomeDir}/.aws`,
+  `sudo mv ${remoteServerDir}/config ${remoteHomeDir}/.aws/config`,
   `cd ${remoteServerDir}`,
   'yarn add aws-sdk',
   `node ${remoteServerDir}/server.js > logger.log 2>&1 &`,
   `cd ${remoteHomeDir}`,
   'sudo yum install git -y',
-  `sudo mkdir ${remoteHomeDir}/.aws`,
-  `sudo mv ${remoteServerDir}/config ${remoteHomeDir}/.aws/config`,
 ];
 
 const buildCommands = ({
