@@ -3,7 +3,7 @@ const { promisify } = require('util');
 const exec = promisify(require('child_process').exec);
 const fs = require('fs');
 const Dynamo = require('aws-sdk/clients/dynamodb');
-const dynamo = new Dynamo();
+const dynamo = new Dynamo({ region: 'us-west-2' });
 const asyncDynamoPutItem = promisify(dynamo.putItem.bind(dynamo));
 const asyncDynamoUpdateItem = promisify(dynamo.updateItem.bind(dynamo));
 
@@ -18,15 +18,6 @@ const userDir = join('/', 'home', 'ec2-user');
 const prodBucket = bucketSuffixes[0];
 const buildsBucket = bucketSuffixes[1];
 const stageBucket = bucketSuffixes[3];
-
-const parseName = (name) => {
-  name = name
-    .replace(/\s+/gi, '-')
-    .toLowerCase()
-    .replace(/[^a-z0-9]/gi, '');
-  if (name.length === 0) name = 'jade-framework';
-  return name;
-};
 
 const versionsItemToPut = ({
   projectId,
@@ -159,8 +150,9 @@ module.exports = async function triggerBuild(webhook) {
     );
 
     // need to change to find the right bucketName for multiple apps
-    const initialData = JSON.parse(initialProjectData)[0];
-    initialData.versionId = Date.now();
+    const initialData = JSON.parse(initialProjectData);
+    const date = Date.now().toString();
+    initialData.versionId = date;
 
     const { bucketName } = initialData;
     let pull;
@@ -190,20 +182,20 @@ module.exports = async function triggerBuild(webhook) {
           await exec(
             `aws s3 sync ${repoDir}/public s3://${bucketName}-${prodBucket}`,
           );
-          await exec(`zip -r ${repoDir}/${versionId} ${repoDir}/public`);
+          await exec(`zip -r ${repoDir}/${date} ${repoDir}/public`);
           await exec(
-            `aws s3api put-object --bucket ${bucketName}-${buildsBucket} --key ${versionId}.zip --body ${repoDir}/${versionId}.zip`,
+            `aws s3api put-object --bucket ${bucketName}-${buildsBucket} --key ${date}.zip --body ${repoDir}/${date}.zip`,
           );
           console.log(`Upload to s3://${bucketName}-${prodBucket} complete`);
           console.log(
-            `Upload to s3://${bucketName}-${buildsBucket}/${versionId} complete`,
+            `Upload to s3://${bucketName}-${buildsBucket}/${date} complete`,
           );
           await updateDynamo(webhook, initialData);
-          // update Apps table with activeVersion: versionId
-          // update Version row with versionId
+          // update Apps table with activeVersion: date
+          // update Version row with date
           // add commit URL
 
-          await exec(`rm ${repoDir}/${versionId}.zip`);
+          await exec(`rm ${repoDir}/${date}.zip`);
         } else if (branch === 'staging') {
           await exec(`yarn --cwd ${repoDir} build`);
           await exec(
