@@ -24,6 +24,8 @@ const jadePath = getJadePath(cwd);
 const remoteHomeDir = '/home/ec2-user';
 const remoteServerDir = `${remoteHomeDir}/server`;
 const serverSourceDir = join(__dirname, '..', 'server');
+const dockerRemoteDir = `${remoteHomeDir}/docker`;
+const dockerSourceDir = join(__dirname, '..', 'docker');
 const prodBucket = bucketSuffixes[0];
 const buildsBucket = bucketSuffixes[1];
 
@@ -43,6 +45,10 @@ const setupCommands = [
   `node ${remoteServerDir}/server.js > logger.log 2>&1 &`,
   `cd ${remoteHomeDir}`,
   'sudo yum install git -y',
+  `mkdir ${remoteHomeDir}/docker`,
+  'sudo yum install -y docker',
+  'sudo service docker start',
+  'sudo systemctl enable docker',
 ];
 
 const buildCommands = ({
@@ -109,6 +115,12 @@ const sendSetupFiles = async (host, maxRetries = 10, attempts = 0) => {
           join(serverSourceDir, 'getRegion.js'),
           join(jadePath, 'config'),
           join(jadePath, 'initialProjectData.json'),
+        );
+        await conn.asyncSftp(
+          dockerRemoteDir,
+          join(dockerSourceDir, 'Dockerfile'),
+          join(dockerSourceDir, 'index.js'),
+          join(dockerSourceDir, 'package.json'),
         );
         await removeFile(jadePath, 'config');
         await removeFile(jadePath, 'initialProjectData.json');
