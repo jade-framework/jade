@@ -2,7 +2,7 @@ const path = require('path');
 
 const { lambdaIamRoleName, lambdaNames } = require('../../templates/constants');
 const { zipit } = require('../../util/zipit');
-const { sleep, join } = require('../../util/fileUtils');
+const { sleep, join, removeFile } = require('../../util/fileUtils');
 const { createLambdaFunction } = require('./createLambdaFunction');
 const { createLambdaPermission } = require('./createLambdaPermission');
 const { createLambdaRole } = require('./createLambdaRole');
@@ -14,6 +14,7 @@ const {
   asyncGetCallerIdentity,
 } = require('../awsAsyncFunctions');
 const { bucketSuffixes } = require('../../templates/constants');
+const { jadeLog, jadeErr } = require('../../util/logger');
 
 const initJadeLambdas = async (bucketName) => {
   const functionName = lambdaNames;
@@ -33,14 +34,15 @@ const initJadeLambdas = async (bucketName) => {
       ),
     );
     await uploadToBucket(functionFile, `${bucketName}-${bucketSuffixes[2]}`);
+    await removeFile('.', functionFile);
 
     let lambdaRoleResponse = await roleExists(lambdaIamRoleName);
     if (!lambdaRoleResponse) {
       lambdaRoleResponse = await createLambdaRole(lambdaIamRoleName);
-      console.log('Waiting for Lambda role to be ready...');
+      jadeLog('Waiting for Lambda role to be ready...');
       await asyncIamWaitFor('roleExists', { RoleName: lambdaIamRoleName });
       await sleep(10000);
-      console.log('Lambda role ready.');
+      jadeLog('Lambda role ready.');
     }
 
     let lambdaArn;
@@ -71,7 +73,7 @@ const initJadeLambdas = async (bucketName) => {
     }
     return lambdaArn;
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 

@@ -1,4 +1,3 @@
-// const uuid = require('uuid');
 const { getRegion } = require('../../server/getRegion');
 
 const {
@@ -10,6 +9,7 @@ const {
   asyncGetResources,
   asyncCreateDeployment,
 } = require('../awsAsyncFunctions');
+const { jadeErr } = require('../../util/logger');
 
 const deployApi = async (resourceName, whiteListIps, stageName) => {
   const region = getRegion();
@@ -72,7 +72,7 @@ const deployApi = async (resourceName, whiteListIps, stageName) => {
     const endpoint = `https://${restApiId}.execute-api.${region}.amazonaws.com/${stageName}`;
     return endpoint;
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 

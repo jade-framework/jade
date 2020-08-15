@@ -1,5 +1,5 @@
 const { asyncDynamoPutItem } = require('../awsAsyncFunctions');
-const { jadeLog } = require('../../util/logger');
+const { jadeLog, jadeErr } = require('../../util/logger');
 
 const putDynamoItem = async (tableName, items) => {
   let putResponse;
@@ -11,7 +11,7 @@ const putDynamoItem = async (tableName, items) => {
     putResponse = await asyncDynamoPutItem(putParams);
     jadeLog(`Put items to table ${tableName}.`);
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
   return putResponse;
 };
@@ -25,7 +25,7 @@ const putDynamoItems = async (tableName, items) => {
     });
     await Promise.all(promises);
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 

@@ -1,12 +1,12 @@
-const { credentials, getUserName } = require('./getCredentials');
+const { credentials } = require('./getCredentials');
 const { exists, readFile, getJadePath } = require('./fileUtils');
 const { getGitFolder } = require('./helpers');
 const { projectNameLength } = require('../templates/constants');
 const { groupExists, deleteIamGroup } = require('../aws/iam');
+const { jadeErr } = require('./logger');
 
 const {
   asyncGetCallerIdentity,
-  asyncListAttachedUserPolicy,
   asyncCreateGroup,
   asyncHeadBucket,
   asyncGetRole,
@@ -28,10 +28,7 @@ const commandArgProvided = ({ projectName }) => {
 
 // AWS Credentials helper methods
 const awsCredentialsConfigured = () => {
-  // console.log('Looking for AWS Credentials...');
-
   if (credentials) {
-    // console.log('Access Key:', credentials.accessKeyId);
     return true;
   } else {
     return false;
@@ -80,7 +77,7 @@ const bucketExistsWithUser = async (name) => {
     }
     return false;
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 
@@ -339,55 +336,7 @@ const validateGitInput = async (input) => {
   return status;
 };
 
-// const validateGitInput = async (input) => {
-//   const validations = [
-//     {
-//       validation: validateGitUrl,
-//       invalidBoolean: false,
-//       invalidMessage: `URL should have the following format:\nhttps://github.com/user/root`,
-//     },
-//   ];
-
-//   const status = await validateResource(input, validations);
-
-//   return status;
-// };
-
 // Validate User Permissions
-const hasRequiredPermissions = async () => {
-  const requiredPolicies = ['IAMFullAccess'];
-
-  try {
-    // grab user Policies
-    const userName = await getUserName();
-    const data = await asyncListAttachedUserPolicy({
-      UserName: userName,
-    });
-    const currentUserPolicies = data.AttachedPolicies;
-
-    // check if user has Administrator Access permission
-    if (
-      currentUserPolicies.find((policy) => {
-        return policy.PolicyName === 'AdministratorAccess';
-      })
-    ) {
-      return true;
-    }
-
-    // check user has all the required Policies
-    for (let i = 0; i < requiredPolicies.length; i += 1) {
-      let policy = currentUserPolicies.find((policy) => {
-        return policy.PolicyName === requiredPolicies[i];
-      });
-      if (!policy) return false;
-    }
-
-    return true;
-  } catch (err) {
-    console.log(err);
-  }
-};
-
 const hasIamPermission = async () => {
   try {
     const testGroup = 'testGroup';
@@ -400,7 +349,7 @@ const hasIamPermission = async () => {
 
     return true;
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
     return false;
   }
 };
@@ -418,11 +367,6 @@ const validateUserPermissions = async () => {
       invalidBoolean: false,
       invalidMessage: `Credentials are invalid. Please configure the correct AWS Credentials.`,
     },
-    // {
-    //   validation: hasRequiredPermissions,
-    //   invalidBoolean: false,
-    //   invalidMessage: `User requires IAM permissions to create Jade IAM Group. Please add policy "IAMFullAccess" to your User account. For instructions, please visit: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user.html`,
-    // },
     {
       validation: hasIamPermission,
       invalidBoolean: false,
@@ -479,14 +423,14 @@ const dynamoExists = async () => {
 const validateAwsIsSetup = async (directory) => {
   const validations = [
     {
-      validation: jadePathExists,
-      invalidBoolean: false,
-      invalidMessage: `Your directory is not setup, please run "jade init" to initialize a new directory or change directory to where the ".jade" folder is located.`,
-    },
-    {
       validation: dynamoExists,
       invalidBoolean: false,
       invalidMessage: `Your account does not have AWS services setup. Please run "jade init" to continue.`,
+    },
+    {
+      validation: jadePathExists,
+      invalidBoolean: false,
+      invalidMessage: `Your directory is not setup, please run "jade init" to initialize a new directory or change directory to where the ".jade" folder is located.`,
     },
   ];
 
@@ -498,14 +442,9 @@ const validateAwsIsSetup = async (directory) => {
 const validateAwsIsNotSetup = async (directory) => {
   const validations = [
     {
-      validation: jadePathExists,
-      invalidBoolean: true,
-      invalidMessage: `Your directory is not setup, please run "jade init" to initialize your directory and AWS services.`,
-    },
-    {
       validation: dynamoExists,
       invalidBoolean: true,
-      invalidMessage: `Your account already has AWS setup. Please run "jade add" to add a new app.`,
+      invalidMessage: `Your account already has AWS setup. Please run "jade add" in the same directory as before to add a new app.`,
     },
   ];
 

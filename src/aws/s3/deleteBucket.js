@@ -1,6 +1,7 @@
 const { asyncDeleteS3Bucket } = require('../awsAsyncFunctions');
 const { asyncDeleteBucketObjects } = require('../awsAsyncFunctions');
 const { listBucketObjects } = require('./listBucketObjects');
+const { jadeLog, jadeErr } = require('../../util/logger');
 
 const deleteBucket = async (bucketName) => {
   try {
@@ -21,9 +22,9 @@ const deleteBucket = async (bucketName) => {
       await asyncDeleteBucketObjects(deleteParams);
     }
     await asyncDeleteS3Bucket({ Bucket: bucketName });
-    console.log(`S3 Bucket ${bucketName} deleted`);
+    jadeLog(`S3 Bucket ${bucketName} deleted`);
   } catch (error) {
-    console.log('Error deleting S3 Bucket', error);
+    jadeErr('Error deleting S3 Bucket', error);
   }
 };
 

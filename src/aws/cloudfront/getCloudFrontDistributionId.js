@@ -1,4 +1,5 @@
 const { asyncListCloudFrontDistributions } = require('../awsAsyncFunctions');
+const { jadeErr } = require('../../util/logger');
 
 const getCloudFrontDistributionId = async (originId) => {
   let id;
@@ -9,7 +10,7 @@ const getCloudFrontDistributionId = async (originId) => {
     );
     id = targetDistribution.Id;
   } catch (error) {
-    console.log(error);
+    jadeErr(error);
   }
   return id;
 };

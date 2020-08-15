@@ -7,6 +7,7 @@ const {
 const { jadeIamGroup } = require('../../templates/constants');
 const { groupExists } = require('./exists');
 const { sleep } = require('../../util/fileUtils');
+const { jadeErr } = require('../../util/logger');
 
 const detachAllPolicies = async (groupName) => {
   try {
@@ -25,7 +26,7 @@ const detachAllPolicies = async (groupName) => {
     });
     await Promise.all(promises);
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 
@@ -42,7 +43,7 @@ const deleteIamGroup = async (groupName) => {
       await asyncDeleteGroup({ GroupName: groupName });
     }
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 
@@ -58,7 +59,7 @@ const removeUsersFromGroup = async (users, group) => {
     });
     await Promise.all(promises);
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 
@@ -66,7 +67,7 @@ const deleteJadeIamGroup = async () => {
   try {
     await deleteIamGroup(jadeIamGroup);
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 

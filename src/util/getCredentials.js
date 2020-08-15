@@ -2,6 +2,7 @@ const AWS = require('aws-sdk/global');
 const { asyncGetCallerIdentity } = require('../aws/awsAsyncFunctions');
 const config = new AWS.Config();
 const credentials = config.credentials;
+const { jadeErr } = require('./logger');
 
 const getUserName = async () => {
   try {
@@ -9,7 +10,7 @@ const getUserName = async () => {
     userName = callerIdentity.Arn.split('user/')[1];
     return userName;
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 

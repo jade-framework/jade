@@ -1,7 +1,7 @@
 const { jadeLog } = require('./logger');
 
 const printBuildSuccess = async ({ publicIp, cloudFrontDomainName }) => {
-  jadeLog('Your deployment is ready.');
+  jadeLog('Your deployment is ready!');
   jadeLog(
     'To synchronize your Github commits with new builds, follow these instructions:',
   );

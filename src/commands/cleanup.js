@@ -7,27 +7,28 @@ const {
   lambdaIamRoleName,
   lambdaNames,
 } = require('../templates/constants');
+const { jadeErr } = require('../util/logger');
 
 const cleanup = async () => {
   try {
     await deleteAllBuckets();
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
   try {
     await deleteIamRole(lambdaIamRoleName, lambdaRolePolicies);
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
   try {
     await deleteLambdaFunction(lambdaNames);
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
   try {
     await deleteAllDynamoTables();
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 

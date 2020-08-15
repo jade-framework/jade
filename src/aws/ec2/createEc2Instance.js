@@ -5,9 +5,8 @@ const {
   asyncEc2WaitFor,
 } = require('../awsAsyncFunctions');
 
-const { createJSONFile, getJadePath } = require('../../util/fileUtils');
-
-const { cwd, instanceType, jadeKeyPair } = require('../../templates/constants');
+const { jadeLog, jadeErr } = require('../../util/logger');
+const { instanceType, jadeKeyPair } = require('../../templates/constants');
 
 const { getAmi } = require('./getAmi');
 
@@ -45,10 +44,10 @@ const createEc2Instance = async (projectData) => {
     // const securityGroup = await readJSONFile(securityGroup, jadePath);
     // const keyPair = await readJSONFile(keyPair, jadePath);
 
-    console.log('Reading IAM instance profile...');
+    jadeLog('Reading IAM instance profile...');
     const instanceProfileArn = instanceProfile.Arn;
 
-    console.log('Creating EC2 instance...');
+    jadeLog('Creating EC2 instance...');
     const runInstancesResponse = await asyncRunInstances({
       ...runInstancesParams(projectName),
       ImageId: await getAmi(),
@@ -59,10 +58,10 @@ const createEc2Instance = async (projectData) => {
     // await createJSONFile('ec2Instance', jadePath, runInstancesResponse);
     const instanceId = runInstancesResponse.Instances[0].InstanceId;
 
-    console.log('Waiting for EC2 instance to start running...');
+    jadeLog('Waiting for EC2 instance to start running...');
     await asyncEc2WaitFor('instanceRunning', { InstanceIds: [instanceId] });
 
-    console.log('Associating IAM instance profile with EC2 instance...');
+    jadeLog('Associating IAM instance profile with EC2 instance...');
     await asyncAssociateIamInstanceProfile({
       IamInstanceProfile: {
         Arn: instanceProfileArn,
@@ -70,13 +69,13 @@ const createEc2Instance = async (projectData) => {
       InstanceId: instanceId,
     });
 
-    console.log('Jade EC2 instance successfully configured.');
+    jadeLog('Jade EC2 instance successfully configured.');
     const instanceData = await getInstanceData(instanceId);
-    console.log('EC2 public IP fetched.');
+    jadeLog('EC2 public IP fetched.');
     projectData.publicIp = instanceData.PublicIpAddress;
     return true;
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 

@@ -3,26 +3,31 @@ const { add } = require('./add');
 const { deleteApp } = require('./delete');
 const { destroy } = require('./destroy');
 const { list } = require('./list');
+const { jadeLog, jadeErr } = require('../util/logger');
 
 const commandIsBlank = (cmd) => cmd === undefined || cmd === '';
 const commandIsHelp = (cmd) => cmd === 'help' || cmd === '-h' || cmd === 'man';
 
 const executeCommand = async (command, args, homedir) => {
-  if (command === 'init') {
-    await init(homedir);
-  } else if (command === 'add') {
-    await add(homedir, args);
-  } else if (command === 'delete') {
-    await deleteApp(homedir, args[0]);
-  } else if (command === 'destroy') {
-    await destroy(homedir);
-  } else if (command === 'list') {
-    await list(homedir);
-  } else if (commandIsHelp(command) || commandIsBlank(command)) {
-    // await help(args);
-    console.log(`Help method, command is ${command}, args is ${args}.`);
-  } else {
-    console.log(`Command ${command} is not valid.`);
+  try {
+    if (command === 'init') {
+      await init(homedir);
+    } else if (command === 'add') {
+      await add(homedir, args);
+    } else if (command === 'delete') {
+      await deleteApp(homedir, args[0]);
+    } else if (command === 'destroy') {
+      await destroy(homedir);
+    } else if (command === 'list') {
+      await list(homedir);
+    } else if (commandIsHelp(command) || commandIsBlank(command)) {
+      // await help(args);
+      jadeLog(`Help method, command is ${command}, args is ${args}.`);
+    } else {
+      jadeLog(`Command ${command} is not valid.`);
+    }
+  } catch (err) {
+    jadeErr(err);
   }
 };
 
