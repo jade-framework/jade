@@ -20,6 +20,7 @@ const appsTableName = 'JadeProjects';
 const versionsTableName = 'JadeProjectsVersions';
 const bucketSuffixes = ['prod', 'builds', 'lambda', 'stage'];
 const userDir = join('/', 'home', 'ec2-user');
+const dockerDir = `${userDir}/docker`;
 const prodBucket = bucketSuffixes[0];
 const buildsBucket = bucketSuffixes[1];
 const stageBucket = bucketSuffixes[3];
@@ -132,8 +133,16 @@ module.exports = async function triggerBuild(webhook) {
       try {
         // need to get info from Dynamo, especially publish directory "public"
         if (branch === 'master') {
-          await exec(`sudo yum update -y`);
-          await exec(`yarn --cwd ${repoDir} build`);
+          // await exec(`sudo yum update -y`);
+          // await exec(`yarn --cwd ${repoDir} build`);
+
+          // Build docker image
+          await exec(`docker build ${dockerDir} -t build-app`);
+          // Run container, mount userDir as volume mapped to output folder in container
+          // Remove container after script runs
+          await exec(
+            `docker run --name build --build-arg repo_dir=${repoDir} -p 6000-6000 --rm -v ${userDir}:/output build-app`,
+          );
           console.log('Built', repoDir);
           await exec(
             `aws s3 sync ${repoDir}/public s3://${bucketName}-${prodBucket}`,
