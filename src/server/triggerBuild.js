@@ -93,7 +93,7 @@ const updateDynamo = async (data) => {
 
 const runDockerBuild = async (repoDir) => {
   // Build docker image
-  await exec(`docker build . -t build-app`);
+  await exec(`docker build ../ -t build-app -f ../Dockerfile`);
   // Run container, mount userDir as volume mapped to output folder in container
   // Remove container after script runs
   await exec(
