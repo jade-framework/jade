@@ -141,13 +141,12 @@ const sendSetupFiles = async (host) => {
       join(serverSourceDir, 'sysmon.conf'),
       join(serverSourceDir, 'getRegion.js'),
       join(serverSourceDir, 'deleteCfAndEc2.js'),
+      join(dockerSourceDir, 'Dockerfile'),
+      join(dockerSourceDir, 'dockerBuild.js'),
+      join(dockerSourceDir, 'package.json'),
+      join(dockerSourceDir, '.dockerignore'),
       join(jadePath, 'config'),
       join(jadePath, 'initialProjectData.json'),
-    ]);
-    await sendFiles(host, dockerRemoteDir, [
-      join(dockerSourceDir, 'Dockerfile'),
-      join(dockerSourceDir, 'index.js'),
-      join(dockerSourceDir, 'package.json'),
     ]);
     await removeFile(jadePath, 'config');
     await removeFile(jadePath, 'initialProjectData.json');

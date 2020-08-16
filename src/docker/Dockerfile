@@ -1,6 +1,6 @@
 FROM node:13-alpine
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 ARG repo_dir
 ENV repo_dir_env=$repo_dir
