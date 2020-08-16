@@ -1,6 +1,7 @@
 const { asyncPutBucketPolicy } = require('../awsAsyncFunctions');
+const { jadeLog, jadeErr } = require('../../util/logger');
 
-const updateBucketPolicy = async bucketName => {
+const updateBucketPolicy = async (bucketName) => {
   const readOnlyAnonUserPolicy = {
     Version: '2012-10-17',
     Statement: [
@@ -25,12 +26,12 @@ const updateBucketPolicy = async bucketName => {
   };
 
   // set the new policy on the selected bucket
-  console.log(`Setting policy on bucket ${bucketName}...`);
+  jadeLog(`Setting policy on bucket ${bucketName}...`);
   try {
-    const response = await asyncPutBucketPolicy(bucketPolicyParams);
-    console.log('Successfully set S3 bucket policy', response);
+    await asyncPutBucketPolicy(bucketPolicyParams);
+    jadeLog('Successfully set S3 bucket policy.');
   } catch (error) {
-    console.log('Error setting bucket policy: ', error);
+    jadeErr('Error setting bucket policy: ', error);
   }
 };
 

@@ -1,12 +1,12 @@
 const { asyncListBucketObjects } = require('../awsAsyncFunctions');
+const { jadeErr } = require('../../util/logger');
 
-const listBucketObjects = async bucketName => {
+const listBucketObjects = async (bucketName) => {
   try {
     const response = await asyncListBucketObjects({ Bucket: bucketName });
-    // console.log(response.Contents);
     return response.Contents;
   } catch (error) {
-    console.log(error);
+    jadeErr(error);
   }
 };
 

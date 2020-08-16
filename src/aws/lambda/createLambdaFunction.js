@@ -1,4 +1,5 @@
 const { asyncCreateLambdaFunction } = require('../awsAsyncFunctions');
+const { jadeLog, jadeErr } = require('../../util/logger');
 
 const createLambdaFunction = async (
   bucketName,
@@ -22,10 +23,10 @@ const createLambdaFunction = async (
 
   try {
     const response = await asyncCreateLambdaFunction(params);
-    console.log('Successfully created Lambda function.');
+    jadeLog('Successfully created Lambda function.');
     return response;
   } catch (error) {
-    console.log('Error creating Lambda function', error);
+    jadeErr('Error creating Lambda function', error);
   }
 };
 

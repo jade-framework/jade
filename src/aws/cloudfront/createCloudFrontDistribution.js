@@ -4,6 +4,7 @@ const {
   cloudFrontOriginId,
   cloudFrontOriginDomain,
 } = require('../../templates/constants');
+const { jadeLog, jadeErr } = require('../../util/logger');
 
 const createCloudFrontDistribution = async (bucketName) => {
   const uniqueId = crypto.randomBytes(16).toString('hex');
@@ -74,15 +75,15 @@ const createCloudFrontDistribution = async (bucketName) => {
     },
   };
 
-  console.log('Creating CloudFront distribution...');
+  jadeLog('Creating CloudFront distribution...');
   try {
     const response = await asyncCreateCloudFrontDistribution(distParams);
-    console.log(
-      `CloudFront distribution created at "${response.Distribution.DomainName}".`,
+    jadeLog(
+      `CloudFront distribution created at ${response.Distribution.DomainName}.`,
     );
     return { ...response, originId };
   } catch (error) {
-    console.log('Error creating CloudFront distribution', error);
+    jadeErr('Error creating CloudFront distribution', error);
     return false;
   }
 };

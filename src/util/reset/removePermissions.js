@@ -8,8 +8,10 @@ const {
   ec2InstanceProfile,
   s3FullAccessPolicyArn,
   dynamoDbFullAccessPolicyArn,
+  cloudFrontFullAccess,
 } = require('../../templates/constants');
 const { promisify } = require('util');
+const { jadeLog, jadeErr } = require('../logger');
 
 const apiVersion = 'latest';
 const region = getRegion();
@@ -26,9 +28,9 @@ const deleteSecurityGroup = async (securityGroupName) => {
       GroupName: securityGroupName,
     });
 
-    console.log(err, data);
+    jadeLog(err, data);
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 
@@ -37,25 +39,34 @@ async function removePermissions() {
   iam.removeRoleFromInstanceProfile(
     { InstanceProfileName: ec2InstanceProfile, RoleName: ec2IamRoleName },
     (err, data) => {
-      if (err) console.log(err);
-      console.log(data);
+      if (err) jadeErr(err);
+      jadeLog(data);
     },
   );
 
   iam.detachRolePolicy(
     { RoleName: ec2IamRoleName, PolicyArn: s3FullAccessPolicyArn },
     (err, data) => {
-      if (err) console.log(err);
+      if (err) jadeErr(err);
       iam.detachRolePolicy(
         {
           RoleName: ec2IamRoleName,
           PolicyArn: dynamoDbFullAccessPolicyArn,
         },
         (err, data) => {
-          iam.deleteRole({ RoleName: ec2IamRoleName }, (err, data) => {
-            if (err) console.log(err);
-            console.log(data);
-          });
+          if (err) jadeErr(err);
+          iam.detachRolePolicy(
+            {
+              RoleName: ec2IamRoleName,
+              PolicyArn: cloudFrontFullAccess,
+            },
+            (err, data) => {
+              iam.deleteRole({ RoleName: ec2IamRoleName }, (err, data) => {
+                if (err) jadeErr(err);
+                jadeLog(data);
+              });
+            },
+          );
         },
       );
     },
@@ -64,17 +75,21 @@ async function removePermissions() {
   iam.deleteInstanceProfile(
     { InstanceProfileName: ec2InstanceProfile },
     (err, data) => {
-      if (err) console.log(err);
-      console.log(data);
+      if (err) jadeErr(err);
+      jadeLog(data);
     },
   );
 
   ec2.deleteKeyPair({ KeyName: jadeKeyPair }, (err, data) => {
-    if (err) console.log(err);
-    console.log(data);
+    if (err) jadeErr(err);
+    jadeLog(data);
   });
 
-  await deleteSecurityGroup(securityGroupName);
+  try {
+    await deleteSecurityGroup(securityGroupName);
+  } catch (err) {
+    jadeErr(err);
+  }
 }
 
 module.exports = { removePermissions };

@@ -2,6 +2,7 @@ const {
   asyncUpdateCloudFrontDistribution,
   asyncGetCloudFrontDistributionConfig,
 } = require('../awsAsyncFunctions');
+const { jadeErr } = require('../../util/logger');
 
 const disableCloudFrontDistribution = async (id, config, ETag) => {
   config.DistributionConfig.Enabled = false;
@@ -13,7 +14,7 @@ const disableCloudFrontDistribution = async (id, config, ETag) => {
     let data = await asyncUpdateCloudFrontDistribution(config);
     return data;
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 

@@ -2,9 +2,10 @@ const {
   asyncCreateRole,
   asyncAttachRolePolicy,
 } = require('../awsAsyncFunctions');
+const { jadeLog, jadeErr } = require('../../util/logger');
 
 const createLambdaRole = async (roleName) => {
-  console.log('Creating Lambda role...');
+  jadeLog('Creating Lambda role...');
 
   const myPolicy = {
     Version: '2012-10-17',
@@ -36,15 +37,15 @@ const createLambdaRole = async (roleName) => {
 
   try {
     const createResponse = await asyncCreateRole(createParams);
-    console.log('Successfully created Lambda role.');
+    jadeLog('Successfully created Lambda role.');
 
     await asyncAttachRolePolicy(lambdaPolicyParam1);
-    console.log('Successfully attached Lambda policy.');
+    jadeLog('Successfully attached Lambda policy.');
     await asyncAttachRolePolicy(lambdaPolicyParam2);
-    console.log('Successfully attached CloudFront policy.');
+    jadeLog('Successfully attached CloudFront policy.');
     return createResponse;
   } catch (error) {
-    console.log('Could not create role.', error);
+    jadeErr('Could not create role.', error);
   }
 };
 

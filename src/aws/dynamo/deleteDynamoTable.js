@@ -9,7 +9,7 @@ const deleteDynamoTable = async (tableName) => {
     jadeLog(`DynamoDB table ${tableName} deleted.`);
   } catch (error) {
     jadeErr('Error creating DynamoDB table');
-    console.log(error);
+    jadeErr(error);
   }
   return response;
 };
