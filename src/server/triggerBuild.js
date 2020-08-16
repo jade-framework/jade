@@ -20,7 +20,6 @@ const appsTableName = 'JadeProjects';
 const versionsTableName = 'JadeProjectsVersions';
 const bucketSuffixes = ['prod', 'builds', 'lambda', 'stage'];
 const userDir = join('/', 'home', 'ec2-user');
-const dockerDir = `${userDir}/docker`;
 const prodBucket = bucketSuffixes[0];
 const buildsBucket = bucketSuffixes[1];
 const stageBucket = bucketSuffixes[3];
@@ -93,11 +92,13 @@ const updateDynamo = async (data) => {
 
 const runDockerBuild = async (repoDir) => {
   // Build docker image
-  await exec(`docker build ../ -t build-app -f ../Dockerfile`);
+  console.log('Building docker image...');
+  await exec(`sudo docker build ../ -t build-app -f ../Dockerfile`);
   // Run container, mount userDir as volume mapped to output folder in container
   // Remove container after script runs
+  console.log('Building app in container...');
   await exec(
-    `docker run -e "REPO_DIR=${repoDir}" --name build -p 6000-6000 --rm -v ${repoDir}:/output build-app`,
+    `sudo docker run -e "REPO_DIR=${repoDir}" --name build -p 6000-6000 --rm -v ${repoDir}:/output build-app`,
   );
 };
 
