@@ -9,6 +9,7 @@
 const {
   asyncPutBucketNotificationConfiguration,
 } = require('../awsAsyncFunctions');
+const { jadeLog, jadeErr } = require('../../util/logger');
 const { bucketSuffixes } = require('../../templates/constants');
 
 const setBucketNotificationConfig = async (bucketName, lambdaArn) => {
@@ -27,13 +28,10 @@ const setBucketNotificationConfig = async (bucketName, lambdaArn) => {
   };
 
   try {
-    const response = await asyncPutBucketNotificationConfiguration(params);
-    console.log(
-      'Successfully set bucket notification configuration.',
-      response,
-    );
+    await asyncPutBucketNotificationConfiguration(params);
+    jadeLog('Successfully set bucket notification configuration.');
   } catch (error) {
-    console.log(
+    jadeErr(
       'Error setting bucket notification configuration',
       error,
       error.stack,

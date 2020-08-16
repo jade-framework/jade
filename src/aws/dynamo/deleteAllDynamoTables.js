@@ -22,15 +22,15 @@ const deleteAllDynamoTables = async () => {
 
       if (isJadeTable) {
         try {
-          deleteDynamoTable(tableName);
+          await deleteDynamoTable(tableName);
         } catch (error) {
-          console.log(error);
+          jadeErr(error);
         }
       }
     });
   } catch (error) {
-    jadeErr('Error deleting DynamoDB tables');
-    console.log(error);
+    jadeErr('Error deleting DynamoDB tables:');
+    jadeErr(error);
   }
 };
 module.exports = { deleteAllDynamoTables };

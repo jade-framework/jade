@@ -2,8 +2,15 @@ const os = require('os');
 const { readFileSync } = require('fs');
 const { join } = require('path');
 
-// TODO: change this reference to os.homedir() and handle error
-const awsConfig = join(os.homedir(), '.aws', 'config');
+let awsConfig;
+const getAwsConfig = () => {
+  try {
+    return join(os.homedir(), '.aws', 'config');
+  } catch (err) {
+    return false;
+  }
+};
+awsConfig = getAwsConfig();
 
 const getRegionFromConfigStr = (configStr) => {
   const defaultProfile = configStr.split('[').find((el) => el.match('default'));

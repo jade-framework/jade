@@ -1,5 +1,6 @@
 const https = require('https');
 const { promisify } = require('util');
+const { jadeErr } = require('./logger');
 
 let getGithubIp = (callback) => {
   https
@@ -19,7 +20,7 @@ let getGithubIp = (callback) => {
       },
     )
     .on('error', (err) => {
-      console.error('Error: ' + err);
+      jadeErr('Error: ' + err);
       callback(err);
     });
 };

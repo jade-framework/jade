@@ -1,11 +1,12 @@
 const { asyncAddPermission } = require('../awsAsyncFunctions');
+const { jadeLog, jadeErr } = require('../../util/logger');
 
 const createLambdaPermission = async (params) => {
   try {
     await asyncAddPermission(params);
-    console.log('Successfully added lambda permission.');
-  } catch (error) {
-    console.log('Error adding lambda permission.', error, error.stack);
+    jadeLog('Successfully added lambda permission.');
+  } catch (err) {
+    jadeErr(err);
   }
 };
 

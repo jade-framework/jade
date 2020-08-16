@@ -1,4 +1,4 @@
-const { jadeLog } = require('../../util/logger');
+const { jadeLog, jadeErr } = require('../../util/logger');
 
 const {
   asyncDynamoCreateTable,
@@ -55,7 +55,7 @@ const createDynamoTable = async (
 
     tableInfo = await asyncDynamoDescribeTable({ TableName: tableName });
   } catch (error) {
-    console.log('Error creating DynamoDB table', error);
+    jadeErr('Error creating DynamoDB table', error);
   }
   return tableInfo;
 };

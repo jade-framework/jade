@@ -133,7 +133,7 @@ const setupApp = async (directory, projectData) => {
 
     await createBuckets(bucketName);
 
-    const lambdaArn = await initJadeLambdas(bucketName);
+    const lambdaArn = await initJadeLambdas(bucketName, directory);
     const cfd = await createCloudFrontDistribution(bucketName);
     if (!cfd) return;
 

@@ -7,28 +7,29 @@ const {
 const { jadeIamGroup } = require('../../templates/constants');
 const { groupExists } = require('./exists');
 const { getUserName } = require('../../util/getCredentials');
+const { jadeLog, jadeErr } = require('../../util/logger');
 
 const createGroup = async (groupName) => {
   try {
-    console.log(`Checking if ${groupName} exists...`);
+    jadeLog(`Checking if ${groupName} exists...`);
     let group = await groupExists(groupName);
 
     if (group) {
-      console.log(`${groupName} already exists.`);
+      jadeLog(`${groupName} already exists.`);
     } else {
-      console.log(`${groupName} does not exist. Creating group...`);
+      jadeLog(`${groupName} does not exist. Creating group...`);
       group = (await asyncCreateGroup({ GroupName: groupName })).Group;
-      console.log(`${groupName} created.`);
+      jadeLog(`${groupName} created.`);
     }
     return group;
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 
 const assignGroupPolicies = async (groupName, policies) => {
   try {
-    console.log('Checking for existing policies...');
+    jadeLog('Checking for existing policies...');
     const attachedPolicies = (
       await asyncListAttachedGroupPolicies({
         GroupName: groupName,
@@ -50,12 +51,12 @@ const assignGroupPolicies = async (groupName, policies) => {
       }
     });
     if (promises.length > 0) {
-      console.log(`Attaching policies to ${groupName}.`);
+      jadeLog(`Attaching policies to ${groupName}.`);
       await Promise.all(promises);
     }
-    console.log('Policies attached.');
+    jadeLog('Policies attached.');
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 
@@ -65,7 +66,7 @@ const createIamGroup = async (groupName, policies) => {
     await createGroup(groupName);
     await assignGroupPolicies(groupName, policies);
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 
@@ -73,7 +74,7 @@ const addUserToGroup = async (user, group) => {
   try {
     await asyncAddUserToGroup({ UserName: user, GroupName: group });
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 
@@ -87,7 +88,7 @@ const createJadeIamGroup = async () => {
   try {
     await createIamGroup(jadeIamGroup, requiredPolicies);
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 
@@ -96,7 +97,7 @@ const addUserToJadeGroup = async () => {
     const userName = await getUserName();
     await addUserToGroup(userName, jadeIamGroup);
   } catch (err) {
-    console.log(err);
+    jadeErr(err);
   }
 };
 
