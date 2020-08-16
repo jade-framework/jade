@@ -8,6 +8,7 @@ const {
   ec2InstanceProfile,
   s3FullAccessPolicyArn,
   dynamoDbFullAccessPolicyArn,
+  cloudFrontFullAccess,
 } = require('../../templates/constants');
 const { promisify } = require('util');
 const { jadeLog, jadeErr } = require('../logger');
@@ -53,10 +54,19 @@ async function removePermissions() {
           PolicyArn: dynamoDbFullAccessPolicyArn,
         },
         (err, data) => {
-          iam.deleteRole({ RoleName: ec2IamRoleName }, (err, data) => {
-            if (err) jadeErr(err);
-            jadeLog(data);
-          });
+          if (err) jadeErr(err);
+          iam.detachRolePolicy(
+            {
+              RoleName: ec2IamRoleName,
+              PolicyArn: cloudFrontFullAccess,
+            },
+            (err, data) => {
+              iam.deleteRole({ RoleName: ec2IamRoleName }, (err, data) => {
+                if (err) jadeErr(err);
+                jadeLog(data);
+              });
+            },
+          );
         },
       );
     },
@@ -75,7 +85,11 @@ async function removePermissions() {
     jadeLog(data);
   });
 
-  await deleteSecurityGroup(securityGroupName);
+  try {
+    await deleteSecurityGroup(securityGroupName);
+  } catch (err) {
+    jadeErr(err);
+  }
 }
 
 module.exports = { removePermissions };

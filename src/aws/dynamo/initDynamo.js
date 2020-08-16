@@ -48,6 +48,9 @@ const appsItemToPut = ({
   projectId: {
     S: projectId,
   },
+  isActive: {
+    BOOL: true,
+  },
 });
 
 const versionsItemToPut = ({

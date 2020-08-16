@@ -15,11 +15,11 @@ const executeCommand = async (command, args, homedir) => {
     } else if (command === 'add') {
       await add(homedir, args);
     } else if (command === 'delete') {
-      await deleteApp(homedir, args[0]);
+      await deleteApp(args);
     } else if (command === 'destroy') {
       await destroy(homedir);
     } else if (command === 'list') {
-      await list(homedir);
+      await list();
     } else if (commandIsHelp(command) || commandIsBlank(command)) {
       // await help(args);
       jadeLog(`Help method, command is ${command}, args is ${args}.`);

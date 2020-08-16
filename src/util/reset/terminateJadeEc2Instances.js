@@ -1,4 +1,3 @@
-const { promisify } = require('util');
 const EC2 = require('aws-sdk/clients/ec2');
 const { getRegion } = require('../../server/getRegion');
 const { jadeLog, jadeErr } = require('../logger');

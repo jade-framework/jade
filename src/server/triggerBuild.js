@@ -54,20 +54,20 @@ const updateDynamo = async (data) => {
   } = data;
 
   const item = {
-    projectId,
-    gitUrl,
     bucketName,
     cloudFrontDistributionId,
     cloudFrontOriginId,
     cloudFrontOriginDomain,
     cloudFrontDomainName,
-    publicIp,
-    userInstallCommand,
-    userBuildCommand,
-    publishDirectory,
-    versionId,
     commitUrl,
+    gitUrl,
+    projectId,
     projectName,
+    publicIp,
+    publishDirectory,
+    userBuildCommand,
+    userInstallCommand,
+    versionId,
   };
 
   try {

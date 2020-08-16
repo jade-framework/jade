@@ -390,7 +390,7 @@ const validateDeleteArg = async (input) => {
         'Argument is missing. Please re-run the command in the following format: jade delete <appName>.',
     },
     {
-      validation: validateUniqueProjectName, //check is app exists in config
+      validation: validateUniqueProjectName, //check if app exists in config
       invalidBoolean: true,
       invalidMessage: `App "${projectName}" does not exist or was not deployed using Jade.`,
     },
@@ -430,7 +430,7 @@ const validateAwsIsSetup = async (directory) => {
     {
       validation: jadePathExists,
       invalidBoolean: false,
-      invalidMessage: `Your directory is not setup, please run "jade init" to initialize a new directory or change directory to where the ".jade" folder is located.`,
+      invalidMessage: `Your directory is not setup, please run "jade init" to initialize the Jade directory or change directory to where the ".jade" folder is located.`,
     },
   ];
 

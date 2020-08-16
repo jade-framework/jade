@@ -1,7 +1,7 @@
 const { promisify } = require('util');
 const S3 = require('aws-sdk/clients/s3');
 const CloudFront = require('aws-sdk/clients/cloudfront');
-const AWS = require('aws-sdk/global');
+const AWS = require('aws-sdk');
 const Lambda = require('aws-sdk/clients/lambda');
 const IAM = require('aws-sdk/clients/iam');
 const EC2 = require('aws-sdk/clients/ec2');
@@ -127,6 +127,8 @@ const asyncDynamoListTables = promisify(dynamo.listTables.bind(dynamo));
 const asyncDynamoListTagsOfResource = promisify(
   dynamo.listTagsOfResource.bind(dynamo),
 );
+const asyncDynamoScan = promisify(dynamo.scan.bind(dynamo));
+const asyncDynamoUpdateItem = promisify(dynamo.updateItem.bind(dynamo));
 
 // ApiGateway
 const asyncCreateRestApi = promisify(apigateway.createRestApi.bind(apigateway));
@@ -198,6 +200,8 @@ module.exports = {
   asyncDynamoPutItem,
   asyncDynamoWaitFor,
   asyncDynamoDescribeTable,
+  asyncDynamoScan,
+  asyncDynamoUpdateItem,
   asyncCreateRestApi,
   asyncCreateResource,
   asyncGetResources,

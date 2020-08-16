@@ -96,33 +96,82 @@ const getHost = async ({ publicIp }) => {
   }
 };
 
-const sendSetupFiles = async (host, maxRetries = 10, attempts = 0) => {
+const sendFiles = async (
+  host,
+  remoteDir,
+  localFiles, // array
+  maxRetries = 10,
+  attempts = 0,
+) => {
   try {
     if (attempts >= maxRetries) return Promise.reject('Too many attempts.');
     await getConnection(host)
       .then(async (conn) => {
-        await conn.asyncSftp(
-          remoteServerDir,
-          join(serverSourceDir, 'server.js'),
-          join(serverSourceDir, 'triggerBuild.js'),
-          join(serverSourceDir, 'sysmon.conf'),
-          join(serverSourceDir, 'getRegion.js'),
-          join(jadePath, 'config'),
-          join(jadePath, 'initialProjectData.json'),
-        );
-        await removeFile(jadePath, 'config');
-        await removeFile(jadePath, 'initialProjectData.json');
+        await conn.asyncSftp(remoteDir, ...localFiles);
         return true;
       })
       .catch(async (err) => {
         checkConnError(err);
         await sleep(5000);
-        return await sendSetupFiles(host, maxRetries, attempts + 1);
+        return await sendFiles(
+          host,
+          remoteDir,
+          localFiles,
+          maxRetries,
+          attempts + 1,
+        );
       });
   } catch (err) {
     jadeErr(err);
     return false;
   }
+};
+
+const sendSetupFiles = async (host) => {
+  try {
+    await sendFiles(host, remoteServerDir, [
+      join(serverSourceDir, 'server.js'),
+      join(serverSourceDir, 'triggerBuild.js'),
+      join(serverSourceDir, 'sysmon.conf'),
+      join(serverSourceDir, 'getRegion.js'),
+      join(serverSourceDir, 'deleteCfAndEc2.js'),
+      join(jadePath, 'config'),
+      join(jadePath, 'initialProjectData.json'),
+    ]);
+    await removeFile(jadePath, 'config');
+    await removeFile(jadePath, 'initialProjectData.json');
+    return true;
+  } catch (err) {
+    jadeErr(err);
+    return false;
+  }
+
+  // try {
+  //   if (attempts >= maxRetries) return Promise.reject('Too many attempts.');
+  //   await getConnection(host)
+  //     .then(async (conn) => {
+  //       await conn.asyncSftp(
+  //         remoteServerDir,
+  //         join(serverSourceDir, 'server.js'),
+  //         join(serverSourceDir, 'triggerBuild.js'),
+  //         join(serverSourceDir, 'sysmon.conf'),
+  //         join(serverSourceDir, 'getRegion.js'),
+  //         join(jadePath, 'config'),
+  //         join(jadePath, 'initialProjectData.json'),
+  //       );
+  //       await removeFile(jadePath, 'config');
+  //       await removeFile(jadePath, 'initialProjectData.json');
+  //       return true;
+  //     })
+  //     .catch(async (err) => {
+  //       checkConnError(err);
+  //       await sleep(5000);
+  //       return await sendSetupFiles(host, maxRetries, attempts + 1);
+  //     });
+  // } catch (err) {
+  //   jadeErr(err);
+  //   return false;
+  // }
 };
 
 const sendCommands = async (host, commands, maxRetries = 10, attempts = 0) => {
@@ -138,6 +187,20 @@ const sendCommands = async (host, commands, maxRetries = 10, attempts = 0) => {
         await sleep(5000);
         return await sendCommands(host, commands, maxRetries, attempts + 1);
       });
+  } catch (err) {
+    jadeErr(err);
+    return false;
+  }
+};
+
+const sendDeleteAppCommand = async (eTag, publicIp) => {
+  try {
+    const host = await getHost({ publicIp });
+    if (!host) return;
+
+    await sendCommands(host, [
+      `node ${remoteServerDir}/deleteCfAndEc2.js ${eTag}`,
+    ]);
   } catch (err) {
     jadeErr(err);
     return false;
@@ -166,4 +229,4 @@ const sendFilesAndBuildCommands = async (projectData) => {
   }
 };
 
-module.exports = { sendFilesAndBuildCommands };
+module.exports = { sendFilesAndBuildCommands, sendDeleteAppCommand };
