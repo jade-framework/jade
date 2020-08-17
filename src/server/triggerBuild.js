@@ -105,7 +105,7 @@ const runDockerBuild = async (repoName, repoDir) => {
   // Remove container after script runs
   console.log('Building app in container...');
   await exec(
-    `sudo docker run -e "REPO_DIR=${repoDir}" --name build -p 6000-6000 --rm -v ${repoDir}:/output build-app`,
+    `sudo docker run --name build -p 6000-6000 --rm -v ${repoDir}:/output build-app`,
   );
   // await exec(
   //   `sudo docker run -e "/home/ec2-user/gatsby-default" --name build -p 6000-6000 --rm -v /home/ec2-user/gatsby-default:/output build-app`,
