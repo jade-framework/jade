@@ -1,11 +1,5 @@
 const { deleteBucket } = require('../aws/s3/deleteBucket');
 const {
-  deleteCloudFrontDistribution,
-} = require('../aws/cloudfront/deleteCloudFrontDistribution');
-const {
-  getCloudFrontDistributionId,
-} = require('../aws/cloudfront/getCloudFrontDistributionId');
-const {
   disableCloudFrontDistribution,
 } = require('../aws/cloudfront/disableCloudFrontDistribution');
 const {
@@ -13,28 +7,24 @@ const {
   asyncDynamoUpdateItem,
   asyncGetCloudFrontDistributionConfig,
 } = require('../aws/awsAsyncFunctions');
-const { createJSONFile, removeFile } = require('../util/fileUtils');
 const { sendDeleteAppCommand } = require('../util/connect');
-const { validateDeleteArg } = require('../util/validations');
-const { appsTableName, cwd } = require('../templates/constants');
+const { appsTableName } = require('../templates/constants');
 const { confirmDelete } = require('../util/questions');
-const { getBucketNames } = require('../util/helpers');
+const { getBucketNames, appNotFound } = require('../util/helpers');
 const { jadeErr, jadeLog } = require('../util/logger');
-
-const appNotFound = () => {
-  jadeLog(
-    'This is not a valid Jade app name. Please use "jade list" to see your current Jade apps.',
-  );
-};
 
 const updateAppsTableStatus = async (projectName, bucketName) => {
   const params = {
     ExpressionAttributeNames: {
       '#A': 'isActive',
+      '#F': 'isFrozen',
     },
     ExpressionAttributeValues: {
       ':a': {
         BOOL: false,
+      },
+      ':f': {
+        BOOL: true,
       },
     },
     Key: {
@@ -47,7 +37,7 @@ const updateAppsTableStatus = async (projectName, bucketName) => {
     },
     ReturnValues: 'NONE',
     TableName: appsTableName,
-    UpdateExpression: 'SET #A = :a',
+    UpdateExpression: 'SET #A = :a, #F = :f',
   };
 
   try {
@@ -57,14 +47,6 @@ const updateAppsTableStatus = async (projectName, bucketName) => {
   }
 };
 
-// const handleEc2AndCfDelete = async (eTag, publicIp) => {
-//   try {
-//     await sendDeleteAppCommand(eTag, publicIp);
-//   } catch (err) {
-//     jadeErr(err);
-//   }
-// };
-
 const removeApp = async (match) => {
   jadeLog('Beginning app deletion.');
   let { projectName, bucketName, publicIp, cloudFrontDistributionId } = match;
@@ -73,7 +55,6 @@ const removeApp = async (match) => {
   publicIp = publicIp.S;
   cfdId = cloudFrontDistributionId.S;
 
-  delete buckets;
   jadeLog('Deleting buckets...');
   await Promise.all(
     getBucketNames(bucketName).map((name) => {
@@ -101,7 +82,11 @@ const removeApp = async (match) => {
   jadeLog('CloudFront distribution disabled.');
 
   // delete CloudFront and EC2
-  await sendDeleteAppCommand(eTag, publicIp);
+  const promise = sendDeleteAppCommand(eTag, publicIp);
+
+  Promise.all([promise]).then(() =>
+    jadeLog(`The ${projectName} app is deleted.`),
+  );
 
   jadeLog('Your Jade app has been deleted.');
   jadeLog(
@@ -122,7 +107,7 @@ const deleteApp = async (args) => {
       const match = items.find(
         (item) => item.projectName.S.trim() === appName.trim(),
       );
-      if (match) {
+      if (match && match.isActive.BOOL) {
         const confirm = await confirmDelete();
         if (confirm) await removeApp(match);
       } else {

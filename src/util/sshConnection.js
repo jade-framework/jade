@@ -79,7 +79,14 @@ const promisifyConnection = (conn) => {
               err ? reject(err) : resolve();
             })
             .on('data', (d) => {
-              if (d.length > 1) jadeLog(`OUTPUT: ${d}`);
+              const string = d
+                .toString('utf8')
+                .trim()
+                .replace(/\s{2,}/gi, ' ');
+
+              if (string.length > 2 && !/[{}#\[\]]/gi.test(string)) {
+                jadeLog(`OUTPUT: ${string}`);
+              }
             });
           stream.end(command);
         }

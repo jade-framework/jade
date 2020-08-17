@@ -14,6 +14,7 @@ const {
   s3FullAccessPolicyArn,
   dynamoDbFullAccessPolicyArn,
   cloudFrontFullAccess,
+  ec2FullAccess,
 } = require('../../templates/constants');
 
 const { join, readJSONFile } = require('../../util/fileUtils');
@@ -55,6 +56,12 @@ const configEc2IamRole = async (projectData) => {
       jadeLog('Attaching CloudFront role policy...');
       await asyncAttachRolePolicy({
         PolicyArn: cloudFrontFullAccess,
+        RoleName: ec2IamRoleName,
+      });
+
+      jadeLog('Attaching EC2 role policy...');
+      await asyncAttachRolePolicy({
+        PolicyArn: ec2FullAccess,
         RoleName: ec2IamRoleName,
       });
       ec2RoleResponse = await roleExists(ec2IamRoleName);

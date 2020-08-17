@@ -1,4 +1,5 @@
 const { bucketSuffixes } = require('../templates/constants');
+const { jadeLog } = require('./logger');
 
 const getBucketNames = (bucketName) => {
   return bucketSuffixes.map((suffix) => `${bucketName}-${suffix}`);
@@ -20,4 +21,10 @@ const getGitFolder = (url) => {
   return parts[index + 2];
 };
 
-module.exports = { getBucketNames, parseName, getGitFolder };
+const appNotFound = () => {
+  jadeLog(
+    'This is not a valid Jade app name. Please use "jade list" to see your current Jade apps.',
+  );
+};
+
+module.exports = { getBucketNames, parseName, getGitFolder, appNotFound };

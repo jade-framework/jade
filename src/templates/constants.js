@@ -13,6 +13,7 @@ const s3FullAccessPolicyArn = 'arn:aws:iam::aws:policy/AmazonS3FullAccess';
 const dynamoDbFullAccessPolicyArn =
   'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess';
 const cloudFrontFullAccess = 'arn:aws:iam::aws:policy/CloudFrontFullAccess';
+const ec2FullAccess = 'arn:aws:iam::aws:policy/AmazonEC2FullAccess';
 const lambdaIamRoleName = 'jade-lambda-role';
 const jadePrefix = '\x1b[32;1m💎\x1b[32;0m';
 const lambdaNames = 'jadeInvalidateCloudFrontFile';
@@ -43,6 +44,7 @@ module.exports = {
   s3FullAccessPolicyArn,
   dynamoDbFullAccessPolicyArn,
   cloudFrontFullAccess,
+  ec2FullAccess,
   lambdaIamRoleName,
   jadePrefix,
   lambdaNames,
