@@ -96,14 +96,20 @@ const runDockerBuild = async (repoDir) => {
   // Build docker image
   console.log('Building docker image...');
   await exec(
-    `sudo docker build ${userDir} -t build-app --build-arg REPO_DIR=${repoDir} -f ${userDir}/Dockerfile`,
+    `sudo docker build /${userDir} -t build-app --build-arg REPO_DIR=/${repoDir} -f /${userDir}/Dockerfile`,
   );
+  // await exec(
+  //   `sudo docker build /home/ec2-user -t build-app --build-arg REPO_DIR=/home/ec2-user/gatsby-default -f /home/ec2-user/Dockerfile`,
+  // );
   // Run container, mount userDir as volume mapped to output folder in container
   // Remove container after script runs
   console.log('Building app in container...');
   await exec(
-    `sudo docker run -e "REPO_DIR=${repoDir}" --name build -p 6000-6000 --rm -v ${repoDir}:/output build-app`,
+    `sudo docker run -e "REPO_DIR=/${repoDir}" --name build -p 6000-6000 --rm -v /${repoDir}:/output build-app`,
   );
+  // await exec(
+  //   `sudo docker run -e "/home/ec2-user/gatsby-default" --name build -p 6000-6000 --rm -v /home/ec2-user/gatsby-default:/output build-app`,
+  // );
 };
 
 module.exports = async function triggerBuild(webhook) {
