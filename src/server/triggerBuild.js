@@ -92,11 +92,11 @@ const updateDynamo = async (data) => {
   }
 };
 
-const runDockerBuild = async (repoDir) => {
+const runDockerBuild = async (repoName, repoDir) => {
   // Build docker image
   console.log('Building docker image...');
   await exec(
-    `sudo docker build ${userDir} -t build-app --build-arg REPO_DIR=${repoDir} -f ${userDir}/Dockerfile`,
+    `sudo docker build ${userDir} -t build-app --build-arg REPO_NAME=${repoName} -f ${userDir}/Dockerfile`,
   );
   // await exec(
   //   `sudo docker build /home/ec2-user -t build-app --build-arg REPO_DIR=/home/ec2-user/gatsby-default -f /home/ec2-user/Dockerfile`,
@@ -165,7 +165,7 @@ module.exports = async function triggerBuild(webhook) {
           await exec(`sudo yum update -y`);
           // await exec(`yarn --cwd ${repoDir} build`);
 
-          await runDockerBuild(repoDir);
+          await runDockerBuild(repoName, repoDir);
 
           console.log('Built', repoDir);
           await exec(

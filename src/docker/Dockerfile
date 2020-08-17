@@ -1,13 +1,14 @@
 FROM node:13
 
-ARG REPO_DIR
+ARG REPO_NAME
 # ENV REPO_DIR_ENV $REPO_DIR
-RUN echo $REPO_DIR
 
 WORKDIR /app
 
+RUN mkdir ./${REPO_NAME}
 COPY ./dockerBuild.js .
-COPY .$REPO_DIR .$REPO_DIR
+COPY ./${REPO_NAME} ./${REPO_NAME}
+# COPY ./gatsby-default ./gatsby-default
 COPY ./package.json .
 
 EXPOSE 6000
