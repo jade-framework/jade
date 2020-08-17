@@ -7,6 +7,7 @@ const readFile = promisify(fs.readFile);
 const { log, logErr } = require('./logger');
 
 const AWS = require('aws-sdk');
+const { homedir } = require('os');
 const region = getRegion();
 const apiVersion = 'latest';
 AWS.config.update({ region });
@@ -91,16 +92,24 @@ const updateDynamo = async (data) => {
   }
 };
 
-const runDockerBuild = async (repoDir) => {
+const runDockerBuild = async (repoName, repoDir) => {
   // Build docker image
   console.log('Building docker image...');
-  await exec(`sudo docker build ../ -t build-app -f ../Dockerfile`);
+  await exec(
+    `sudo docker build ${userDir} -t build-app --build-arg REPO_NAME=${repoName} -f ${userDir}/Dockerfile`,
+  );
+  // await exec(
+  //   `sudo docker build /home/ec2-user -t build-app --build-arg REPO_DIR=/home/ec2-user/gatsby-default -f /home/ec2-user/Dockerfile`,
+  // );
   // Run container, mount userDir as volume mapped to output folder in container
   // Remove container after script runs
   console.log('Building app in container...');
   await exec(
-    `sudo docker run -e "REPO_DIR=${repoDir}" --name build -p 6000-6000 --rm -v ${repoDir}:/output build-app`,
+    `sudo docker run --name build -p 6000-6000 --rm -v ${repoDir}:/output build-app`,
   );
+  // await exec(
+  //   `sudo docker run -e "/home/ec2-user/gatsby-default" --name build -p 6000-6000 --rm -v /home/ec2-user/gatsby-default:/output build-app`,
+  // );
 };
 
 module.exports = async function triggerBuild(webhook) {
@@ -116,10 +125,14 @@ module.exports = async function triggerBuild(webhook) {
   const cloneUrl = repository.clone_url;
   const repoDir = join(userDir, repoName);
   const branch = webhook.ref.replace('refs/heads/', '');
+  log('webhook', webhook);
+  log('branch', branch);
+  log('Before pull try block');
   try {
     const initialProjectData = await readFile(
       join(userDir, 'server', 'initialProjectData.json'),
     );
+    log('After initial proj dta');
     const initialData = JSON.parse(initialProjectData);
     const date = Date.now().toString();
     initialData.versionId = date;
@@ -128,9 +141,12 @@ module.exports = async function triggerBuild(webhook) {
 
     const { bucketName } = initialData;
     let pull;
+    log('Pull repo');
     if (branch === 'master') {
       await exec(`git -C ${repoDir} checkout master`);
       pull = await exec(`git -C ${repoDir} pull ${cloneUrl}`);
+      console.log('Finish pull master');
+      console.log(pull);
     } else if (branch === 'staging') {
       await exec(`git -C ${repoDir} checkout staging`);
       pull = await exec(`git -C ${repoDir} pull -X theirs --no-edit`);
@@ -149,7 +165,7 @@ module.exports = async function triggerBuild(webhook) {
           // await exec(`sudo yum update -y`);
           // await exec(`yarn --cwd ${repoDir} build`);
 
-          await runDockerBuild(repoDir);
+          await runDockerBuild(repoName, repoDir);
 
           log('Built', repoDir);
           await exec(
