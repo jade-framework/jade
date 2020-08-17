@@ -91,6 +91,18 @@ const updateDynamo = async (data) => {
   }
 };
 
+const runDockerBuild = async (repoDir) => {
+  // Build docker image
+  console.log('Building docker image...');
+  await exec(`sudo docker build ../ -t build-app -f ../Dockerfile`);
+  // Run container, mount userDir as volume mapped to output folder in container
+  // Remove container after script runs
+  console.log('Building app in container...');
+  await exec(
+    `sudo docker run -e "REPO_DIR=${repoDir}" --name build -p 6000-6000 --rm -v ${repoDir}:/output build-app`,
+  );
+};
+
 module.exports = async function triggerBuild(webhook) {
   if (!webhook.ref) {
     return {
@@ -134,7 +146,11 @@ module.exports = async function triggerBuild(webhook) {
         // need to get info from Dynamo, especially publish directory "public"
         if (branch === 'master') {
           await exec(`sudo yum update -y`);
-          await exec(`yarn --cwd ${repoDir} build`);
+          // await exec(`sudo yum update -y`);
+          // await exec(`yarn --cwd ${repoDir} build`);
+
+          await runDockerBuild(repoDir);
+
           log('Built', repoDir);
           await exec(
             `aws s3 sync ${repoDir}/public s3://${bucketName}-${prodBucket}`,

@@ -84,7 +84,7 @@ const promisifyConnection = (conn) => {
                 .trim()
                 .replace(/\s{2,}/gi, ' ');
 
-              if (string.length > 2 && !/[{}#\[\]]/gi.test(string)) {
+              if (string.length > 2 && !/[{}#%\[\]]/gi.test(string)) {
                 jadeLog(`OUTPUT: ${string}`);
               }
             });

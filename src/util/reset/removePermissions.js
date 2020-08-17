@@ -37,7 +37,7 @@ const deleteSecurityGroup = async (
     jadeLog(res);
   } catch (err) {
     if (/DependencyViolation/.test(err.code)) {
-      jadeLog('Retrying deletion of Jade security group...');
+      jadeLog('Waiting for Jade security group to be detached...');
       await sleep(5000);
       await deleteSecurityGroup(securityGroupName, maxRetries, attempts + 1);
     } else {
@@ -52,7 +52,7 @@ async function removePermissions() {
     { InstanceProfileName: ec2InstanceProfile, RoleName: ec2IamRoleName },
     (err, data) => {
       if (err) jadeErr(err);
-      jadeLog(data);
+      jadeLog('Removed role from instance profile.');
     },
   );
 
@@ -82,7 +82,7 @@ async function removePermissions() {
                 (err, data) => {
                   iam.deleteRole({ RoleName: ec2IamRoleName }, (err, data) => {
                     if (err) jadeErr(err);
-                    jadeLog(data);
+                    jadeLog('EC2 role deleted.');
                   });
                 },
               );
@@ -97,13 +97,13 @@ async function removePermissions() {
     { InstanceProfileName: ec2InstanceProfile },
     (err, data) => {
       if (err) jadeErr(err);
-      jadeLog(data);
+      jadeLog('Instance profile deleted.');
     },
   );
 
   ec2.deleteKeyPair({ KeyName: jadeKeyPair }, (err, data) => {
     if (err) jadeErr(err);
-    jadeLog(data);
+    jadeLog('Key pair deleted.');
   });
 
   try {
