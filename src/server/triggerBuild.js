@@ -4,8 +4,10 @@ const fs = require('fs');
 const { getRegion } = require('./getRegion');
 const exec = promisify(require('child_process').exec);
 const readFile = promisify(fs.readFile);
+const { log, logErr } = require('./logger');
 
 const AWS = require('aws-sdk');
+const { homedir } = require('os');
 const region = getRegion();
 const apiVersion = 'latest';
 AWS.config.update({ region });
@@ -34,7 +36,7 @@ const parseName = (name) => {
 };
 
 const updateDynamo = async (data) => {
-  console.log('Updating Dynamo...');
+  log('Updating Dynamo...');
 
   const {
     projectId,
@@ -84,16 +86,18 @@ const updateDynamo = async (data) => {
       },
     });
 
-    console.log('DynamoDB table updated.');
+    log('DynamoDB table updated.');
   } catch (err) {
-    console.log(err);
+    logErr(err);
   }
 };
 
 const runDockerBuild = async (repoDir) => {
   // Build docker image
   console.log('Building docker image...');
-  await exec(`sudo docker build ../ -t build-app -f ../Dockerfile`);
+  await exec(
+    `sudo docker build ${userDir} -t build-app --build-arg REPO_DIR=${repoDir} -f ${userDir}/Dockerfile`,
+  );
   // Run container, mount userDir as volume mapped to output folder in container
   // Remove container after script runs
   console.log('Building app in container...');
@@ -109,16 +113,20 @@ module.exports = async function triggerBuild(webhook) {
       msg: 'Webhook successfully received by EC2. Welcome to Jade!',
     };
   }
-  console.log('Webhook being processed...');
+  log('Webhook being processed...');
   const { repository } = webhook;
   const repoName = repository.name;
   const cloneUrl = repository.clone_url;
   const repoDir = join(userDir, repoName);
   const branch = webhook.ref.replace('refs/heads/', '');
+  log('webhook', webhook);
+  log('branch', branch);
+  log('Before pull try block');
   try {
     const initialProjectData = await readFile(
       join(userDir, 'server', 'initialProjectData.json'),
-    ); // need to change to find the right bucketName for multiple apps
+    );
+    log('After initial proj dta');
     const initialData = JSON.parse(initialProjectData);
     const date = Date.now().toString();
     initialData.versionId = date;
@@ -127,9 +135,12 @@ module.exports = async function triggerBuild(webhook) {
 
     const { bucketName } = initialData;
     let pull;
+    log('Pull repo');
     if (branch === 'master') {
       await exec(`git -C ${repoDir} checkout master`);
       pull = await exec(`git -C ${repoDir} pull ${cloneUrl}`);
+      console.log('Finish pull master');
+      console.log(pull);
     } else if (branch === 'staging') {
       await exec(`git -C ${repoDir} checkout staging`);
       pull = await exec(`git -C ${repoDir} pull -X theirs --no-edit`);
@@ -144,7 +155,8 @@ module.exports = async function triggerBuild(webhook) {
       try {
         // need to get info from Dynamo, especially publish directory "public"
         if (branch === 'master') {
-          // await exec(`sudo yum update -y`);
+          log('before update');
+          await exec(`sudo yum update -y`);
           // await exec(`yarn --cwd ${repoDir} build`);
 
           await runDockerBuild(repoDir);
@@ -157,20 +169,18 @@ module.exports = async function triggerBuild(webhook) {
           await exec(
             `aws s3api put-object --bucket ${bucketName}-${buildsBucket} --key ${date}.zip --body ${repoDir}/${date}.zip`,
           );
-          console.log(`Upload to s3://${bucketName}-${prodBucket} complete`);
-          console.log(
-            `Upload to s3://${bucketName}-${buildsBucket}/${date} complete`,
-          );
+          log(`Upload to s3://${bucketName}-${prodBucket} complete`);
+          log(`Upload to s3://${bucketName}-${buildsBucket}/${date} complete`);
           await updateDynamo(initialData);
         } else if (branch === 'staging') {
           await exec(`yarn --cwd ${repoDir} build`);
           await exec(
             `aws s3 sync ${repoDir}/public s3://${bucketName}-${stageBucket}`,
           );
-          console.log(`Upload to s3://${bucketName}-${stageBucket} complete`);
+          log(`Upload to s3://${bucketName}-${stageBucket} complete`);
         }
       } catch (err) {
-        console.log(err); // convert to logger later
+        logErr(err); // convert to logger later
       }
     })();
     return {
@@ -178,7 +188,7 @@ module.exports = async function triggerBuild(webhook) {
       msg: 'Webhook successfully processed, Jade build triggered.',
     };
   } catch (err) {
-    console.log(err);
+    logErr(err);
     return {
       statusCode: 202,
       msg: 'Error in processing your webhook, please contact Jade team...',

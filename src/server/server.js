@@ -1,4 +1,5 @@
 const http = require('http');
+const { log, logErr } = require('./logger');
 const triggerBuild = require('./triggerBuild');
 
 const hostname = '0.0.0.0';
@@ -7,12 +8,12 @@ async function start() {
   try {
     const server = http.createServer((req, res) => {
       req.on('error', (err) => {
-        console.error(err);
+        logErr(err);
         res.statusCode = 400;
         res.end();
       });
       res.on('error', (err) => {
-        console.error(err);
+        logErr(err);
       });
 
       if (req.method === 'POST' && req.url === '/webhook') {
@@ -23,7 +24,7 @@ async function start() {
           })
           .on('end', () => {
             body = JSON.parse(Buffer.concat(body).toString());
-            console.log(body); // convert to logger later
+            log(body); // convert to logger later
             (async () => {
               const { statusCode, msg } = await triggerBuild(body);
               res.statusCode = statusCode;
@@ -37,10 +38,10 @@ async function start() {
     });
 
     server.listen(port, hostname, () => {
-      console.log(`Node server listening at http://${hostname}:${port}/`);
+      log(`Node server listening at http://${hostname}:${port}/`);
     });
   } catch (err) {
-    console.log(err);
+    logErr(err);
   }
 }
 

@@ -3,39 +3,60 @@ const { asyncDynamoScan } = require('../aws/awsAsyncFunctions');
 const { appsTableName } = require('../templates/constants');
 
 const printItems = (items) => {
+  let count = 0;
   const projectNameHeader = 'Project Name';
   const domainNameHeader = 'Domain Name';
   const publicIpHeader = 'Webhook endpoint';
+  const deletedHeader = 'Deleted?';
+  const frozenHeader = 'Frozen?';
+  let countLength = count.toString().length;
   let projectNameLength = projectNameHeader.length;
   let domainNameLength = domainNameHeader.length;
   let publicIpLength = publicIpHeader.length;
+  let deletedLength = deletedHeader.length;
+  let frozenLength = frozenHeader.length;
+
   items = items.map((item) => {
     const projectName = item.projectName.S;
     const domainName = item.cloudFrontDomainName.S;
     const publicIp = item.publicIp.S;
-
+    const active = item.isActive.BOOL ? 'No' : 'Yes';
+    const frozen = item.isFrozen.BOOL ? 'Yes' : 'No';
     if (projectName.length > projectNameLength) {
       projectNameLength = projectName.length;
     }
     if (domainName.length > domainNameLength) {
       domainNameLength = domainName.length;
     }
-    if (publicIp.length > publicIpLength) {
-      publicIpLength = publicIp.length + 'http://'.length;
+    const itemPublicIpLength = publicIp.length + 'http://'.length;
+    if (itemPublicIpLength > publicIpLength) {
+      publicIpLength = itemPublicIpLength;
     }
-    return { projectName, domainName, publicIp };
+    count++;
+    const newCount = count.toString().length;
+    if (newCount > countLength) {
+      countLength = newCount;
+    }
+    return { id: count, projectName, domainName, publicIp, active, frozen };
   });
 
   jadeLog(
-    `${projectNameHeader.padEnd(projectNameLength)} | ${domainNameHeader.padEnd(
-      domainNameLength,
-    )} | ${publicIpHeader.padEnd(publicIpLength)}`,
+    `${'#'.padEnd(countLength)} | ${projectNameHeader.padEnd(
+      projectNameLength,
+    )} | ${domainNameHeader.padEnd(domainNameLength)} | ${publicIpHeader.padEnd(
+      publicIpLength,
+    )} | ${deletedHeader.padEnd(deletedLength)} | ${frozenHeader.padEnd(
+      frozenLength,
+    )}`,
   );
-  items.forEach(({ projectName, domainName, publicIp }) => {
+  items.forEach(({ id, projectName, domainName, publicIp, active, frozen }) => {
+    const ip = `http://${publicIp}`;
     jadeLog(
-      `${projectName.padEnd(projectNameLength)} | ${domainName.padEnd(
-        domainNameLength,
-      )} | http://${publicIp.padEnd(publicIpLength)}`,
+      `${id.toString().padEnd(countLength)} | ${projectName.padEnd(
+        projectNameLength,
+      )} | ${domainName.padEnd(domainNameLength)} | ${ip.padEnd(
+        publicIpLength,
+      )} | ${active.padEnd(deletedLength)} | ${frozen.padEnd(frozenLength)}`,
     );
   });
 };

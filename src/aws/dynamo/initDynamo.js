@@ -51,6 +51,9 @@ const appsItemToPut = ({
   isActive: {
     BOOL: true,
   },
+  isFrozen: {
+    BOOL: false,
+  },
 });
 
 const versionsItemToPut = ({

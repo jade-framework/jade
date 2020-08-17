@@ -4,10 +4,11 @@ const exec = promisify(require('child_process').exec);
 const buildAndExport = async () => {
   console.log('Container running...');
   const repoDir = process.env.REPO_DIR;
+  console.log(repoDir);
   try {
     console.log('Updating dependencies...');
     await exec(`yarn --cwd ${repoDir} install`);
-    await exec(`yarn --cwd ${repoDir} cache clean`);
+    // await exec(`yarn --cwd ${repoDir} cache clean`);
     console.log(`Building project...`);
     await exec(`yarn --cwd ${repoDir} build`);
     console.log(`Copying project to host...`);

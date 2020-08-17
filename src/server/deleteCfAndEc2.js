@@ -4,6 +4,7 @@ const exec = promisify(require('child_process').exec);
 const fs = require('fs');
 const readFile = promisify(fs.readFile);
 const sleep = async (ms) => new Promise((r) => setTimeout(r, ms));
+const { log, logErr } = require('./logger');
 const oneMinute = 60000;
 
 const AWS = require('aws-sdk');
@@ -17,24 +18,25 @@ const cf = new AWS.CloudFront({ apiVersion });
 const asyncGetDistribution = promisify(cf.getDistribution.bind(cf));
 const asyncDeleteDistribution = promisify(cf.deleteDistribution.bind(cf));
 
-// const args = process.argv;
-// let eTag = args[2];
+const userDir = `/home/ec2-user`;
 
 let eTag;
 
 const deleteCfWithRetries = async (cfId, maxRetries = 100, attempts = 0) => {
   try {
     const getRes = await asyncGetDistribution({ Id: cfId });
-    console.log(getRes);
+    log(getRes);
     if (getRes.Distribution.Status !== 'Deployed') {
       await sleep(oneMinute);
       return await deleteCfWithRetries(cfId, maxRetries, attempts + 1);
     } else {
       eTag = getRes.ETag;
+      log(eTag);
       await asyncDeleteDistribution({ Id: cfId, IfMatch: eTag });
       return true;
     }
   } catch (err) {
+    logErr(err);
     return await deleteCfWithRetries(cfId, maxRetries, attempts + 1);
   }
 };
@@ -48,7 +50,7 @@ const deleteCf = async () => {
     const { cloudFrontDistributionId } = initialData;
     await deleteCfWithRetries(cloudFrontDistributionId);
   } catch (err) {
-    console.log(err);
+    logErr(err);
   }
 };
 
@@ -62,9 +64,13 @@ const deleteEc2 = async () => {
 
 (async () => {
   try {
+    log('Deleting CF...');
     await deleteCf();
+    log('CF deleted.');
+    log('Deleting EC2...');
     await deleteEc2();
+    log('EC2 deleted.');
   } catch (err) {
-    console.log(err);
+    logErr(err);
   }
 })();

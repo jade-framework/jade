@@ -9,8 +9,10 @@ const {
   s3FullAccessPolicyArn,
   dynamoDbFullAccessPolicyArn,
   cloudFrontFullAccess,
+  ec2FullAccess,
 } = require('../../templates/constants');
 const { promisify } = require('util');
+const { sleep } = require('../fileUtils');
 const { jadeLog, jadeErr } = require('../logger');
 
 const apiVersion = 'latest';
@@ -19,18 +21,28 @@ const region = getRegion();
 const iam = new IAM({ apiVersion, region });
 const ec2 = new EC2({ apiVersion, region });
 
-const deleteSecurityGroup = async (securityGroupName) => {
+const deleteSecurityGroup = async (
+  securityGroupName,
+  maxRetries = 10,
+  attempts = 0,
+) => {
   try {
     const asyncDeleteSecurityGroup = promisify(
       ec2.deleteSecurityGroup.bind(ec2),
     );
-    const [err, data] = await asyncDeleteSecurityGroup({
+    const res = await asyncDeleteSecurityGroup({
       GroupName: securityGroupName,
     });
 
-    jadeLog(err, data);
+    jadeLog(res);
   } catch (err) {
-    jadeErr(err);
+    if (/DependencyViolation/.test(err.code)) {
+      jadeLog('Retrying deletion of Jade security group...');
+      await sleep(5000);
+      await deleteSecurityGroup(securityGroupName, maxRetries, attempts + 1);
+    } else {
+      jadeErr(err);
+    }
   }
 };
 
@@ -61,10 +73,19 @@ async function removePermissions() {
               PolicyArn: cloudFrontFullAccess,
             },
             (err, data) => {
-              iam.deleteRole({ RoleName: ec2IamRoleName }, (err, data) => {
-                if (err) jadeErr(err);
-                jadeLog(data);
-              });
+              if (err) jadeErr(err);
+              iam.detachRolePolicy(
+                {
+                  RoleName: ec2IamRoleName,
+                  PolicyArn: ec2FullAccess,
+                },
+                (err, data) => {
+                  iam.deleteRole({ RoleName: ec2IamRoleName }, (err, data) => {
+                    if (err) jadeErr(err);
+                    jadeLog(data);
+                  });
+                },
+              );
             },
           );
         },

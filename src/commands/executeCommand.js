@@ -3,6 +3,8 @@ const { add } = require('./add');
 const { deleteApp } = require('./delete');
 const { destroy } = require('./destroy');
 const { list } = require('./list');
+const { freeze } = require('./freeze');
+const { unfreeze } = require('./unfreeze');
 const { jadeLog, jadeErr } = require('../util/logger');
 
 const commandIsBlank = (cmd) => cmd === undefined || cmd === '';
@@ -20,6 +22,10 @@ const executeCommand = async (command, args, homedir) => {
       await destroy(homedir);
     } else if (command === 'list') {
       await list();
+    } else if (command === 'freeze') {
+      await freeze(args);
+    } else if (command === 'unfreeze') {
+      await unfreeze(args);
     } else if (commandIsHelp(command) || commandIsBlank(command)) {
       // await help(args);
       jadeLog(`Help method, command is ${command}, args is ${args}.`);

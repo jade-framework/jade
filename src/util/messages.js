@@ -19,4 +19,16 @@ const printBuildSuccess = async ({ publicIp, cloudFrontDomainName }) => {
   );
 };
 
-module.exports = { printBuildSuccess };
+const appNotFound = () => {
+  jadeLog(
+    'This app does not exist or has already been deleted. Please use "jade list" to see your current Jade apps.',
+  );
+};
+
+const appsNotFound = () => {
+  jadeLog(
+    'You do not have any Jade apps to delete. Please run "jade init" to create a new one.',
+  );
+};
+
+module.exports = { printBuildSuccess, appNotFound, appsNotFound };
