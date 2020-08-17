@@ -51,7 +51,7 @@ const appConfigQuestions = async () => {
   const questions = [
     {
       name: 'gitUrl',
-      message: `Please enter your GitHub URL here. Note that Jade will use the "root" folder for deployment (https://github.com/user/root):\n`,
+      message: `Please enter your public GitHub repo's URL here. Note that Jade will use the "root" folder for deployment (https://github.com/user/root):\n`,
       validate: (input) => {
         return promptGitUrl(input);
       },

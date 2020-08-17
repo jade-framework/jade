@@ -22,7 +22,7 @@ const deleteBucket = async (bucketName) => {
       await asyncDeleteBucketObjects(deleteParams);
     }
     await asyncDeleteS3Bucket({ Bucket: bucketName });
-    jadeLog(`S3 Bucket ${bucketName} deleted`);
+    jadeLog(`S3 Bucket ${bucketName} deleted.`);
   } catch (error) {
     jadeErr('Error deleting S3 Bucket', error);
   }

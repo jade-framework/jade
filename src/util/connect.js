@@ -39,8 +39,9 @@ const setupCommands = [
   `sudo mkdir ${remoteHomeDir}/.aws`,
   `sudo mv ${remoteServerDir}/config ${remoteHomeDir}/.aws/config`,
   `cd ${remoteServerDir}`,
-  'yarn add aws-sdk',
-  `node ${remoteServerDir}/server.js > logger.log 2>&1 &`,
+  'yarn add aws-sdk logplease',
+  `node ${remoteServerDir}/server.js &`,
+  // `node ${remoteServerDir}/server.js > logger.log 2>&1 &`,
   `cd ${remoteHomeDir}`,
   'sudo yum install git -y',
 ];
@@ -131,10 +132,11 @@ const sendSetupFiles = async (host) => {
   try {
     await sendFiles(host, remoteServerDir, [
       join(serverSourceDir, 'server.js'),
-      join(serverSourceDir, 'triggerBuild.js'),
       join(serverSourceDir, 'sysmon.conf'),
+      join(serverSourceDir, 'triggerBuild.js'),
       join(serverSourceDir, 'getRegion.js'),
       join(serverSourceDir, 'deleteCfAndEc2.js'),
+      join(serverSourceDir, 'logger.js'),
       join(jadePath, 'config'),
       join(jadePath, 'initialProjectData.json'),
     ]);
@@ -145,33 +147,6 @@ const sendSetupFiles = async (host) => {
     jadeErr(err);
     return false;
   }
-
-  // try {
-  //   if (attempts >= maxRetries) return Promise.reject('Too many attempts.');
-  //   await getConnection(host)
-  //     .then(async (conn) => {
-  //       await conn.asyncSftp(
-  //         remoteServerDir,
-  //         join(serverSourceDir, 'server.js'),
-  //         join(serverSourceDir, 'triggerBuild.js'),
-  //         join(serverSourceDir, 'sysmon.conf'),
-  //         join(serverSourceDir, 'getRegion.js'),
-  //         join(jadePath, 'config'),
-  //         join(jadePath, 'initialProjectData.json'),
-  //       );
-  //       await removeFile(jadePath, 'config');
-  //       await removeFile(jadePath, 'initialProjectData.json');
-  //       return true;
-  //     })
-  //     .catch(async (err) => {
-  //       checkConnError(err);
-  //       await sleep(5000);
-  //       return await sendSetupFiles(host, maxRetries, attempts + 1);
-  //     });
-  // } catch (err) {
-  //   jadeErr(err);
-  //   return false;
-  // }
 };
 
 const sendCommands = async (host, commands, maxRetries = 10, attempts = 0) => {
@@ -198,9 +173,8 @@ const sendDeleteAppCommand = async (eTag, publicIp) => {
     const host = await getHost({ publicIp });
     if (!host) return;
 
-    await sendCommands(host, [
-      `node ${remoteServerDir}/deleteCfAndEc2.js ${eTag}`,
-    ]);
+    const command = [`node ${remoteServerDir}/deleteCfAndEc2.js ${eTag}`];
+    return (async () => sendCommands(host, command))();
   } catch (err) {
     jadeErr(err);
     return false;

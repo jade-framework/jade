@@ -1,4 +1,5 @@
 const { bucketSuffixes } = require('../templates/constants');
+const { jadeLog } = require('./logger');
 
 const getBucketNames = (bucketName) => {
   return bucketSuffixes.map((suffix) => `${bucketName}-${suffix}`);

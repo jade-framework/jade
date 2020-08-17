@@ -113,6 +113,8 @@ const asyncAssociateIamInstanceProfile = promisify(
 );
 const asyncEc2WaitFor = promisify(ec2.waitFor.bind(ec2));
 const asyncDescribeImages = promisify(ec2.describeImages.bind(ec2));
+const asyncStartInstances = promisify(ec2.startInstances.bind(ec2));
+const asyncStopInstances = promisify(ec2.stopInstances.bind(ec2));
 
 // STS
 const asyncGetCallerIdentity = promisify(sts.getCallerIdentity.bind(sts));
@@ -185,6 +187,8 @@ module.exports = {
   asyncDescribeKeyPairs,
   asyncDeleteKeyPair,
   asyncDescribeInstances,
+  asyncStartInstances,
+  asyncStopInstances,
   asyncRunInstances,
   asyncAssociateIamInstanceProfile,
   asyncEc2WaitFor,

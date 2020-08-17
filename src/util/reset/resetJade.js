@@ -3,11 +3,11 @@ const { terminateJadeEc2Instances } = require('./terminateJadeEc2Instances');
 const { removePermissions } = require('./removePermissions');
 const { cleanup } = require('../../commands/cleanup');
 
-async function resetJade() {
+const resetJade = async () => {
   await deleteJadeFolder();
   await terminateJadeEc2Instances();
   await removePermissions();
   await cleanup();
-}
+};
 
-resetJade();
+module.exports = { resetJade };
