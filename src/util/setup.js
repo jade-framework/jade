@@ -14,7 +14,7 @@ const {
 const { createAndConfigEc2, installEc2JadeEnvironment } = require('../aws/ec2');
 const { initDynamo, addAppToDynamo } = require('../aws/dynamo');
 
-const { printBuildSuccess } = require('./printBuildSuccess');
+const { printBuildSuccess } = require('./messages');
 const {
   initialInitQuestions,
   initialAddQuestions,

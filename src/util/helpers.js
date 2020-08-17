@@ -21,10 +21,4 @@ const getGitFolder = (url) => {
   return parts[index + 2];
 };
 
-const appNotFound = () => {
-  jadeLog(
-    'This is not a valid Jade app name. Please use "jade list" to see your current Jade apps.',
-  );
-};
-
-module.exports = { getBucketNames, parseName, getGitFolder, appNotFound };
+module.exports = { getBucketNames, parseName, getGitFolder };
