@@ -86,7 +86,7 @@ const removeApp = async (match) => {
   jadeLog('CloudFront distribution disabled.');
 
   // unfreeze instance if frozen
-  await unfreezeApp(match);
+  await unfreezeApp(projectName);
 
   // delete CloudFront and EC2
   const promise = sendDeleteAppCommand(eTag, publicIp);

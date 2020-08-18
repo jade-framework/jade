@@ -4,8 +4,10 @@ const {
   asyncStopInstances,
   asyncDescribeInstances,
   asyncDynamoUpdateItem,
+  asyncEc2WaitFor,
 } = require('../aws/awsAsyncFunctions');
 const { appsTableName } = require('../templates/constants');
+const { jadeLog, jadeErr } = require('./logger');
 
 const updateAppsTableStatus = async (projectName, bucketName, toFreeze) => {
   const frozenBool = toFreeze === 'freeze' ? true : false;
@@ -106,6 +108,7 @@ const unfreezeEc2 = async (match) => {
     }
     const instanceId = data.InstanceId;
     jadeLog(`Starting ${projectName}'s EC2 instance...`);
+    await asyncEc2WaitFor('instanceStopped', { InstanceIds: [instanceId] });
     await asyncStartInstances({ InstanceIds: [instanceId] });
     jadeLog(`${projectName}'s EC2 instance has now been started.`);
     await updateAppsTableStatus(projectName, bucketName, 'unfreeze');

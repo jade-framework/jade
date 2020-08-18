@@ -142,13 +142,13 @@ module.exports = async function triggerBuild(webhook) {
       try {
         // need to get info from Dynamo, especially publish directory "public"
         if (branch === 'master') {
-          log('before update');
           await exec(`sudo yum update -y`);
+          // await exec(`sudo yum update -y`);
           // await exec(`yarn --cwd ${repoDir} build`);
 
           await runDockerBuild(repoName, repoDir, userDir);
 
-          console.log('Built', repoDir);
+          log('Built', repoDir);
           await exec(
             `aws s3 sync ${repoDir}/public s3://${bucketName}-${prodBucket}`,
           );
