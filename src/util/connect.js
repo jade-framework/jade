@@ -52,24 +52,25 @@ const setupCommands = [
   'sudo systemctl enable docker',
 ];
 
-const buildCommands = ({
-  gitUrl,
+const buildCommands = ({ gitUrl, gitFolder }) => {
+  const repoDir = `${remoteHomeDir}/${gitFolder}`;
+  return [
+    `git clone ${gitUrl}`,
+    `cd server`,
+    `sudo docker build ${userDir} -t build-app --build-arg REPO_NAME=${gitFolder} -f ${userDir}/Dockerfile`,
+    `sudo docker run --name build -p 6000-6000 --rm -v ${repoDir}:/output build-app`,
+  ];
+};
+
+const syncCommands = ({
   gitFolder,
   bucketName,
-  // userInstallCommand,
-  // userBuildCommand,
   publishDirectory,
   versionId,
 }) => {
   const repoDir = `${remoteHomeDir}/${gitFolder}`;
   return [
-    `git clone ${gitUrl}`,
-    // `cd ${repoDir}`,
-    // userInstallCommand,
-    // userBuildCommand,
-    `cd server`,
-    `sudo docker build ${userDir} -t build-app --build-arg REPO_NAME=${gitFolder} -f ${userDir}/Dockerfile`,
-    `sudo docker run --name build -p 6000-6000 --rm -v ${repoDir}:/output build-app`,
+    `cd ${repoDir}`,
     `aws s3 sync ${publishDirectory} s3://${bucketName}-${prodBucket}`,
     `zip -r ${repoDir}/${versionId} ${repoDir}/${publishDirectory}`,
     `aws s3api put-object --bucket ${bucketName}-${buildsBucket} --key ${versionId}.zip --body ${repoDir}/${versionId}.zip`,
@@ -208,10 +209,12 @@ const sendFilesAndBuildCommands = async (projectData) => {
     projectData.projectId = `${parseName(projectName)}-${date}`;
     await createJSONFile(initialProjectData, jadePath, projectData);
 
-    const commands = [...setupCommands, ...buildCommands(projectData)];
+    const commandsBuild = [...setupCommands, ...buildCommands(projectData)];
+    const commandsSync = [...syncCommands(projectData)];
     await writeAwsConfig(region, jadePath);
     await sendSetupFiles(host);
-    await sendCommands(host, commands);
+    await sendCommands(host, commandsBuild);
+    await sendCommands(host, commandsSync);
     return true;
   } catch (err) {
     jadeErr(err);
