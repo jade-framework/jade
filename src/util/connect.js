@@ -24,10 +24,10 @@ const jadePath = getJadePath(cwd);
 const remoteHomeDir = '/home/ec2-user';
 const remoteServerDir = `${remoteHomeDir}/server`;
 const serverSourceDir = join(__dirname, '..', 'server');
-const dockerRemoteDir = `${remoteHomeDir}/docker`;
 const dockerSourceDir = join(__dirname, '..', 'docker');
 const prodBucket = bucketSuffixes[0];
 const buildsBucket = bucketSuffixes[1];
+const userDir = join('/', 'home', 'ec2-user');
 
 const setupCommands = [
   'sudo yum update -y',
@@ -56,17 +56,20 @@ const buildCommands = ({
   gitUrl,
   gitFolder,
   bucketName,
-  userInstallCommand,
-  userBuildCommand,
+  // userInstallCommand,
+  // userBuildCommand,
   publishDirectory,
   versionId,
 }) => {
   const repoDir = `${remoteHomeDir}/${gitFolder}`;
   return [
     `git clone ${gitUrl}`,
-    `cd ${repoDir}`,
-    userInstallCommand,
-    userBuildCommand,
+    // `cd ${repoDir}`,
+    // userInstallCommand,
+    // userBuildCommand,
+    `cd server`,
+    `sudo docker build ${userDir} -t build-app --build-arg REPO_NAME=${gitFolder} -f ${userDir}/Dockerfile`,
+    `sudo docker run --name build -p 6000-6000 --rm -v ${repoDir}:/output build-app`,
     `aws s3 sync ${publishDirectory} s3://${bucketName}-${prodBucket}`,
     `zip -r ${repoDir}/${versionId} ${repoDir}/${publishDirectory}`,
     `aws s3api put-object --bucket ${bucketName}-${buildsBucket} --key ${versionId}.zip --body ${repoDir}/${versionId}.zip`,
@@ -143,6 +146,7 @@ const sendSetupFiles = async (host) => {
       join(serverSourceDir, 'getRegion.js'),
       join(serverSourceDir, 'deleteCfAndEc2.js'),
       join(serverSourceDir, 'logger.js'),
+      join(serverSourceDir, 'runDockerBuild.js'),
       join(jadePath, 'config'),
       join(jadePath, 'initialProjectData.json'),
     ]);

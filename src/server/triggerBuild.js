@@ -5,6 +5,7 @@ const { getRegion } = require('./getRegion');
 const exec = promisify(require('child_process').exec);
 const readFile = promisify(fs.readFile);
 const { log, logErr } = require('./logger');
+const runDockerBuild = require('./runDockerBuild');
 
 const AWS = require('aws-sdk');
 const { homedir } = require('os');
@@ -92,26 +93,6 @@ const updateDynamo = async (data) => {
   }
 };
 
-const runDockerBuild = async (repoName, repoDir) => {
-  // Build docker image
-  console.log('Building docker image...');
-  await exec(
-    `sudo docker build ${userDir} -t build-app --build-arg REPO_NAME=${repoName} -f ${userDir}/Dockerfile`,
-  );
-  // await exec(
-  //   `sudo docker build /home/ec2-user -t build-app --build-arg REPO_DIR=/home/ec2-user/gatsby-default -f /home/ec2-user/Dockerfile`,
-  // );
-  // Run container, mount userDir as volume mapped to output folder in container
-  // Remove container after script runs
-  console.log('Building app in container...');
-  await exec(
-    `sudo docker run --name build -p 6000-6000 --rm -v ${repoDir}:/output build-app`,
-  );
-  // await exec(
-  //   `sudo docker run -e "/home/ec2-user/gatsby-default" --name build -p 6000-6000 --rm -v /home/ec2-user/gatsby-default:/output build-app`,
-  // );
-};
-
 module.exports = async function triggerBuild(webhook) {
   if (!webhook.ref) {
     return {
@@ -165,7 +146,7 @@ module.exports = async function triggerBuild(webhook) {
           await exec(`sudo yum update -y`);
           // await exec(`yarn --cwd ${repoDir} build`);
 
-          await runDockerBuild(repoName, repoDir);
+          await runDockerBuild(repoName, repoDir, userDir);
 
           console.log('Built', repoDir);
           await exec(
