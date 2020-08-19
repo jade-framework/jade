@@ -5,7 +5,7 @@ const {
   validateAwsIsNotSetup,
 } = require('../util/validations');
 
-const init = async (directory) => {
+const init = async (directory, args) => {
   try {
     jadeLog('Checking if your AWS account is correctly setup...');
     const invalidUserPermissions = await validateUserPermissions();
@@ -20,7 +20,7 @@ const init = async (directory) => {
       jadeErr(invalidAws);
       return;
     }
-    await launchApp('init', directory);
+    await launchApp('init', directory, args);
   } catch (err) {
     jadeErr(err);
   }

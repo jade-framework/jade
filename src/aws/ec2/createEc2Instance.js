@@ -7,7 +7,7 @@ const {
 
 const { jadeLog, jadeErr } = require('../../util/logger');
 const { instanceType, jadeKeyPair } = require('../../templates/constants');
-
+const { tagName } = require('../../util/helpers');
 const { getAmi } = require('./getAmi');
 
 const runInstancesParams = (projectName) => ({
@@ -24,7 +24,7 @@ const runInstancesParams = (projectName) => ({
         },
         {
           Key: 'Name',
-          Value: `${projectName}'s Jade EC2 Instance`,
+          Value: tagName(projectName),
         },
       ],
     },
@@ -41,9 +41,6 @@ const getInstanceData = async (instanceId) => {
 const createEc2Instance = async (projectData) => {
   const { projectName, instanceProfile, securityGroup } = projectData;
   try {
-    // const securityGroup = await readJSONFile(securityGroup, jadePath);
-    // const keyPair = await readJSONFile(keyPair, jadePath);
-
     jadeLog('Reading IAM instance profile...');
     const instanceProfileArn = instanceProfile.Arn;
 
@@ -55,8 +52,11 @@ const createEc2Instance = async (projectData) => {
       SecurityGroupIds: [securityGroup.SecurityGroups[0].GroupId],
     });
 
-    // await createJSONFile('ec2Instance', jadePath, runInstancesResponse);
-    const instanceId = runInstancesResponse.Instances[0].InstanceId;
+    const instance = runInstancesResponse.Instances.find((el) => {
+      const match = el.Tags.find((tag) => tag.Value === tagName(projectName));
+      if (match) return true;
+    });
+    const instanceId = instance.InstanceId;
 
     jadeLog('Waiting for EC2 instance to start running...');
     await asyncEc2WaitFor('instanceRunning', { InstanceIds: [instanceId] });

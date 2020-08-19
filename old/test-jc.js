@@ -3,21 +3,23 @@ const {
   createBuckets,
   uploadToBucket,
   setBucketNotificationConfig,
-} = require('../aws/s3');
-const { createBucket } = require('../aws/s3/createBucket');
-const { updateBucketPolicy } = require('../aws/s3/updateBucketPolicy');
+} = require('../src/aws/s3');
+const { createBucket } = require('../src/aws/s3/createBucket');
+const { updateBucketPolicy } = require('../src/aws/s3/updateBucketPolicy');
 const {
   createCloudFrontDistribution,
-} = require('../aws/cloudfront/createCloudFrontDistribution');
+} = require('../src/aws/cloudfront/createCloudFrontDistribution');
 const {
   updateCloudFrontDistribution,
 } = require('../aws/cloudfront/updateCloudFrontDistribution');
-const { zipit } = require('../util/zipit');
-const { createLambdaRole } = require('../aws/lambda/createLambdaRole');
-const { createLambdaFunction } = require('../aws/lambda/createLambdaFunction');
+const { zipit } = require('../src/util/zipit');
+const { createLambdaRole } = require('../src/aws/lambda/createLambdaRole');
+const {
+  createLambdaFunction,
+} = require('../src/aws/lambda/createLambdaFunction');
 const {
   createLambdaPermission,
-} = require('../aws/lambda/createLambdaPermission');
+} = require('../src/aws/lambda/createLambdaPermission');
 const cwd = process.cwd();
 
 const bucketName = 'test-0a9394f7-6e3c-4442-84f5-1fb91f81c18d';

@@ -65,7 +65,7 @@ const createSecurityGroup = async (projectData) => {
       jadeSecurityGroups.SecurityGroups &&
       jadeSecurityGroups.SecurityGroups.length > 0
     ) {
-      jadeLog('Jade security group already exists.');
+      jadeLog('Using existing Jade security group...');
     } else {
       jadeLog('Creating Jade security group...');
       const securityGroupResponse = await asyncCreateSecurityGroup(

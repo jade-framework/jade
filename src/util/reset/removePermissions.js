@@ -1,6 +1,3 @@
-const IAM = require('aws-sdk/clients/iam');
-const EC2 = require('aws-sdk/clients/ec2');
-const { getRegion } = require('../../server/getRegion');
 const {
   securityGroupName,
   jadeKeyPair,
@@ -11,25 +8,29 @@ const {
   cloudFrontFullAccess,
   ec2FullAccess,
 } = require('../../templates/constants');
-const { promisify } = require('util');
+const { deleteIamRole, deleteInstanceProfile } = require('../../aws/iam');
+const {
+  asyncDeleteSecurityGroup,
+  asyncDeleteKeyPair,
+} = require('../../aws/awsAsyncFunctions');
 const { sleep } = require('../fileUtils');
 const { jadeLog, jadeErr } = require('../logger');
 
-const apiVersion = 'latest';
-const region = getRegion();
-
-const iam = new IAM({ apiVersion, region });
-const ec2 = new EC2({ apiVersion, region });
-
+// delete security group is no longer used because EC2 instances have to wait for CFDs to be disabled
+// once EC2s are ready to delete CFD, they will self-terminate
+// the user will have to delete Jade security groups and user groups manually
 const deleteSecurityGroup = async (
   securityGroupName,
-  maxRetries = 10,
-  attempts = 0,
+  maxRetries = 20,
+  attempts = 1,
 ) => {
-  try {
-    const asyncDeleteSecurityGroup = promisify(
-      ec2.deleteSecurityGroup.bind(ec2),
+  if (attempts > maxRetries) {
+    jadeLog(
+      'Please run this command in a few minutes as AWS is taking too long to remove the Jade security group.',
     );
+    return;
+  }
+  try {
     const res = await asyncDeleteSecurityGroup({
       GroupName: securityGroupName,
     });
@@ -37,8 +38,10 @@ const deleteSecurityGroup = async (
     jadeLog(res);
   } catch (err) {
     if (/DependencyViolation/.test(err.code)) {
-      jadeLog('Retrying deletion of Jade security group...');
-      await sleep(5000);
+      jadeLog(
+        `Waiting for Jade security group to be detached (retry ${attempts}/${maxRetries})...`,
+      );
+      await sleep(10000);
       await deleteSecurityGroup(securityGroupName, maxRetries, attempts + 1);
     } else {
       jadeErr(err);
@@ -46,68 +49,15 @@ const deleteSecurityGroup = async (
   }
 };
 
-// TODO: add retries
 async function removePermissions() {
-  iam.removeRoleFromInstanceProfile(
-    { InstanceProfileName: ec2InstanceProfile, RoleName: ec2IamRoleName },
-    (err, data) => {
-      if (err) jadeErr(err);
-      jadeLog(data);
-    },
-  );
+  await deleteInstanceProfile(ec2InstanceProfile, ec2IamRoleName);
 
-  iam.detachRolePolicy(
-    { RoleName: ec2IamRoleName, PolicyArn: s3FullAccessPolicyArn },
-    (err, data) => {
-      if (err) jadeErr(err);
-      iam.detachRolePolicy(
-        {
-          RoleName: ec2IamRoleName,
-          PolicyArn: dynamoDbFullAccessPolicyArn,
-        },
-        (err, data) => {
-          if (err) jadeErr(err);
-          iam.detachRolePolicy(
-            {
-              RoleName: ec2IamRoleName,
-              PolicyArn: cloudFrontFullAccess,
-            },
-            (err, data) => {
-              if (err) jadeErr(err);
-              iam.detachRolePolicy(
-                {
-                  RoleName: ec2IamRoleName,
-                  PolicyArn: ec2FullAccess,
-                },
-                (err, data) => {
-                  iam.deleteRole({ RoleName: ec2IamRoleName }, (err, data) => {
-                    if (err) jadeErr(err);
-                    jadeLog(data);
-                  });
-                },
-              );
-            },
-          );
-        },
-      );
-    },
-  );
-
-  iam.deleteInstanceProfile(
-    { InstanceProfileName: ec2InstanceProfile },
-    (err, data) => {
-      if (err) jadeErr(err);
-      jadeLog(data);
-    },
-  );
-
-  ec2.deleteKeyPair({ KeyName: jadeKeyPair }, (err, data) => {
-    if (err) jadeErr(err);
-    jadeLog(data);
-  });
+  await deleteIamRole(ec2IamRoleName);
 
   try {
-    await deleteSecurityGroup(securityGroupName);
+    await asyncDeleteKeyPair({ KeyName: jadeKeyPair });
+    jadeLog('Key pair deleted.');
+    // await deleteSecurityGroup(securityGroupName);
   } catch (err) {
     jadeErr(err);
   }

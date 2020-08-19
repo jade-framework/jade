@@ -2,7 +2,7 @@ const { launchApp } = require('../util/setup');
 const { validateAwsIsSetup } = require('../util/validations');
 const { jadeErr, jadeLog } = require('../util/logger');
 
-const add = async (directory) => {
+const add = async (directory, args) => {
   try {
     const invalidAws = await validateAwsIsSetup(directory);
     if (invalidAws) {
@@ -10,7 +10,7 @@ const add = async (directory) => {
       return;
     }
 
-    await launchApp('add', directory);
+    await launchApp('add', directory, args);
   } catch (err) {
     jadeLog(err);
   }

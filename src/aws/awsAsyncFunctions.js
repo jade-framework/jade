@@ -44,9 +44,7 @@ const asyncListCloudFrontDistributions = promisify(
 const asyncDeleteCloudFrontDistribution = promisify(
   cloudFront.deleteDistribution.bind(cloudFront),
 );
-// const asyncGetDistribution = promisify(
-//   cloudFront.getDistribution.bind(cloudFront)
-// );
+const asyncCloudFrontWaitFor = promisify(cloudFront.waitFor.bind(cloudFront));
 
 // S3
 const asyncListBuckets = promisify(s3.listBuckets.bind(s3));
@@ -72,12 +70,21 @@ const asyncGetFunction = promisify(lambda.getFunction.bind(lambda));
 // IAM
 const asyncAttachRolePolicy = promisify(iam.attachRolePolicy.bind(iam));
 const asyncCreateRole = promisify(iam.createRole.bind(iam));
+const asyncListAttachedRolePolicies = promisify(
+  iam.listAttachedRolePolicies.bind(iam),
+);
 const asyncDeleteRole = promisify(iam.deleteRole.bind(iam));
 const asyncCreateInstanceProfile = promisify(
   iam.createInstanceProfile.bind(iam),
 );
 const asyncGetInstanceProfile = promisify(iam.getInstanceProfile.bind(iam));
 const asyncAddRoleToProfile = promisify(iam.addRoleToInstanceProfile.bind(iam));
+const asyncRemoveRoleFromInstanceProfile = promisify(
+  iam.removeRoleFromInstanceProfile.bind(iam),
+);
+const asyncDeleteInstanceProfile = promisify(
+  iam.deleteInstanceProfile.bind(iam),
+);
 const asyncGetRole = promisify(iam.getRole.bind(iam));
 const asyncIamWaitFor = promisify(iam.waitFor.bind(iam));
 const asyncDetachRolePolicy = promisify(iam.detachRolePolicy.bind(iam));
@@ -103,6 +110,7 @@ const asyncDescribeSecurityGroups = promisify(
 const asyncAuthorizeSecurityGroupIngress = promisify(
   ec2.authorizeSecurityGroupIngress.bind(ec2),
 );
+const asyncDeleteSecurityGroup = promisify(ec2.deleteSecurityGroup.bind(ec2));
 const asyncCreateKeyPair = promisify(ec2.createKeyPair.bind(ec2));
 const asyncDescribeKeyPairs = promisify(ec2.describeKeyPairs.bind(ec2));
 const asyncDeleteKeyPair = promisify(ec2.deleteKeyPair.bind(ec2));
@@ -115,6 +123,7 @@ const asyncEc2WaitFor = promisify(ec2.waitFor.bind(ec2));
 const asyncDescribeImages = promisify(ec2.describeImages.bind(ec2));
 const asyncStartInstances = promisify(ec2.startInstances.bind(ec2));
 const asyncStopInstances = promisify(ec2.stopInstances.bind(ec2));
+const asyncTerminateInstances = promisify(ec2.terminateInstances.bind(ec2));
 
 // STS
 const asyncGetCallerIdentity = promisify(sts.getCallerIdentity.bind(sts));
@@ -161,12 +170,14 @@ module.exports = {
   asyncCreateCloudFrontInvalidation,
   asyncListCloudFrontDistributions,
   asyncDeleteCloudFrontDistribution,
+  asyncCloudFrontWaitFor,
   asyncAddPermission,
   asyncCreateLambdaFunction,
   asyncDeleteLambdaFunction,
   asyncAttachRolePolicy,
   asyncCreateRole,
   asyncDeleteRole,
+  asyncListAttachedRolePolicies,
   asyncDetachRolePolicy,
   asyncListAttachedUserPolicy,
   asyncGetGroup,
@@ -180,15 +191,19 @@ module.exports = {
   asyncCreateInstanceProfile,
   asyncGetInstanceProfile,
   asyncAddRoleToProfile,
+  asyncRemoveRoleFromInstanceProfile,
+  asyncDeleteInstanceProfile,
   asyncCreateSecurityGroup,
   asyncDescribeSecurityGroups,
   asyncAuthorizeSecurityGroupIngress,
+  asyncDeleteSecurityGroup,
   asyncCreateKeyPair,
   asyncDescribeKeyPairs,
   asyncDeleteKeyPair,
   asyncDescribeInstances,
   asyncStartInstances,
   asyncStopInstances,
+  asyncTerminateInstances,
   asyncRunInstances,
   asyncAssociateIamInstanceProfile,
   asyncEc2WaitFor,

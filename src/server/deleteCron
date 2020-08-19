@@ -1,0 +1,1 @@
+*/1 * * * * sh /home/ec2-user/server/startDelete.sh

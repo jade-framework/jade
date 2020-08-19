@@ -31,4 +31,12 @@ const appsNotFound = () => {
   );
 };
 
-module.exports = { printBuildSuccess, appNotFound, appsNotFound };
+const userMsg = (command) => {
+  if (command === 'add') {
+    return 'Thank you! Your new Jade app will now be setup.';
+  } else if (command === 'init') {
+    return 'Thank you! The Jade framework will now be setup.';
+  }
+};
+
+module.exports = { printBuildSuccess, appNotFound, appsNotFound, userMsg };

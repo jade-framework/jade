@@ -6,9 +6,11 @@ const { unfreezeApp } = require('./freezeApps');
 const {
   asyncDynamoScan,
   asyncDynamoUpdateItem,
-  asyncGetCloudFrontDistributionConfig,
 } = require('../aws/awsAsyncFunctions');
-const { sendDeleteAppCommand } = require('../util/connect');
+const {
+  asyncSendDeleteAppCommand,
+  syncSendDeleteAppCommand,
+} = require('../util/connect');
 const { appsTableName } = require('../templates/constants');
 const { confirmDelete } = require('./questions');
 const { getBucketNames } = require('./helpers');
@@ -49,7 +51,7 @@ const updateAppsTableStatus = async (projectName, bucketName) => {
   }
 };
 
-const removeApp = async (match) => {
+const removeApp = async (match, sync) => {
   jadeLog('Beginning app deletion.');
   let {
     projectName,
@@ -64,40 +66,39 @@ const removeApp = async (match) => {
   cfdId = cloudFrontDistributionId.S;
   isFrozen = isFrozen.BOOL;
 
-  jadeLog('Deleting buckets...');
-  await Promise.all(
-    getBucketNames(bucketName).map((name) => {
-      return (async () => {
-        await deleteBucket(name);
-      })();
-    }),
-  );
-  jadeLog('Buckets deleted.');
+  try {
+    jadeLog('Deleting buckets...');
+    await Promise.all(
+      getBucketNames(bucketName).map((name) => {
+        return (async () => {
+          await deleteBucket(name);
+        })();
+      }),
+    );
+    jadeLog('Buckets deleted.');
 
-  // disable CloudFront
-  jadeLog('Disabling CloudFront distribution...');
-  const cloudFrontConfig = await asyncGetCloudFrontDistributionConfig({
-    Id: cfdId,
-  });
-  let eTag = cloudFrontConfig.ETag;
+    // disable CloudFront
+    let data = await disableCloudFrontDistribution(cfdId);
+    eTag = data.ETag;
+    jadeLog('CloudFront distribution disabled.');
 
-  let data = await disableCloudFrontDistribution(cfdId, cloudFrontConfig, eTag);
-  eTag = data.ETag;
-  jadeLog('CloudFront distribution disabled.');
+    // unfreeze instance if frozen
+    await unfreezeApp(projectName);
 
-  // unfreeze instance if frozen
-  await unfreezeApp(match);
+    // delete CloudFront and EC2
+    if (sync) {
+      await syncSendDeleteAppCommand(publicIp);
+    } else {
+      await asyncSendDeleteAppCommand(publicIp);
+    }
 
-  // delete CloudFront and EC2
-  const promise = sendDeleteAppCommand(eTag, publicIp);
-
-  Promise.all([promise]).then(() =>
-    jadeLog(`The ${projectName} app is deleted.`),
-  );
-  // update DynamoDb
-  jadeLog('Updating DynamoDB...');
-  await updateAppsTableStatus(projectName, bucketName);
-  jadeLog('DynamoDB updated.');
+    // update DynamoDb
+    jadeLog('Updating DynamoDB...');
+    await updateAppsTableStatus(projectName, bucketName);
+    jadeLog('DynamoDB updated.');
+  } catch (err) {
+    jadeErr(err);
+  }
 };
 
 const deleteOneApp = async (appName) => {
@@ -130,7 +131,7 @@ const deleteOneApp = async (appName) => {
   }
 };
 
-const deleteAllApps = async () => {
+const deleteAllApps = async (sync) => {
   const params = {
     TableName: appsTableName,
   };
@@ -141,7 +142,7 @@ const deleteAllApps = async () => {
       const promises = items.map((item) => {
         if (item.isActive.BOOL) {
           return (async () => {
-            await removeApp(item);
+            await removeApp(item, sync);
           })();
         }
       });
@@ -156,7 +157,3 @@ const deleteAllApps = async () => {
 };
 
 module.exports = { deleteOneApp, deleteAllApps };
-
-// (async () => {
-//   await deleteAllApps();
-// })();

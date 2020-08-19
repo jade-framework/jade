@@ -14,7 +14,7 @@ const {
 const { createAndConfigEc2, installEc2JadeEnvironment } = require('../aws/ec2');
 const { initDynamo, addAppToDynamo } = require('../aws/dynamo');
 
-const { printBuildSuccess } = require('./messages');
+const { printBuildSuccess, userMsg } = require('./messages');
 const {
   initialInitQuestions,
   initialAddQuestions,
@@ -23,7 +23,6 @@ const {
 } = require('./questions');
 const {
   validateBucketCreation,
-  validateUserPermissions,
   validateInitialInput,
   validateGitInput,
 } = require('./validations');
@@ -34,18 +33,16 @@ const {
   cloudFrontOriginDomain,
 } = require('../templates/constants');
 const {
-  readJSONFile,
   createDirectory,
   exists,
   join,
   readConfig,
-  writeConfig,
   getJadePath,
 } = require('./fileUtils');
 const { getBucketNames, getGitFolder, parseName } = require('./helpers');
 const { jadeLog, jadeWarn, jadeErr } = require('./logger');
 
-const getUserProjectData = async (command) => {
+const getUserProjectData = async (command, args) => {
   try {
     let initialQuestions;
     if (command === 'add') {
@@ -54,7 +51,7 @@ const getUserProjectData = async (command) => {
       initialQuestions = initialInitQuestions;
     }
     const config = await getConfig();
-    let initialAns = await initialQuestions();
+    let initialAns = await initialQuestions(args);
 
     const invalidInitialAns = await validateInitialInput({
       ...initialAns,
@@ -65,7 +62,7 @@ const getUserProjectData = async (command) => {
       return false;
     }
 
-    const appConfigAns = await appConfigQuestions(initialAns);
+    const appConfigAns = await appConfigQuestions(args);
 
     const invalidAppConfig = await validateGitInput({
       ...appConfigAns,
@@ -109,17 +106,6 @@ const getUserProjectData = async (command) => {
   }
 };
 
-// const updateBucketData = async (directory, projectData) => {
-//   try {
-//     const jadePath = getJadePath(directory);
-
-//     return true;
-//   } catch (err) {
-//     jadeErr(err);
-//     return false;
-//   }
-// };
-
 const setupApp = async (directory, projectData) => {
   try {
     const { bucketName } = projectData;
@@ -127,9 +113,6 @@ const setupApp = async (directory, projectData) => {
     await addUserToJadeGroup();
 
     await createDirectory('.jade', directory);
-
-    // const bucketData = await updateBucketData(directory, projectData);
-    // if (!bucketData) return false;
 
     await createBuckets(bucketName);
 
@@ -207,16 +190,8 @@ const setupAwsInfra = async (projectData) => {
   }
 };
 
-const userMsg = (command) => {
-  if (command === 'add') {
-    return 'Thank you! Your new Jade app will now be setup.';
-  } else if (command === 'init') {
-    return 'Thank you! The Jade framework will now be setup.';
-  }
-};
-
-const launchApp = async (command, directory) => {
-  const projectData = await getUserProjectData(command);
+const launchApp = async (command, directory, args) => {
+  const projectData = await getUserProjectData(command, args);
   if (!projectData) return;
 
   jadeLog(userMsg(command));

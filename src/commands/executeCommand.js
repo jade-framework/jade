@@ -5,6 +5,7 @@ const { destroy } = require('./destroy');
 const { list } = require('./list');
 const { freeze } = require('./freeze');
 const { unfreeze } = require('./unfreeze');
+const { help } = require('./help');
 const { jadeLog, jadeErr } = require('../util/logger');
 
 const commandIsBlank = (cmd) => cmd === undefined || cmd === '';
@@ -13,7 +14,7 @@ const commandIsHelp = (cmd) => cmd === 'help' || cmd === '-h' || cmd === 'man';
 const executeCommand = async (command, args, homedir) => {
   try {
     if (command === 'init') {
-      await init(homedir);
+      await init(homedir, args);
     } else if (command === 'add') {
       await add(homedir, args);
     } else if (command === 'delete') {
@@ -27,8 +28,7 @@ const executeCommand = async (command, args, homedir) => {
     } else if (command === 'unfreeze') {
       await unfreeze(args);
     } else if (commandIsHelp(command) || commandIsBlank(command)) {
-      // await help(args);
-      jadeLog(`Help method, command is ${command}, args is ${args}.`);
+      await help();
     } else {
       jadeLog(`Command ${command} is not valid.`);
     }
