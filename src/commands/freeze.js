@@ -2,8 +2,7 @@ const { appNotFound } = require('../util/messages');
 const { jadeErr } = require('../util/logger');
 const { freezeApp } = require('../util/freezeApps');
 
-const freeze = async (args) => {
-  const appName = args[0];
+const freeze = async ([appName, ..._]) => {
   if (!appName) return appNotFound();
   try {
     await freezeApp(appName);

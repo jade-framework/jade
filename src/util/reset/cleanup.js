@@ -1,13 +1,15 @@
-const { deleteAllBuckets } = require('../aws/s3/deleteAllBuckets');
-const { deleteIamRole } = require('../aws/iam');
-const { deleteLambdaFunction } = require('../aws/lambda/deleteLambdaFunction');
-const { deleteAllDynamoTables } = require('../aws/dynamo');
+const { deleteAllBuckets } = require('../../aws/s3/deleteAllBuckets');
+const { deleteIamRole } = require('../../aws/iam');
+const {
+  deleteLambdaFunction,
+} = require('../../aws/lambda/deleteLambdaFunction');
+const { deleteAllDynamoTables } = require('../../aws/dynamo');
 const {
   lambdaRolePolicies,
   lambdaIamRoleName,
   lambdaNames,
-} = require('../templates/constants');
-const { jadeErr } = require('../util/logger');
+} = require('../../templates/constants');
+const { jadeErr } = require('../logger');
 
 const cleanup = async () => {
   try {
@@ -16,7 +18,7 @@ const cleanup = async () => {
     jadeErr(err);
   }
   try {
-    await deleteIamRole(lambdaIamRoleName, lambdaRolePolicies);
+    await deleteIamRole(lambdaIamRoleName);
   } catch (err) {
     jadeErr(err);
   }

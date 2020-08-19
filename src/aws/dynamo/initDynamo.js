@@ -147,7 +147,7 @@ const addAppToDynamo = async (projectData) => {
     const putPromise1 = putDynamoItem(appsTableName, appsItem);
     const putPromise2 = putDynamoItem(versionsTableName, versionsItem);
     await Promise.all([putPromise1, putPromise2]);
-    jadeLog('DynamoDB setup complete.');
+    jadeLog('DynamoDB updated with new app.');
   } catch (error) {
     jadeErr(error);
   }

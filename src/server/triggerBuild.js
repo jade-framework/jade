@@ -132,7 +132,7 @@ module.exports = async function triggerBuild(webhook) {
     const initialProjectData = await readFile(
       join(userDir, 'server', 'initialProjectData.json'),
     );
-    log('After initial proj dta');
+    log('After initial proj data');
     const initialData = JSON.parse(initialProjectData);
     const date = Date.now().toString();
     initialData.versionId = date;

@@ -3,12 +3,12 @@ const { promptProjectName, promptGitUrl } = require('./validations');
 const { jadePrefix } = require('../templates/constants');
 
 // questions used for jade init
-const initialInitQuestions = async () => {
+const initialInitQuestions = async (args) => {
   const questions = [
     {
       message: 'What is your project name?\n',
       name: 'projectName',
-      default: 'My Jade Project',
+      default: args[0] || 'My Jade Project',
       validate: (input) => {
         return promptProjectName(input);
       },
@@ -25,12 +25,12 @@ const initialInitQuestions = async () => {
 };
 
 // questions used for jade add
-const initialAddQuestions = async () => {
+const initialAddQuestions = async (args) => {
   const questions = [
     {
       name: 'projectName',
       message: 'What is your new project name?\n',
-      default: 'My New Jade Project',
+      default: args[0] || 'My New Jade Project',
       validate: (input) => {
         return promptProjectName(input);
       },
@@ -47,7 +47,8 @@ const initialAddQuestions = async () => {
   return answers;
 };
 
-const appConfigQuestions = async () => {
+const appConfigQuestions = async (args) => {
+  const [_, userGitUrl, userInstall, userBuild, userPublish] = args;
   const questions = [
     {
       name: 'gitUrl',
@@ -58,21 +59,22 @@ const appConfigQuestions = async () => {
       filter: (input) => {
         return input.replace(/\s/gi, '');
       },
+      default: userGitUrl || 'https://github.com/user/root',
     },
     {
       name: 'userInstallCommand',
       message: `Please enter the command to install your project's environment:\n`,
-      default: `yarn install`,
+      default: userInstall || `yarn install`,
     },
     {
       name: 'userBuildCommand',
       message: `Please enter the command to build your project files:\n`,
-      default: `yarn build`,
+      default: userBuild || `yarn build`,
     },
     {
       name: 'publishDirectory',
       message: `Please specify the publish directory. Jade will take files in this directory and deploy them to the CDN:\n`,
-      default: `public\/`,
+      default: userPublish || `public\/`,
     },
   ];
   const answers = await prompt(questions);
@@ -95,7 +97,7 @@ const confirmResponses = async (projectData) => {
     `Installation command  >>>  ${userInstallCommand}`,
     `Build command         >>>  ${userBuildCommand}`,
     `Publish directory     >>>  ${publishDirectory}`,
-    'Is this correct?',
+    'Is this correct?\n',
   ];
 
   const answer = await prompt([
@@ -115,7 +117,7 @@ const confirmDeleteKeyPair = async () => {
       type: 'confirm',
       name: 'delete',
       message:
-        'Jade cannot find a ".jade" folder in the current directory with the Jade private key. Would you like to make a new key pair (note: this will prevent you from accessing existing EC2 instances)?',
+        'Jade cannot find a ".jade" folder in the current directory with the Jade private key. Would you like to make a new key pair (note: this will prevent you from accessing existing EC2 instances)?\n',
     },
   ];
   const answers = await prompt(questions);
@@ -128,7 +130,7 @@ const confirmDelete = async () => {
       type: 'confirm',
       name: 'delete',
       message:
-        'Are you sure? This will remove the app and its associated AWS infrastructure (including CloudFront, EC2, and S3). This action will not affect other Jade apps.',
+        'Are you sure? This will remove the app and its associated AWS infrastructure (including CloudFront, EC2, and S3). This action will not affect other Jade apps.\n',
     },
   ];
   const answers = await prompt(questions);
@@ -141,11 +143,18 @@ const confirmDestroy = async () => {
       type: 'confirm',
       name: 'destroy',
       message:
-        'Are you sure? This will remove all apps deployed with Jade and their provisioned resources from AWS.',
+        'Are you sure? This will remove all apps deployed with Jade and their provisioned resources from AWS.\n',
+    },
+    {
+      type: 'confirm',
+      name: 'sync',
+      message:
+        'Would you like to wait for Jade to remove all apps? This may take up to 90 minutes. Otherwise, you will have to manually remove the Jade IAM roles from your AWS account. For more info, please visit: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_manage_delete.html\n',
+      when: ({ destroy }) => destroy,
     },
   ];
   const answers = await prompt(questions);
-  return answers.destroy;
+  return answers;
 };
 
 module.exports = {

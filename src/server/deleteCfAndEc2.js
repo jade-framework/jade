@@ -15,31 +15,32 @@ const apiVersion = 'latest';
 AWS.config.update({ region });
 
 const cf = new AWS.CloudFront({ apiVersion });
-const asyncGetDistribution = promisify(cf.getDistribution.bind(cf));
+// const asyncGetDistribution = promisify(cf.getDistribution.bind(cf));
 const asyncDeleteDistribution = promisify(cf.deleteDistribution.bind(cf));
+const asyncWaitFor = promisify(cf.waitFor.bind(cf));
 
 const userDir = `/home/ec2-user`;
 
 let eTag;
 
-const deleteCfWithRetries = async (cfId, maxRetries = 100, attempts = 0) => {
-  try {
-    const getRes = await asyncGetDistribution({ Id: cfId });
-    log(getRes);
-    if (getRes.Distribution.Status !== 'Deployed') {
-      await sleep(oneMinute);
-      return await deleteCfWithRetries(cfId, maxRetries, attempts + 1);
-    } else {
-      eTag = getRes.ETag;
-      log(eTag);
-      await asyncDeleteDistribution({ Id: cfId, IfMatch: eTag });
-      return true;
-    }
-  } catch (err) {
-    logErr(err);
-    return await deleteCfWithRetries(cfId, maxRetries, attempts + 1);
-  }
-};
+// const deleteCfWithRetries = async (cfId, maxRetries = 100, attempts = 0) => {
+//   try {
+//     const getRes = await asyncGetDistribution({ Id: cfId });
+//     log(getRes);
+//     if (getRes.Distribution.Status !== 'Deployed') {
+//       await sleep(oneMinute);
+//       return await deleteCfWithRetries(cfId, maxRetries, attempts + 1);
+//     } else {
+//       eTag = getRes.ETag;
+//       log(eTag);
+//       await asyncDeleteDistribution({ Id: cfId, IfMatch: eTag });
+//       return true;
+//     }
+//   } catch (err) {
+//     logErr(err);
+//     return await deleteCfWithRetries(cfId, maxRetries, attempts + 1);
+//   }
+// };
 
 const deleteCf = async () => {
   try {
@@ -48,7 +49,13 @@ const deleteCf = async () => {
     );
     const initialData = JSON.parse(initialProjectData);
     const { cloudFrontDistributionId } = initialData;
-    await deleteCfWithRetries(cloudFrontDistributionId);
+    const waitRes = await asyncWaitFor({ Id: cloudFrontDistributionId });
+    eTag = waitRes.ETag;
+    await asyncDeleteDistribution({
+      Id: cloudFrontDistributionId,
+      IfMatch: eTag,
+    });
+    // await deleteCfWithRetries(cloudFrontDistributionId);
   } catch (err) {
     logErr(err);
   }

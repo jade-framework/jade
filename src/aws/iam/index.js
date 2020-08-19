@@ -3,6 +3,7 @@ const { deleteIamRole } = require('./deleteIamRole');
 const { roleExists, instanceProfileExists, groupExists } = require('./exists');
 const { createJadeIamGroup, addUserToJadeGroup } = require('./createIamGroup');
 const { deleteIamGroup, deleteJadeIamGroup } = require('./deleteIamGroup');
+const { deleteInstanceProfile } = require('./deleteInstanceProfile');
 
 module.exports = {
   configEc2IamRole,
@@ -14,4 +15,5 @@ module.exports = {
   addUserToJadeGroup,
   deleteIamGroup,
   deleteJadeIamGroup,
+  deleteInstanceProfile,
 };

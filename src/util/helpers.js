@@ -21,4 +21,6 @@ const getGitFolder = (url) => {
   return parts[index + 2];
 };
 
-module.exports = { getBucketNames, parseName, getGitFolder };
+const tagName = (projectName) => `${projectName}'s Jade EC2 Instance`;
+
+module.exports = { getBucketNames, parseName, getGitFolder, tagName };

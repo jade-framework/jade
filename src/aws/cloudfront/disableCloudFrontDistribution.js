@@ -1,18 +1,28 @@
 const {
   asyncUpdateCloudFrontDistribution,
   asyncGetCloudFrontDistributionConfig,
+  asyncCloudFrontWaitFor,
 } = require('../awsAsyncFunctions');
-const { jadeErr } = require('../../util/logger');
+const { jadeLog, jadeErr } = require('../../util/logger');
 
-const disableCloudFrontDistribution = async (id, config, ETag) => {
-  config.DistributionConfig.Enabled = false;
-  config.Id = id;
-  config.IfMatch = ETag;
-  delete config['ETag'];
-
+const disableCloudFrontDistribution = async (cfdId) => {
+  const params = {
+    Id: cfdId,
+  };
   try {
-    let data = await asyncUpdateCloudFrontDistribution(config);
-    return data;
+    jadeLog(
+      'Getting CFD config (this may take a while if you recently deployed the app)...',
+    );
+    await asyncCloudFrontWaitFor('distributionDeployed', params);
+    let getData = await asyncGetCloudFrontDistributionConfig(params);
+    const { ETag, ...data } = getData;
+    data.IfMatch = ETag;
+    data.DistributionConfig.Enabled = false;
+    data.Id = cfdId;
+    jadeLog('Updating CFD...');
+    let updateData = await asyncUpdateCloudFrontDistribution(data);
+    jadeLog('CFD updated.');
+    return updateData;
   } catch (err) {
     jadeErr(err);
   }

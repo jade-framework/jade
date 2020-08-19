@@ -28,7 +28,7 @@ const printItems = (items) => {
     if (domainName.length > domainNameLength) {
       domainNameLength = domainName.length;
     }
-    const itemPublicIpLength = publicIp.length + 'http://'.length;
+    const itemPublicIpLength = `http://${publicIp}/webhook`.length;
     if (itemPublicIpLength > publicIpLength) {
       publicIpLength = itemPublicIpLength;
     }
@@ -50,7 +50,7 @@ const printItems = (items) => {
     )}`,
   );
   items.forEach(({ id, projectName, domainName, publicIp, active, frozen }) => {
-    const ip = `http://${publicIp}`;
+    const ip = `http://${publicIp}/webhook`;
     jadeLog(
       `${id.toString().padEnd(countLength)} | ${projectName.padEnd(
         projectNameLength,
