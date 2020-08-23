@@ -83,7 +83,6 @@ const createJadeIamGroup = async () => {
     'arn:aws:iam::aws:policy/AmazonEC2FullAccess',
     'arn:aws:iam::aws:policy/AWSLambdaFullAccess',
     'arn:aws:iam::aws:policy/CloudFrontFullAccess',
-    // 'arn:aws:iam::aws:policy/AmazonAPIGatewayAdministrator',
   ];
   try {
     await createIamGroup(jadeIamGroup, requiredPolicies);

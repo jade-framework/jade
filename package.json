@@ -1,8 +1,37 @@
 {
   "name": "jade",
-  "version": "1.3.0",
+  "version": "2.0.0",
   "main": "index.js",
   "author": "Jade Framework",
+  "description": "Serverless framework for AWS Lambda and API Gateway",
+  "keywords": [
+    "jamstack",
+    "ci/cd",
+    "continuous integration/continuous delivery",
+    "aws",
+    "amazon web services",
+    "cloudfront",
+    "dynamodb",
+    "ec2",
+    "lambda",
+    "s3",
+    "docker",
+    "jade"
+  ],
+  "contributors": [
+    {
+      "name": "Jeremy Crichton",
+      "email": "jeremycrichton@gmail.com"
+    },
+    {
+      "name": "Krunal Patel",
+      "email": "kpatel27@gmail.com"
+    },
+    {
+      "name": "Edmond Tam",
+      "email": "edmondtam2@gmail.com"
+    }
+  ],
   "license": "MIT",
   "dependencies": {
     "aws-sdk": "^2.714.0",
@@ -15,6 +44,9 @@
   "bin": {
     "jade": "./bin/cli.js"
   },
+  "scripts": {
+    "test": "jest"
+  },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
     "eslint": "^7.6.0",
@@ -24,6 +56,7 @@
     "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-react": "^7.20.5",
+    "jest": "^26.4.2",
     "logplease": "^1.2.15",
     "prettier": "^2.0.5"
   }
