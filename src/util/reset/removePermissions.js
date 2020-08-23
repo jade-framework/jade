@@ -3,10 +3,6 @@ const {
   jadeKeyPair,
   ec2IamRoleName,
   ec2InstanceProfile,
-  s3FullAccessPolicyArn,
-  dynamoDbFullAccessPolicyArn,
-  cloudFrontFullAccess,
-  ec2FullAccess,
 } = require('../../templates/constants');
 const { deleteIamRole, deleteInstanceProfile } = require('../../aws/iam');
 const {
@@ -57,7 +53,7 @@ async function removePermissions() {
   try {
     await asyncDeleteKeyPair({ KeyName: jadeKeyPair });
     jadeLog('Key pair deleted.');
-    // await deleteSecurityGroup(securityGroupName);
+    await deleteSecurityGroup(securityGroupName);
   } catch (err) {
     jadeErr(err);
   }

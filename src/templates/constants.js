@@ -9,11 +9,12 @@ const securityGroup = 'securityGroup';
 const securityGroupName = 'jade-security-group';
 const ec2IamRoleName = 'jade-ec2-role';
 const ec2InstanceProfile = 'jade-ec2-instance-profile';
-const s3FullAccessPolicyArn = 'arn:aws:iam::aws:policy/AmazonS3FullAccess';
-const dynamoDbFullAccessPolicyArn =
-  'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess';
-const cloudFrontFullAccess = 'arn:aws:iam::aws:policy/CloudFrontFullAccess';
-const ec2FullAccess = 'arn:aws:iam::aws:policy/AmazonEC2FullAccess';
+const ec2RolePolicies = [
+  'arn:aws:iam::aws:policy/AmazonS3FullAccess',
+  'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+  'arn:aws:iam::aws:policy/CloudFrontFullAccess',
+  'arn:aws:iam::aws:policy/AmazonEC2FullAccess',
+];
 const lambdaIamRoleName = 'jade-lambda-role';
 const jadePrefix = '\x1b[32;1m💎\x1b[32;0m';
 const lambdaNames = 'jadeInvalidateCloudFrontFile';
@@ -41,14 +42,11 @@ module.exports = {
   securityGroupName,
   ec2IamRoleName,
   ec2InstanceProfile,
-  s3FullAccessPolicyArn,
-  dynamoDbFullAccessPolicyArn,
-  cloudFrontFullAccess,
-  ec2FullAccess,
+  ec2RolePolicies,
   lambdaIamRoleName,
-  jadePrefix,
   lambdaNames,
   lambdaRolePolicies,
+  jadePrefix,
   initialProjectData,
   projectNameLength,
   bucketSuffixes,
