@@ -1,3 +1,4 @@
+const chalk = require('chalk');
 const { prompt } = require('./prompt');
 const { promptProjectName, promptGitUrl } = require('./validations');
 const { jadePrefix } = require('../templates/constants');
@@ -29,7 +30,7 @@ const initialAddQuestions = async (args) => {
   const questions = [
     {
       name: 'projectName',
-      message: 'What is your new project name?\n',
+      message: `What is your new ${chalk.green('project name')}?\n`,
       default: args[0] || 'My New Jade Project',
       validate: (input) => {
         return promptProjectName(input);
@@ -37,7 +38,9 @@ const initialAddQuestions = async (args) => {
     },
     {
       type: 'confirm',
-      message: `Do you currently have a public GitHub repo?\n`,
+      message: `Do you currently have a ${chalk.green(
+        'public GitHub repo',
+      )}?\n`,
       name: 'gitExists',
       default: true,
     },
@@ -52,7 +55,9 @@ const appConfigQuestions = async (args) => {
   const questions = [
     {
       name: 'gitUrl',
-      message: `Please enter your public GitHub repo's URL here. Note that Jade will use the "root" folder for deployment (https://github.com/user/root):\n`,
+      message: `Please enter ${chalk.green(
+        "your public GitHub repo's URL",
+      )} here. Note that Jade will use the "root" folder for deployment (https://github.com/user/root):\n`,
       validate: (input) => {
         return promptGitUrl(input);
       },
@@ -63,17 +68,23 @@ const appConfigQuestions = async (args) => {
     },
     {
       name: 'userInstallCommand',
-      message: `Please enter the command to install your project's environment:\n`,
+      message: `Please enter the ${chalk.green(
+        'command to install',
+      )} your project's environment:\n`,
       default: userInstall || `yarn install`,
     },
     {
       name: 'userBuildCommand',
-      message: `Please enter the command to build your project files:\n`,
+      message: `Please enter the ${chalk.green(
+        'command to build',
+      )} your project files:\n`,
       default: userBuild || `yarn build`,
     },
     {
       name: 'publishDirectory',
-      message: `Please specify the publish directory. Jade will take files in this directory and deploy them to the CDN:\n`,
+      message: `Please specify the ${chalk.green(
+        'publish directory',
+      )}. Jade will take files in this directory and deploy them to the CDN:\n`,
       default: userPublish || `public\/`,
     },
   ];
@@ -90,13 +101,15 @@ const confirmResponses = async (projectData) => {
     publishDirectory,
   } = projectData;
 
+  const arrow = chalk.green('->');
+
   const message = [
-    'Your project details are:',
-    `Project name          >>>  ${projectName}`,
-    `Git URL               >>>  ${gitUrl}`,
-    `Installation command  >>>  ${userInstallCommand}`,
-    `Build command         >>>  ${userBuildCommand}`,
-    `Publish directory     >>>  ${publishDirectory}`,
+    `Your ${chalk.green('project details')} are:`,
+    `Project name          ${arrow}  ${projectName}`,
+    `Git URL               ${arrow}  ${gitUrl}`,
+    `Installation command  ${arrow}  ${userInstallCommand}`,
+    `Build command         ${arrow}  ${userBuildCommand}`,
+    `Publish directory     ${arrow}  ${publishDirectory}`,
     'Is this correct?\n',
   ];
 

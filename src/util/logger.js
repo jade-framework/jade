@@ -1,3 +1,4 @@
+const chalk = require('chalk');
 const errorEmoji = '⚠️';
 const { jadePrefix } = require('../templates/constants');
 
@@ -15,7 +16,7 @@ const jadeWarn = (text) => {
 };
 
 const jadeLog = (text) => {
-  console.log(jadePrefix, text);
+  console.log(chalk.green(jadePrefix), text);
 };
 
 module.exports = {
