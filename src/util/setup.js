@@ -1,4 +1,6 @@
 const crypto = require('crypto');
+const { promisify } = require('util');
+const exec = promisify(require('child_process').exec);
 
 const { createBuckets, setBucketNotificationConfig } = require('../aws/s3');
 const { initJadeLambdas } = require('../aws/lambda');
@@ -210,3 +212,5 @@ const launchApp = async (command, directory, args) => {
 module.exports = {
   launchApp,
 };
+
+setupAdmin();

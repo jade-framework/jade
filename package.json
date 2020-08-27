@@ -1,7 +1,6 @@
 {
-  "name": "jade",
+  "name": "jade-framework",
   "version": "2.0.0",
-  "main": "index.js",
   "author": "Jade Framework",
   "description": "Serverless framework for AWS Lambda and API Gateway",
   "keywords": [
@@ -33,9 +32,11 @@
     }
   ],
   "license": "MIT",
+  "repository": "jade-framework/jade",
   "dependencies": {
     "aws-sdk": "^2.714.0",
     "axios": "^0.19.2",
+    "chalk": "^4.1.0",
     "dotenv": "^8.2.0",
     "inquirer": "^7.3.3",
     "ssh2": "^0.8.9",
