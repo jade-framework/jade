@@ -1,8 +1,8 @@
 {
-  "name": "jade-framework",
-  "version": "2.0.0",
+  "name": "@jade-framework/jade",
+  "version": "1.0.0-beta.0",
   "author": "Jade Framework",
-  "description": "Serverless framework for AWS Lambda and API Gateway",
+  "description": "An open source deployment environment for JAMstack applications",
   "keywords": [
     "jamstack",
     "ci/cd",
