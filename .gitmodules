@@ -1,0 +1,3 @@
+[submodule "src/admin"]
+	path = src/admin
+	url = https://github.com/jade-framework/jade-admin
