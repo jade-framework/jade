@@ -19,7 +19,7 @@ const executeCommand = async (command, args, homedir) => {
     } else if (command === 'add') {
       await add(homedir, args);
     } else if (command === 'admin') {
-      await admin();
+      await admin(homedir);
     } else if (command === 'delete') {
       await deleteApp(args);
     } else if (command === 'destroy') {
