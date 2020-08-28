@@ -1,5 +1,6 @@
 const { init } = require('./init');
 const { add } = require('./add');
+const { admin } = require('./admin');
 const { deleteApp } = require('./delete');
 const { destroy } = require('./destroy');
 const { list } = require('./list');
@@ -17,6 +18,8 @@ const executeCommand = async (command, args, homedir) => {
       await init(homedir, args);
     } else if (command === 'add') {
       await add(homedir, args);
+    } else if (command === 'admin') {
+      await admin();
     } else if (command === 'delete') {
       await deleteApp(args);
     } else if (command === 'destroy') {
