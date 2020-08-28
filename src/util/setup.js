@@ -212,5 +212,3 @@ const launchApp = async (command, directory, args) => {
 module.exports = {
   launchApp,
 };
-
-setupAdmin();
