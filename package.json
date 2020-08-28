@@ -36,10 +36,8 @@
   "dependencies": {
     "aws-sdk": "^2.714.0",
     "axios": "^0.19.2",
-    "dotenv": "^8.2.0",
     "inquirer": "^7.3.3",
-    "ssh2": "^0.8.9",
-    "uuid": "^8.3.0"
+    "ssh2": "^0.8.9"
   },
   "bin": {
     "jade": "./bin/cli.js"
@@ -47,7 +45,11 @@
   "scripts": {
     "test": "jest"
   },
+  "jest": {
+    "testEnvironment": "node"
+  },
   "devDependencies": {
+    "aws-sdk-mock": "^5.1.0",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.6.0",
     "eslint-config-airbnb": "^18.2.0",

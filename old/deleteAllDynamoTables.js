@@ -1,10 +1,10 @@
-const { jadeLog, jadeErr } = require('../../util/logger');
+const { jadeLog, jadeErr } = require('../src/util/logger');
 const {
   asyncDynamoListTables,
   asyncDynamoDescribeTable,
   asyncDynamoListTagsOfResource,
-} = require('../awsAsyncFunctions');
-const deleteDynamoTable = require('./deleteDynamoTable');
+} = require('../src/aws/awsAsyncFunctions');
+const deleteDynamoTable = require('../src/aws/dynamo/deleteDynamoTable');
 
 const deleteAllDynamoTables = async () => {
   try {

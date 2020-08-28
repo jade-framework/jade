@@ -6,8 +6,6 @@ const {
   asyncDynamoWaitFor,
 } = require('../awsAsyncFunctions');
 
-// to discuss: AWS.config.update({endpoint: "http://localhost:8000"})
-
 const createDynamoTable = async (
   tableName,
   primaryKeyName,

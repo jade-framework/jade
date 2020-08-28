@@ -1,5 +1,10 @@
 const { jadeLog, jadeErr } = require('../../util/logger');
-const { asyncDynamoDeleteTable } = require('../awsAsyncFunctions');
+const {
+  asyncDynamoListTables,
+  asyncDynamoDescribeTable,
+  asyncDynamoListTagsOfResource,
+  asyncDynamoDeleteTable,
+} = require('../awsAsyncFunctions');
 
 const deleteDynamoTable = async (tableName) => {
   let response;
@@ -8,9 +13,36 @@ const deleteDynamoTable = async (tableName) => {
     await asyncDynamoDeleteTable({ TableName: tableName });
     jadeLog(`DynamoDB table ${tableName} deleted.`);
   } catch (error) {
-    jadeErr('Error creating DynamoDB table');
     jadeErr(error);
   }
   return response;
 };
-module.exports = deleteDynamoTable;
+
+const deleteAllDynamoTables = async () => {
+  try {
+    jadeLog(`Deleting all DynamoDB tables...`);
+    const allTables = await asyncDynamoListTables();
+    allTables.TableNames.forEach(async (tableName) => {
+      const tableInfo = await asyncDynamoDescribeTable({
+        TableName: tableName,
+      });
+      const tags = await asyncDynamoListTagsOfResource({
+        ResourceArn: tableInfo.Table.TableArn,
+      });
+      const isJadeTable =
+        tags.Tags && tags.Tags.some((tag) => tag.Value === 'jade');
+
+      if (isJadeTable) {
+        try {
+          await deleteDynamoTable(tableName);
+        } catch (error) {
+          jadeErr(error);
+        }
+      }
+    });
+  } catch (error) {
+    jadeErr(error);
+  }
+};
+
+module.exports = { deleteDynamoTable, deleteAllDynamoTables };
