@@ -5,6 +5,11 @@ const {
   createIamRole,
   deleteIamRole,
 } = require('../src/aws/iam');
+
+const {
+  asyncListAttachedRolePolicies,
+} = require('../src/aws/awsAsyncFunctions');
+
 const { join, readJSONFile } = require('../src/util/fileUtils');
 
 const roleName = 'testJadeRole';
@@ -37,10 +42,50 @@ describe('AWS IAM', () => {
       expect(role).toMatchObject(expected);
     });
 
-    test('role is not created if it exists', async () => {});
-    test('role policies are attached', async () => {});
-    test('policies are detached before role is deleted', async () => {});
-    test('deleting role does not throw error', async () => {});
+    test('role is not created if it exists', async () => {
+      const log = jest.spyOn(console, 'log');
+      const documentPolicy = await readJSONFile(
+        'ec2IamConfig',
+        join(__dirname, '..', 'src', 'templates'),
+      );
+      await createIamRole(documentPolicy, roleName, rolePolicies);
+      role = await roleExists(roleName);
+      await createIamRole(documentPolicy, roleName, rolePolicies);
+      expect(log).toHaveBeenLastCalledWith(`Using existing ${roleName} role.`);
+    });
+    test('role policies are attached', async () => {
+      let params = { RoleName: roleName };
+      let expected = [
+        {
+          PolicyName: 'AmazonEC2FullAccess',
+          PolicyArn: 'arn:aws:iam::aws:policy/AmazonEC2FullAccess',
+        },
+        {
+          PolicyName: 'AWSLambdaFullAccess',
+          PolicyArn: 'arn:aws:iam::aws:policy/AWSLambdaFullAccess',
+        },
+      ];
+      const documentPolicy = await readJSONFile(
+        'ec2IamConfig',
+        join(__dirname, '..', 'src', 'templates'),
+      );
+      await createIamRole(documentPolicy, roleName, rolePolicies);
+      let attachedPolicies = (await asyncListAttachedRolePolicies(params))
+        .AttachedPolicies;
+
+      expect(attachedPolicies).toMatchObject(expected);
+    });
+    test('deleting role does not throw error', async () => {
+      const log = jest.spyOn(console, 'log');
+      const documentPolicy = await readJSONFile(
+        'ec2IamConfig',
+        join(__dirname, '..', 'src', 'templates'),
+      );
+      await createIamRole(documentPolicy, roleName, rolePolicies);
+      role = await roleExists(roleName);
+      await deleteIamRole(roleName);
+      expect(log).toHaveBeenLastCalledWith(`${roleName} successfully deleted.`);
+    });
   });
 
   describe('Group', () => {
