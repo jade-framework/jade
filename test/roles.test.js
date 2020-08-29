@@ -87,8 +87,6 @@ describe('AWS IAM', () => {
         join(__dirname, '..', 'src', 'templates'),
       );
       await createIamRole(documentPolicy, roleName, rolePolicies);
-      let role = await roleExists(roleName);
-      expect(role).toBeTruthy();
       let attachedPolicies = await asyncListAttachedRolePolicies(params);
       expect(attachedPolicies).toMatchObject(expected);
     });
@@ -98,12 +96,10 @@ describe('AWS IAM', () => {
         join(__dirname, '..', 'src', 'templates'),
       );
       await createIamRole(documentPolicy, roleName, rolePolicies);
-      let role = await roleExists(roleName);
-      expect(role).toBeTruthy();
       expect(async () => {
         await asyncDeleteRole({ RoleName: roleName });
       }).rejects;
-      role = await roleExists(roleName);
+      let role = await roleExists(roleName);
       expect(role).toBeTruthy();
     });
     test('deleting role does not throw error', async () => {
@@ -112,10 +108,8 @@ describe('AWS IAM', () => {
         join(__dirname, '..', 'src', 'templates'),
       );
       await createIamRole(documentPolicy, roleName, rolePolicies);
-      let role = await roleExists(roleName);
-      expect(role).toBeTruthy();
       await deleteIamRole(roleName);
-      role = await roleExists(roleName);
+      let role = await roleExists(roleName);
       expect(role).toBe(false);
     });
   });
@@ -159,8 +153,6 @@ describe('AWS IAM', () => {
       };
 
       await createIamGroup(groupName, groupPolicies);
-      let group = await groupExists(groupName);
-      expect(group).toBeTruthy();
       let attachedPolicies = await asyncListAttachedGroupPolicies({
         GroupName: groupName,
       });
@@ -168,10 +160,8 @@ describe('AWS IAM', () => {
     });
     test('group is deleted correctly', async () => {
       await createIamGroup(groupName, groupPolicies);
-      let group = await groupExists(groupName);
-      expect(group).toBeTruthy();
       await deleteIamGroup(groupName);
-      group = await groupExists(groupName);
+      let group = await groupExists(groupName);
       expect(group).toBe(false);
     });
   });
@@ -189,8 +179,6 @@ describe('AWS IAM', () => {
         'ec2IamConfig',
         join(__dirname, '..', 'src', 'templates'),
       );
-      let role = await roleExists(roleName);
-      expect(role).toBe(false);
       await createIamRole(documentPolicy, roleName, rolePolicies);
       role = await roleExists(roleName);
       expect(role).toBeTruthy();
@@ -199,14 +187,10 @@ describe('AWS IAM', () => {
       expect(profile).toBeTruthy();
     });
     test('instance profile is not created if it exists', async () => {
-      let profile = await instanceProfileExists(profileName);
-      expect(profile).toBe(false);
       const documentPolicy = await readJSONFile(
         'ec2IamConfig',
         join(__dirname, '..', 'src', 'templates'),
       );
-      let role = await roleExists(roleName);
-      expect(role).toBe(false);
       await createIamRole(documentPolicy, roleName, rolePolicies);
       role = await roleExists(roleName);
       expect(role).toBeTruthy();
@@ -218,8 +202,6 @@ describe('AWS IAM', () => {
       expect(profile).toBeTruthy();
     });
     test('instance profile is deleted correctly', async () => {
-      let profile = await instanceProfileExists(profileName);
-      expect(profile).toBe(false);
       const documentPolicy = await readJSONFile(
         'ec2IamConfig',
         join(__dirname, '..', 'src', 'templates'),
@@ -227,10 +209,9 @@ describe('AWS IAM', () => {
       let role = await roleExists(roleName);
       expect(role).toBe(false);
       await createIamRole(documentPolicy, roleName, rolePolicies);
-      role = await roleExists(roleName);
-      expect(role).toBeTruthy();
       await createInstanceProfile(profileName, roleName);
       profile = await instanceProfileExists(profileName);
+      expect(profile).toBeTruthy();
       await deleteInstanceProfile(profileName, roleName);
       profile = await instanceProfileExists(profileName);
       expect(profile).toBe(false);
