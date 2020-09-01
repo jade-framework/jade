@@ -100,4 +100,4 @@ const addUserToJadeGroup = async () => {
   }
 };
 
-module.exports = { createJadeIamGroup, addUserToJadeGroup };
+module.exports = { createJadeIamGroup, addUserToJadeGroup, createIamGroup };
