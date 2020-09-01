@@ -390,7 +390,7 @@ const validateDeleteArg = async (input) => {
         'Argument is missing. Please re-run the command in the following format: jade delete <appName>.',
     },
     {
-      validation: validateUniqueProjectName, //check if app exists in config
+      validation: validateUniqueProjectName, // check if app exists in config
       invalidBoolean: true,
       invalidMessage: `App "${projectName}" does not exist or was not deployed using Jade.`,
     },
@@ -418,6 +418,22 @@ const dynamoExists = async () => {
   } catch (err) {
     return false;
   }
+};
+
+// Validations helper method
+const validateResource = async (resourceData, validations) => {
+  let msg;
+
+  for (let i = 0; i < validations.length; i++) {
+    const { validation, invalidBoolean, invalidMessage } = validations[i];
+    const result = await validation(resourceData);
+
+    if (result === invalidBoolean) {
+      msg = invalidMessage;
+      break;
+    }
+  }
+  return msg;
 };
 
 const validateAwsIsSetup = async (directory) => {
@@ -451,22 +467,6 @@ const validateAwsIsNotSetup = async (directory) => {
   const status = await validateResource(directory, validations);
 
   return status;
-};
-
-// Validations helper method
-const validateResource = async (resourceData, validations) => {
-  let msg;
-
-  for (let i = 0; i < validations.length; i++) {
-    const { validation, invalidBoolean, invalidMessage } = validations[i];
-    const result = await validation(resourceData);
-
-    if (result === invalidBoolean) {
-      msg = invalidMessage;
-      break;
-    }
-  }
-  return msg;
 };
 
 module.exports = {

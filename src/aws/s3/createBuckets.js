@@ -1,5 +1,8 @@
-const { createBucket } = require('./createBucket');
-const { updateBucketPolicy } = require('./updateBucketPolicy');
+const {
+  createBucket,
+  updateBucketPolicy,
+  putBucketWebsite,
+} = require('./index');
 const { getBucketNames } = require('../../util/helpers');
 const { jadeLog, jadeErr } = require('../../util/logger');
 
@@ -13,6 +16,7 @@ const createBuckets = async (bucketName) => {
         })();
       }),
     );
+    await putBucketWebsite(`${bucketName}-stage`);
     jadeLog('All S3 buckets created and configured.');
   } catch (error) {
     jadeErr(error);
