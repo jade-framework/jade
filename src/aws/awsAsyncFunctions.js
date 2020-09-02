@@ -7,7 +7,6 @@ const IAM = require('aws-sdk/clients/iam');
 const EC2 = require('aws-sdk/clients/ec2');
 const STS = require('aws-sdk/clients/sts');
 const Dynamo = require('aws-sdk/clients/dynamodb');
-const ApiGateway = require('aws-sdk/clients/apigateway');
 const { getRegion } = require('../server/getRegion');
 
 const region = getRegion();
@@ -22,7 +21,6 @@ const iam = new IAM();
 const ec2 = new EC2();
 const sts = new STS();
 const dynamo = new Dynamo();
-const apigateway = new ApiGateway();
 
 // CLOUDFRONT
 const asyncCreateCloudFrontDistribution = promisify(
@@ -141,20 +139,6 @@ const asyncDynamoListTagsOfResource = promisify(
 const asyncDynamoScan = promisify(dynamo.scan.bind(dynamo));
 const asyncDynamoUpdateItem = promisify(dynamo.updateItem.bind(dynamo));
 
-// ApiGateway
-const asyncCreateRestApi = promisify(apigateway.createRestApi.bind(apigateway));
-const asyncGetResources = promisify(apigateway.getResources.bind(apigateway));
-const asyncPutMethod = promisify(apigateway.putMethod.bind(apigateway));
-const asyncPutIntegration = promisify(
-  apigateway.putIntegration.bind(apigateway),
-);
-const asyncCreateResource = promisify(
-  apigateway.createResource.bind(apigateway),
-);
-const asyncCreateDeployment = promisify(
-  apigateway.createDeployment.bind(apigateway),
-);
-
 module.exports = {
   asyncListBuckets,
   asyncListBucketObjects,
@@ -221,12 +205,6 @@ module.exports = {
   asyncDynamoDescribeTable,
   asyncDynamoScan,
   asyncDynamoUpdateItem,
-  asyncCreateRestApi,
-  asyncCreateResource,
-  asyncGetResources,
-  asyncPutMethod,
-  asyncPutIntegration,
-  asyncCreateDeployment,
   asyncDynamoDeleteTable,
   asyncDynamoListTables,
   asyncDynamoListTagsOfResource,

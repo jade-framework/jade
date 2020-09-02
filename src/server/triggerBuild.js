@@ -94,7 +94,7 @@ const updateDynamo = async (data) => {
 
 const runDockerBuild = async (repoName, repoDir) => {
   // Build docker image
-  console.log('Building docker image...');
+  log('Building docker image...');
   await exec(
     `sudo docker build ${userDir} -t build-app --build-arg REPO_NAME=${repoName} -f ${userDir}/Dockerfile`,
   );
@@ -103,7 +103,7 @@ const runDockerBuild = async (repoName, repoDir) => {
   // );
   // Run container, mount userDir as volume mapped to output folder in container
   // Remove container after script runs
-  console.log('Building app in container...');
+  log('Building app in container...');
   await exec(
     `sudo docker run --name build -p 6000-6000 --rm -v ${repoDir}:/output build-app`,
   );
@@ -145,8 +145,8 @@ module.exports = async function triggerBuild(webhook) {
     if (branch === 'master') {
       await exec(`git -C ${repoDir} checkout master`);
       pull = await exec(`git -C ${repoDir} pull ${cloneUrl}`);
-      console.log('Finish pull master');
-      console.log(pull);
+      log('Finish pull master');
+      log(pull);
     } else if (branch === 'staging') {
       await exec(`git -C ${repoDir} checkout staging`);
       pull = await exec(`git -C ${repoDir} pull -X theirs --no-edit`);

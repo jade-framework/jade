@@ -1,4 +1,11 @@
+const chalk = require('chalk');
 const { jadeLog } = require('./logger');
+
+const greet = (command) => {
+  if (command === 'add') {
+    jadeLog(`Let's add a new ${chalk.green('Jade')} app...`);
+  }
+};
 
 const printBuildSuccess = async ({ publicIp, cloudFrontDomainName }) => {
   jadeLog('Your deployment is ready!');
@@ -39,4 +46,10 @@ const userMsg = (command) => {
   }
 };
 
-module.exports = { printBuildSuccess, appNotFound, appsNotFound, userMsg };
+module.exports = {
+  greet,
+  printBuildSuccess,
+  appNotFound,
+  appsNotFound,
+  userMsg,
+};

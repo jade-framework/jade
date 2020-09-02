@@ -16,7 +16,7 @@ const ec2RolePolicies = [
   'arn:aws:iam::aws:policy/AmazonEC2FullAccess',
 ];
 const lambdaIamRoleName = 'jade-lambda-role';
-const jadePrefix = '\x1b[32;1m💎\x1b[32;0m';
+const jadePrefix = '\x1b[32;1m💎\x1b[32;0m ';
 const lambdaNames = 'jadeInvalidateCloudFrontFile';
 const lambdaRolePolicies = [
   'arn:aws:iam::aws:policy/CloudFrontFullAccess',

@@ -8,7 +8,6 @@ const buildAndExport = async () => {
   try {
     console.log('Updating dependencies...');
     await exec(`yarn --cwd ./${repoDir} install`);
-    // await exec(`yarn --cwd ${repoDir} cache clean`);
     console.log(`Building project...`);
     await exec(`yarn --cwd ./${repoDir} build`);
     console.log(`Copying project to host...`);
