@@ -39,6 +39,7 @@ const deleteAllDynamoTables = async () => {
           jadeErr(error);
         }
       }
+      return true;
     });
   } catch (error) {
     jadeErr(error);

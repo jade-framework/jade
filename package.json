@@ -49,8 +49,7 @@
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
       "<rootDir>/src/admin/"
-    ],
-    "maxConcurrency": 20
+    ]
   },
   "devDependencies": {
     "aws-sdk-mock": "^5.1.0",

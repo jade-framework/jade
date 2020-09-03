@@ -9,7 +9,7 @@ const putDynamoItem = async (tableName, items) => {
       Item: items,
     };
     putResponse = await asyncDynamoPutItem(putParams);
-    jadeLog(`Put items to table ${tableName}.`);
+    jadeLog(`Put item to table ${tableName}.`);
   } catch (err) {
     jadeErr(err);
   }
