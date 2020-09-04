@@ -4,6 +4,7 @@ const {
   asyncDynamoDescribeTable,
   asyncDynamoListTagsOfResource,
   asyncDynamoDeleteTable,
+  asyncDynamoWaitFor,
 } = require('../awsAsyncFunctions');
 
 const deleteDynamoTable = async (tableName) => {
@@ -11,6 +12,7 @@ const deleteDynamoTable = async (tableName) => {
   try {
     jadeLog(`Deleting DynamoDB table ${tableName}...`);
     await asyncDynamoDeleteTable({ TableName: tableName });
+    await asyncDynamoWaitFor('tableNotExists', { TableName: tableName });
     jadeLog(`DynamoDB table ${tableName} deleted.`);
   } catch (error) {
     jadeErr(error);
@@ -39,6 +41,7 @@ const deleteAllDynamoTables = async () => {
           jadeErr(error);
         }
       }
+      return true;
     });
   } catch (error) {
     jadeErr(error);

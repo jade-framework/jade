@@ -9,10 +9,23 @@ const tableName = 'testDynamoTable';
 const primaryKeyName = 'testPrimaryKey';
 const secondaryKeyName = 'testSecondaryKey';
 
+const arrayHasMatch = (arr, reg) => {
+  return arr.filter((item) => !!item.match(reg)).length > 0;
+};
+
 describe('AWS DynamodB', () => {
+  let consoleOutput = [];
+  const originalLog = console.log;
+  const mockedLog = (...output) => consoleOutput.push(...output);
+
   beforeEach(async () => {
     jest.setTimeout(30000);
-    // jest.spyOn(console, 'log').mockImplementation(() => {});
+    // jest.useFakeTimers();
+    console.log = mockedLog;
+  });
+
+  afterEach(async () => {
+    console.log = originalLog;
   });
 
   describe('Table', () => {
@@ -28,6 +41,8 @@ describe('AWS DynamodB', () => {
 
       afterEach(async () => {
         await deleteDynamoTable(tableName);
+        console.warn(consoleOutput);
+        consoleOutput = [];
       });
 
       test('table successfully created', async () => {
@@ -42,25 +57,48 @@ describe('AWS DynamodB', () => {
         );
         expect(newTable).toBeUndefined();
       });
+
       test('and an item can be put', async () => {
         const params = {
           [primaryKeyName]: { S: 'itemPrimaryKey' },
           [secondaryKeyName]: { S: 'itemSecondaryKey' },
         };
-        const item = await putDynamoItem(tableName, params);
-        const expected = {};
-        expect(item).toMatchObject(expected);
+        await putDynamoItem(tableName, params);
+        const isPut = arrayHasMatch(consoleOutput, 'Put item to table');
+        expect(isPut).toBe(true);
+      });
+    });
+
+    describe('can be deleted', () => {
+      let table;
+      const tableName2 = `${tableName}2`;
+      beforeEach(async () => {
+        table = await createDynamoTable(
+          tableName2,
+          primaryKeyName,
+          secondaryKeyName,
+        );
       });
 
-      describe('and can be deleted', () => {
-        test('one at a time', async () => {
-          const result = await deleteDynamoTable(tableName);
-          console.log('table: ', result);
-          const expected = { TableDescription: { TableName: tableName } };
-          expect(result).toMatchObject(expected);
-        });
+      afterEach(async () => {
+        console.warn(consoleOutput);
+        consoleOutput = [];
+      });
 
-        test('all at once', () => {});
+      test('one at a time', async () => {
+        await deleteDynamoTable(tableName2);
+        const isDeleted = arrayHasMatch(consoleOutput, `${tableName2} deleted`);
+        expect(isDeleted).toBe(true);
+      });
+
+      test('all at once', async () => {
+        const tableName3 = `${tableName}3`;
+        await createDynamoTable(tableName3, primaryKeyName, secondaryKeyName);
+        await deleteAllDynamoTables();
+        const isDeleted =
+          arrayHasMatch(consoleOutput, `${tableName2} deleted`) &&
+          arrayHasMatch(consoleOutput, `${tableName3} deleted`);
+        expect(isDeleted).toBe(true);
       });
     });
   });
