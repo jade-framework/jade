@@ -1,3 +1,6 @@
+const { join } = require('path');
+const { createIamRole } = require('../iam/createIamRole');
+const { readJSONFile } = require('../../util/fileUtils');
 const {
   lambdaIamRoleName,
   lambdaRolePolicies,
