@@ -6,6 +6,7 @@ const {
 } = require('../src/aws/awsAsyncFunctions');
 
 const { getBucketNames } = require('../src/util/helpers');
+const { createBuckets } = require('../src/aws/s3/createBuckets');
 const { deleteBucket } = require('../src/aws/s3/deleteBucket');
 
 const bucketName = 'jadetests3';
