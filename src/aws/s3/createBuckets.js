@@ -1,8 +1,6 @@
-const {
-  createBucket,
-  updateBucketPolicy,
-  putBucketWebsite,
-} = require('./index');
+const { createBucket } = require('./createBucket');
+const { updateBucketPolicy } = require('./updateBucketPolicy');
+const { putBucketWebsite } = require('./putBucketWebsite');
 const { getBucketNames } = require('../../util/helpers');
 const { jadeLog, jadeErr } = require('../../util/logger');
 
