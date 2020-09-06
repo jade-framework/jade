@@ -4,11 +4,7 @@ const {
   deleteLambdaFunction,
 } = require('../../aws/lambda/deleteLambdaFunction');
 const { deleteAllDynamoTables } = require('../../aws/dynamo');
-const {
-  lambdaRolePolicies,
-  lambdaIamRoleName,
-  lambdaNames,
-} = require('../../templates/constants');
+const { lambdaIamRoleName, lambdaNames } = require('../../templates/constants');
 const { jadeErr } = require('../logger');
 
 const cleanup = async () => {

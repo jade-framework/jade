@@ -31,12 +31,16 @@ const groupPolicies = [
   'arn:aws:iam::aws:policy/CloudFrontFullAccess',
 ];
 
-const profileName = 'test-JadeInstanceProfile';
+const profileName = 'testJadeInstanceProfile';
 
 describe('AWS IAM', () => {
   beforeEach(async () => {
-    jest.setTimeout(20000);
+    jest.setTimeout(50000);
     jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    await deleteInstanceProfile(profileName, roleName);
+    await deleteIamRole(roleName);
+    await deleteIamGroup(groupName);
   });
 
   describe('Role', () => {
