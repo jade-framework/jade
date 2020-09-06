@@ -5,6 +5,8 @@ const {
   deleteAllDynamoTables,
 } = require('../src/aws/dynamo');
 
+const { asyncDynamoWaitFor } = require('../src/aws/awsAsyncFunctions');
+
 const tableName = 'testDynamoTable';
 const primaryKeyName = 'testPrimaryKey';
 const secondaryKeyName = 'testSecondaryKey';
@@ -19,8 +21,7 @@ describe('AWS DynamodB', () => {
   const mockedLog = (...output) => consoleOutput.push(...output);
 
   beforeEach(async () => {
-    jest.setTimeout(30000);
-    // jest.useFakeTimers();
+    jest.setTimeout(60000);
     console.log = mockedLog;
   });
 
@@ -32,6 +33,7 @@ describe('AWS DynamodB', () => {
     describe('can be created', () => {
       let table;
       beforeEach(async () => {
+        await asyncDynamoWaitFor('tableNotExists', { TableName: tableName });
         table = await createDynamoTable(
           tableName,
           primaryKeyName,
@@ -73,6 +75,7 @@ describe('AWS DynamodB', () => {
       let table;
       const tableName2 = `${tableName}2`;
       beforeEach(async () => {
+        await asyncDynamoWaitFor('tableNotExists', { TableName: tableName2 });
         table = await createDynamoTable(
           tableName2,
           primaryKeyName,
@@ -95,6 +98,7 @@ describe('AWS DynamodB', () => {
         const tableName3 = `${tableName}3`;
         await createDynamoTable(tableName3, primaryKeyName, secondaryKeyName);
         await deleteAllDynamoTables();
+        await asyncDynamoWaitFor('tableNotExists', { TableName: tableName3 });
         const isDeleted =
           arrayHasMatch(consoleOutput, `${tableName2} deleted`) &&
           arrayHasMatch(consoleOutput, `${tableName3} deleted`);
