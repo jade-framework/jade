@@ -15,7 +15,7 @@ const admin = async (directory) => {
     await exec(`yarn --cwd ${path.join(__dirname, '../admin/server')} install`);
     await exec(`yarn --cwd ${path.join(__dirname, '../admin/client')} install`);
     jadeLog('Admin packages installed.');
-    jadeLog('Starting admin server...');
+    jadeLog('Running admin server...');
     exec(`yarn --cwd ${path.join(__dirname, '../admin/server')} start`);
   } catch (err) {
     jadeErr(err);

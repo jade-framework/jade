@@ -1,6 +1,5 @@
 const crypto = require('crypto');
 const { promisify } = require('util');
-const exec = promisify(require('child_process').exec);
 
 const { createBuckets, setBucketNotificationConfig } = require('../aws/s3');
 const { initJadeLambdas } = require('../aws/lambda');
@@ -139,26 +138,6 @@ const setupApp = async (directory, projectData) => {
   }
 };
 
-// const setupConfig = async (directory, projectData) => {
-//   const jadePath = getJadePath(directory);
-//   let config = [];
-
-//   try {
-//     if (!(await exists(join(jadePath, 'config.json')))) {
-//       await writeConfig(directory, config);
-//     } else {
-//       config = await readConfig(directory);
-//     }
-
-//     const newConfig = [...config, projectData];
-//     await writeConfig(directory, newConfig);
-//     return true;
-//   } catch (err) {
-//     jadeErr(err);
-//     return false;
-//   }
-// };
-
 const getConfig = async (directory = cwd) => {
   let config = [];
   if (await exists(join(getJadePath(directory), 'config.json'))) {
@@ -166,19 +145,6 @@ const getConfig = async (directory = cwd) => {
   }
   return config;
 };
-
-// const getConfigByBucketName = async (bucketName) => {
-//   try {
-//     let config = [];
-//     if (await exists(join(getJadePath(directory), 'config.json'))) {
-//       config = await readConfig(directory);
-//     }
-//     return config.find((proj) => proj.bucketName === bucketName)[0];
-//   } catch (err) {
-//     jadeErr(err);
-//     return false;
-//   }
-// };
 
 const setupAwsInfra = async (projectData) => {
   try {

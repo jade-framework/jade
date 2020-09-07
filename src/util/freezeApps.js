@@ -10,8 +10,17 @@ const { appsTableName } = require('../templates/constants');
 const { tagName } = require('./helpers');
 const { jadeLog, jadeErr } = require('./logger');
 const { appNotFound } = require('./messages');
+const { getHost, sendCommands } = require('./connect');
 
-const updateAppsTableStatus = async (projectName, bucketName, toFreeze) => {
+const remoteHomeDir = '/home/ec2-user';
+const remoteServerDir = `${remoteHomeDir}/server`;
+
+const updateAppsTableStatus = async (
+  projectName,
+  bucketName,
+  toFreeze,
+  publicIp = null,
+) => {
   const frozenBool = toFreeze === 'freeze' ? true : false;
   const params = {
     ExpressionAttributeNames: {
@@ -34,6 +43,12 @@ const updateAppsTableStatus = async (projectName, bucketName, toFreeze) => {
     TableName: appsTableName,
     UpdateExpression: 'SET #F = :f',
   };
+
+  if (publicIp) {
+    params.ExpressionAttributeNames['#P'] = 'publicIp';
+    params.ExpressionAttributeValues[':p'] = { S: publicIp };
+    params.UpdateExpression = 'SET #F = :f, #P = :p';
+  }
 
   try {
     jadeLog('Updating DynamoDB...');
@@ -113,9 +128,24 @@ const unfreezeEc2 = async (match) => {
     await asyncEc2WaitFor('instanceStopped', { InstanceIds: [instanceId] });
     await asyncStartInstances({ InstanceIds: [instanceId] });
     jadeLog('Waiting for the EC2 instance to start running...');
-    await asyncEc2WaitFor('instanceRunning', { InstanceIds: [instanceId] });
+    const res = await asyncEc2WaitFor('instanceRunning', {
+      InstanceIds: [instanceId],
+    });
+    const publicIp = res.Reservations[0].Instances[0].PublicIpAddress;
     jadeLog(`${projectName}'s EC2 instance has now been started.`);
-    await updateAppsTableStatus(projectName, bucketName, 'unfreeze');
+    jadeLog('Restarting processes...');
+    const host = await getHost({ publicIp });
+    const commands = [
+      'sudo systemctl start nginx',
+      `node ${remoteServerDir}/server.js &`,
+      `sudo service docker start`,
+    ];
+    await sendCommands(host, commands);
+    jadeLog('Processes restarted.');
+    jadeLog(
+      `To continue developing, please change your GitHub webhook to http://${publicIp}/webhook.`,
+    );
+    await updateAppsTableStatus(projectName, bucketName, 'unfreeze', publicIp);
   } catch (err) {
     jadeErr(err);
   }
@@ -133,6 +163,9 @@ const freezeApp = async (appName) => {
         (item) => item.projectName.S.trim() === appName.trim(),
       );
       if (match) {
+        jadeLog(
+          'Please note that you have to change the GitHub webhook IP address when you unfreeze this app. The address will only be available once you unfreeze, and you can use "jade list" or "jade admin" to see what address to use.',
+        );
         await freezeEc2(match);
       } else {
         return appNotFound();

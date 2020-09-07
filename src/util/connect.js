@@ -45,30 +45,23 @@ const setupCommands = [
   `node ${remoteServerDir}/server.js &`,
   `cd ${remoteHomeDir}`,
   'sudo yum install git -y',
-  `mkdir ${remoteHomeDir}/docker`,
   'sudo yum install -y docker',
   'sudo service docker start',
   'sudo systemctl enable docker',
 ];
 
-const buildCommands = ({
-  gitUrl,
-  gitFolder,
-  bucketName,
-  userInstallCommand,
-  userBuildCommand,
-  publishDirectory,
-  versionId,
-}) => {
+const buildCommands = ({ gitUrl, gitFolder, bucketName, versionId }) => {
   const repoDir = `${remoteHomeDir}/${gitFolder}`;
+  const publicDir = `${repoDir}/public`;
   return [
     `git clone ${gitUrl}`,
+    `sudo docker build ${remoteHomeDir} -t build-app --build-arg REPO_NAME=${gitFolder} -f ${remoteHomeDir}/Dockerfile`,
+    `sudo docker run --name build -p 6000-6000 --rm -v ${repoDir}:/output build-app`,
     `cd ${repoDir}`,
-    userInstallCommand,
-    userBuildCommand,
-    `aws s3 sync ${publishDirectory} s3://${bucketName}-${prodBucket}`,
-    `zip -r ${repoDir}/${versionId} ${repoDir}/${publishDirectory}`,
+    `aws s3 sync ${publicDir} s3://${bucketName}-${prodBucket}`,
+    `zip -r ${repoDir}/${versionId} ${publicDir}`,
     `aws s3api put-object --bucket ${bucketName}-${buildsBucket} --key ${versionId}.zip --body ${repoDir}/${versionId}.zip`,
+    `rm ${repoDir}/${versionId}.zip`,
   ];
 };
 

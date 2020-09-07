@@ -51,7 +51,7 @@ const initialAddQuestions = async (args) => {
 };
 
 const appConfigQuestions = async (args) => {
-  const [_, userGitUrl, userInstall, userBuild, userPublish] = args;
+  const [_, userGitUrl] = args;
   const questions = [
     {
       name: 'gitUrl',
@@ -66,40 +66,13 @@ const appConfigQuestions = async (args) => {
       },
       default: userGitUrl || 'https://github.com/user/root',
     },
-    {
-      name: 'userInstallCommand',
-      message: `Please enter the ${chalk.green(
-        'command to install',
-      )} your project's environment:\n`,
-      default: userInstall || `yarn install`,
-    },
-    {
-      name: 'userBuildCommand',
-      message: `Please enter the ${chalk.green(
-        'command to build',
-      )} your project files:\n`,
-      default: userBuild || `yarn build`,
-    },
-    {
-      name: 'publishDirectory',
-      message: `Please specify the ${chalk.green(
-        'publish directory',
-      )}. Jade will take files in this directory and deploy them to the CDN:\n`,
-      default: userPublish || `public\/`,
-    },
   ];
   const answers = await prompt(questions);
   return answers;
 };
 
 const confirmResponses = async (projectData) => {
-  const {
-    projectName,
-    gitUrl,
-    userInstallCommand,
-    userBuildCommand,
-    publishDirectory,
-  } = projectData;
+  const { projectName, gitUrl } = projectData;
 
   const arrow = chalk.green('->');
 
@@ -107,9 +80,6 @@ const confirmResponses = async (projectData) => {
     `Your ${chalk.green('project details')} are:`,
     `Project name          ${arrow}  ${projectName}`,
     `Git URL               ${arrow}  ${gitUrl}`,
-    `Installation command  ${arrow}  ${userInstallCommand}`,
-    `Build command         ${arrow}  ${userBuildCommand}`,
-    `Publish directory     ${arrow}  ${publishDirectory}`,
     'Is this correct?\n',
   ];
 
