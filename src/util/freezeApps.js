@@ -164,7 +164,7 @@ const freezeApp = async (appName) => {
       );
       if (match) {
         jadeLog(
-          'Please note that you have change the GitHub webhook IP address when you unfreeze this app. The address will only be available once you unfreeze, and you can use "jade list" or "jade admin" to see what address to use.',
+          'Please note that you have to change the GitHub webhook IP address when you unfreeze this app. The address will only be available once you unfreeze, and you can use "jade list" or "jade admin" to see what address to use.',
         );
         await freezeEc2(match);
       } else {
