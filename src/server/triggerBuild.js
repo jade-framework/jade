@@ -89,21 +89,15 @@ const updateDynamo = async (data) => {
 const runDockerBuild = async (repoName, repoDir) => {
   // Build docker image
   log('Building docker image...');
-  // await exec(
-  //   `sudo docker build ${userDir} -t build-app --build-arg REPO_NAME=${repoName} -f ${userDir}/Dockerfile`,
-  // );
-  // await exec(
-  //   `sudo docker build /home/ec2-user -t build-app --build-arg REPO_DIR=/home/ec2-user/gatsby-default -f /home/ec2-user/Dockerfile`,
-  // );
+  await exec(
+    `sudo docker build ${userDir} -t build-app --build-arg REPO_NAME=${repoName} -f ${userDir}/Dockerfile`,
+  );
   // Run container, mount userDir as volume mapped to output folder in container
   // Remove container after script runs
   log('Building app in container...');
   await exec(
     `sudo docker run --name build -p 6000-6000 --rm -v ${repoDir}:/output build-app`,
   );
-  // await exec(
-  //   `sudo docker run -e "/home/ec2-user/gatsby-default" --name build -p 6000-6000 --rm -v /home/ec2-user/gatsby-default:/output build-app`,
-  // );
 };
 
 module.exports = async function triggerBuild(webhook) {
@@ -144,6 +138,8 @@ module.exports = async function triggerBuild(webhook) {
     } else if (branch === 'staging') {
       await exec(`git -C ${repoDir} checkout staging`);
       pull = await exec(`git -C ${repoDir} pull -X theirs --no-edit`);
+      log('Finish pull staging');
+      log(pull);
     }
     if (/Already up to date/.test(pull.stdout)) {
       return {
@@ -172,14 +168,16 @@ module.exports = async function triggerBuild(webhook) {
           log(`Upload to s3://${bucketName}-${buildsBucket}/${date} complete`);
           await updateDynamo(initialData);
         } else if (branch === 'staging') {
-          await exec(`yarn --cwd ${repoDir} build`);
+          await exec(`sudo yum update -y`);
+          await runDockerBuild(repoName, repoDir);
+
           await exec(
             `aws s3 sync ${repoDir}/public s3://${bucketName}-${stageBucket}`,
           );
           log(`Upload to s3://${bucketName}-${stageBucket} complete`);
         }
       } catch (err) {
-        logErr(err); // convert to logger later
+        logErr(err);
       }
     })();
     return {
