@@ -8,7 +8,6 @@ WORKDIR /app
 RUN mkdir ./${REPO_NAME}
 COPY ./dockerBuild.js .
 COPY ./${REPO_NAME} ./${REPO_NAME}
-# COPY ./gatsby-default ./gatsby-default
 COPY ./package.json .
 
 EXPOSE 6000

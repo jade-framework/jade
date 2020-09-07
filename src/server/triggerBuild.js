@@ -47,9 +47,6 @@ const updateDynamo = async (data) => {
     cloudFrontOriginDomain,
     cloudFrontDomainName,
     publicIp,
-    userInstallCommand,
-    userBuildCommand,
-    publishDirectory,
     versionId,
     commitUrl,
     projectName,
@@ -66,9 +63,6 @@ const updateDynamo = async (data) => {
     projectId,
     projectName,
     publicIp,
-    publishDirectory,
-    userBuildCommand,
-    userInstallCommand,
     versionId,
   };
 
@@ -95,9 +89,9 @@ const updateDynamo = async (data) => {
 const runDockerBuild = async (repoName, repoDir) => {
   // Build docker image
   log('Building docker image...');
-  await exec(
-    `sudo docker build ${userDir} -t build-app --build-arg REPO_NAME=${repoName} -f ${userDir}/Dockerfile`,
-  );
+  // await exec(
+  //   `sudo docker build ${userDir} -t build-app --build-arg REPO_NAME=${repoName} -f ${userDir}/Dockerfile`,
+  // );
   // await exec(
   //   `sudo docker build /home/ec2-user -t build-app --build-arg REPO_DIR=/home/ec2-user/gatsby-default -f /home/ec2-user/Dockerfile`,
   // );
@@ -162,8 +156,6 @@ module.exports = async function triggerBuild(webhook) {
         // need to get info from Dynamo, especially publish directory "public"
         if (branch === 'master') {
           await exec(`sudo yum update -y`);
-          // await exec(`sudo yum update -y`);
-          // await exec(`yarn --cwd ${repoDir} build`);
 
           await runDockerBuild(repoName, repoDir);
 
@@ -175,6 +167,7 @@ module.exports = async function triggerBuild(webhook) {
           await exec(
             `aws s3api put-object --bucket ${bucketName}-${buildsBucket} --key ${date}.zip --body ${repoDir}/${date}.zip`,
           );
+          await exec(`rm ${repoDir}/${date}.zip`);
           log(`Upload to s3://${bucketName}-${prodBucket} complete`);
           log(`Upload to s3://${bucketName}-${buildsBucket}/${date} complete`);
           await updateDynamo(initialData);
