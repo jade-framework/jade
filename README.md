@@ -26,6 +26,16 @@ To provision your AWS services, run `jade init`. You will be prompted for the fo
 | `jade delete <app name>`   | Remove an app from the JAMstack                                                                |
 | `jade destroy`             | Remove all apps and all Jade AWS infrastructure (note the synchronous vs asynchronous options) |
 
+## Notes regarding Jade commands
+`jade init` and `jade add` will provision a new EC2 instance for each app. In order for the EC2 instance to pull source code on updates, a webhook must be setup on GitHub with it's destination address set to the EC2 instance's public IPv4 adress. The IP address and instructions on how to setup the a GitHub webhook will be provided by Jade when a new app is deployed.
+
+`jade freeze` will stop the EC2 instance. When this happens the EC2 instance will lose its public IPv4 address. The project's GitHub webhook destination address will need to be updated when the EC2 instance is restarted.
+
+`jade unfreeze` will restart the EC2 instance and a new IPv4 address will be assigned. Please note that you have to change the GitHub webhook IP address when you unfreeze the app. You can use `jade list` or `jade admin` to see the new IP address of the EC2 instance associated with the app.
+
+`jade destroy` will give the option to synchronously or asynchronously remove all apps and their associated AWS infrastracture. Due to the nature of CloudFront, it can take up to 90 minutes to remove a distribution.
+
+
 ## Concluding remarks
 
 Thanks for checking out the Jade framework! Please feel free to reach out to us with any questions and to discuss our code.
