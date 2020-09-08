@@ -1,5 +1,5 @@
 const { deleteOneApp } = require('../util/deleteApps');
-const { appNotFound } = require('../util/helpers');
+const { appNotFound } = require('../util/messages');
 const { jadeErr } = require('../util/logger');
 
 const deleteApp = async (args) => {
