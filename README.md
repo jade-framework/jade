@@ -1,14 +1,20 @@
 ![Jade logo](https://i.imgur.com/hxu6ISd.png)
 
-Jade is a framework to help users automate the deployment of JAMstack applications with AWS and GitHub. For more details on Jade or the JAMstack, please visit [our website](https://jadeframework.dev) or feel free to contact us directly.
+Jade is a framework to help users automate the deployment of JAMstack applications with AWS and GitHub. For more details on Jade or the JAMstack, please visit [our website](https://jadeframework.dev).
 
 ## Setup guide
 
-To install the Jade package, run `npm install -g @jade-framework/jade`.
+To install the Jade package, run 
+
+    $ npm install -g @jade-framework/jade
 
 In order to use Jade, you will need an AWS account, a Gatsby project and a public GitHub repo. To get started, you may use our Gatsby template [here](https://github.com/gatsbyjs/gatsby-starter-default) or follow the official Gatsby instructions to set up a Gatsby project [here](https://www.gatsbyjs.com/docs/quick-start/).
 
-To provision your AWS services, run `jade init`. You will be prompted for the following information:
+To provision your AWS services, run
+
+    $ jade init
+
+You will be prompted for the following information:
 
 - Your project name
 - Your GitHub repo
