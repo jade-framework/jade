@@ -33,7 +33,7 @@ You will be prompted for the following information:
 | `jade destroy`             | Remove all apps and all Jade AWS infrastructure (note the synchronous vs asynchronous options) |
 
 ## Notes regarding Jade commands
-`jade init` and `jade add` will provision a new EC2 instance for each app. In order for the EC2 instance to pull source code on updates, a webhook must be setup on GitHub with it's destination address set to the EC2 instance's public IPv4 adress. The IP address and instructions on how to setup the a GitHub webhook will be provided by Jade when a new app is deployed.
+`jade init` and `jade add` will provision a new EC2 instance for each app. In order for the EC2 instance to pull source code on updates, a webhook must be setup on GitHub with it's destination address set to the EC2 instance's public IPv4 adress. The IP address and instructions on how to setup a GitHub webhook will be provided by Jade when a new app is deployed.
 
 `jade freeze` will stop the EC2 instance. When this happens the EC2 instance will lose its public IPv4 address. The project's GitHub webhook destination address will need to be updated when the EC2 instance is restarted.
 
