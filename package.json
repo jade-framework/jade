@@ -33,7 +33,10 @@
     }
   ],
   "license": "MIT",
-  "repository": "jade-framework/jade",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jade-framework/jade.git"
+  },
   "dependencies": {
     "aws-sdk": "^2.714.0",
     "axios": "^0.19.2",
