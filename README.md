@@ -16,17 +16,6 @@ To provision your AWS services, run `jade init`. You will be prompted for the fo
 
 ## Jade commands
 
-<<<<<<< HEAD
-| Command                    | Description                                                                                    |
-| -------------------------- | ---------------------------------------------------------------------------------------------- |
-| `jade init`                | Initialize a new JAMstack app and associated AWS services                                      |
-| `jade add`                 | Add a new JAMstack app                                                                         |
-| `jade list`                | List all your existing JAMstack apps                                                           |
-| `jade freeze <app name>`   | Freeze your EC2 instance when you aren't developing your app                                   |
-| `jade unfreeze <app name>` | Unfreeze your EC2 instance to continue development                                             |
-| `jade delete <app name>`   | Remove an app from the JAMstack                                                                |
-| `jade destroy`             | Remove all apps and all Jade AWS infrastructure (note the synchronous vs asynchronous options) |
-=======
 | Command                    | Description                                                                |
 | -------------------------- | -------------------------------------------------------------------------- |
 | `jade init`                | Set up the initial Jade infrastructure on AWS and deploy your JAMstack app |
@@ -36,7 +25,6 @@ To provision your AWS services, run `jade init`. You will be prompted for the fo
 | `jade unfreeze <app name>` | Unfreeze your EC2 instance to continue development                         |
 | `jade delete <app name>`   | Remove an app from the Jade infrastructure                                 |
 | `jade destroy`             | Remove all apps and all Jade AWS infrastructure                            |
->>>>>>> master
 
 ## Concluding remarks
 
