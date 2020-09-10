@@ -56,6 +56,7 @@ const buildCommands = ({ gitUrl, gitFolder, bucketName, versionId }) => {
   return [
     `git clone ${gitUrl}`,
     `git branch staging`,
+    `git branch -u origin/staging staging`,
     `sudo docker build ${remoteHomeDir} -t build-app --build-arg REPO_NAME=${gitFolder} -f ${remoteHomeDir}/Dockerfile`,
     `sudo docker run --name build -p 6000-6000 --rm -v ${repoDir}:/output build-app`,
     `cd ${repoDir}`,
