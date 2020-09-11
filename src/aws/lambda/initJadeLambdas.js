@@ -23,16 +23,7 @@ const initJadeLambdas = async (bucketName) => {
   const functionDescription = `Invalidate index.html in CloudFront on upload to S3.`;
 
   try {
-    await zipit(
-      `${functionName}.js`,
-      join(
-        path.resolve(path.dirname('.')),
-        'src',
-        'aws',
-        'lambda',
-        `${functionName}.js`,
-      ),
-    );
+    await zipit(`${functionName}.js`, join(__dirname, `${functionName}.js`));
     await uploadToBucket(functionFile, `${bucketName}-${bucketSuffixes[2]}`);
     await removeFile('.', functionFile);
 

@@ -1,8 +1,9 @@
 {
   "name": "@jade-framework/jade",
-  "version": "1.0.0-beta.2",
+  "version": "2.0.7",
   "author": "Jade Framework",
   "description": "An open source deployment environment for JAMstack applications",
+  "homepage": "https://jadeframework.dev",
   "keywords": [
     "jamstack",
     "ci/cd",
@@ -32,7 +33,10 @@
     }
   ],
   "license": "MIT",
-  "repository": "jade-framework/jade",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jade-framework/jade.git"
+  },
   "dependencies": {
     "aws-sdk": "^2.714.0",
     "axios": "^0.19.2",

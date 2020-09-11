@@ -4,7 +4,7 @@ Jade is a framework to help users automate the deployment of JAMstack applicatio
 
 ## Setup guide
 
-To install the Jade package, run 
+To install the Jade package, run
 
     $ npm install -g @jade-framework/jade
 
@@ -22,17 +22,18 @@ You will be prompted for the following information:
 
 ## Jade commands
 
-| Command                    | Description                                                                                    |
-| -------------------------- | ---------------------------------------------------------------------------------------------- |
-| `jade init`                | Initialize a new JAMstack app and associated AWS services                                      |
-| `jade add`                 | Add a new JAMstack app                                                                         |
-| `jade list`                | List all your existing JAMstack apps                                                           |
-| `jade freeze <app name>`   | Freeze your EC2 instance when you aren't developing your app                                   |
-| `jade unfreeze <app name>` | Unfreeze your EC2 instance to continue development                                             |
-| `jade delete <app name>`   | Remove an app and its associated AWS infrastructure                                                   |
-| `jade destroy`             | Remove all apps and all Jade AWS infrastructure (note the synchronous vs asynchronous options) |
+| Command                    | Description                                                  |
+| -------------------------- | ------------------------------------------------------------ |
+| `jade init`                | Initialize a new JAMstack app and associated AWS services    |
+| `jade add`                 | Add a new JAMstack app                                       |
+| `jade list`                | List all your existing JAMstack apps                         |
+| `jade freeze <app name>`   | Freeze your EC2 instance when you aren't developing your app |
+| `jade unfreeze <app name>` | Unfreeze your EC2 instance to continue development           |
+| `jade delete <app name>`   | Remove an app and its associated AWS infrastructure          |
+| `jade destroy`             | Remove all apps and all Jade AWS infrastructure              |
 
 ## Notes regarding Jade commands
+
 `jade init` and `jade add` will provision a new EC2 instance for each app. In order for the EC2 instance to pull source code on updates, a webhook must be setup on GitHub with it's destination address set to the EC2 instance's public IPv4 adress. The IP address and instructions on how to setup a GitHub webhook will be provided by Jade when a new app is deployed.
 
 `jade freeze` will stop the EC2 instance. When this happens the EC2 instance will lose its public IPv4 address. The project's GitHub webhook destination address will need to be updated when the EC2 instance is restarted.
@@ -40,7 +41,6 @@ You will be prompted for the following information:
 `jade unfreeze` will restart the EC2 instance and a new IPv4 address will be assigned. Please note that you have to change the GitHub webhook IP address when you unfreeze the app. You can use `jade list` or `jade admin` to see the new IP address of the EC2 instance associated with the app.
 
 `jade destroy` will give the option to synchronously or asynchronously remove all apps and their associated AWS infrastracture. Due to the nature of CloudFront, it can take up to 90 minutes to remove a distribution.
-
 
 ## Concluding remarks
 
