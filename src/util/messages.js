@@ -3,7 +3,7 @@ const { jadeLog } = require('./logger');
 
 const greet = (command) => {
   if (command === 'add') {
-    jadeLog(`Let's add a new ${chalk.green('Jade')} app...`);
+    jadeLog(`Adding a new ${chalk.green('Jade')} app...`);
   }
 };
 
