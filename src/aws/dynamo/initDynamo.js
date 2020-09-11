@@ -66,9 +66,6 @@ const versionsItemToPut = ({
   cloudFrontOriginDomain,
   cloudFrontDomainName,
   publicIp,
-  userInstallCommand,
-  userBuildCommand,
-  publishDirectory,
   versionId,
 }) => ({
   projectId: {
@@ -97,15 +94,6 @@ const versionsItemToPut = ({
   },
   publicIp: {
     S: publicIp,
-  },
-  userInstallCommand: {
-    S: userInstallCommand,
-  },
-  userBuildCommand: {
-    S: userBuildCommand,
-  },
-  publishDirectory: {
-    S: publishDirectory,
   },
   versionId: {
     S: versionId,
