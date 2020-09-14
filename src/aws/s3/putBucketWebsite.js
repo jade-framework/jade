@@ -8,7 +8,7 @@ const putBucketWebsite = async (bucketName) => {
         Key: 'error.html',
       },
       IndexDocument: {
-        Suffix: '404.html',
+        Suffix: 'index.html',
       },
     },
   });
