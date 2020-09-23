@@ -5,7 +5,7 @@ const putBucketWebsite = async (bucketName) => {
     Bucket: bucketName,
     WebsiteConfiguration: {
       ErrorDocument: {
-        Key: 'error.html',
+        Key: '404.html',
       },
       IndexDocument: {
         Suffix: 'index.html',

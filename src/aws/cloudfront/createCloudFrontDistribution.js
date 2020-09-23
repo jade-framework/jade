@@ -16,7 +16,7 @@ const createCloudFrontDistribution = async (bucketName) => {
     DistributionConfig: {
       CallerReference: callerReference,
       Comment: callerReference,
-      DefaultRootObject: 'index.html',
+      // DefaultRootObject: 'index.html',
       DefaultCacheBehavior: {
         ForwardedValues: {
           Cookies: {
