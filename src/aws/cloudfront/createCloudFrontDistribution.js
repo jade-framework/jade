@@ -16,7 +16,7 @@ const createCloudFrontDistribution = async (bucketName) => {
     DistributionConfig: {
       CallerReference: callerReference,
       Comment: callerReference,
-      DefaultRootObject: 'index.html',
+      // DefaultRootObject: 'index.html',
       DefaultCacheBehavior: {
         ForwardedValues: {
           Cookies: {
@@ -39,7 +39,7 @@ const createCloudFrontDistribution = async (bucketName) => {
           Enabled: false,
           Quantity: 0,
         },
-        ViewerProtocolPolicy: 'allow-all',
+        ViewerProtocolPolicy: 'redirect-to-https',
         AllowedMethods: {
           Items: ['GET', 'HEAD'],
           Quantity: 2,

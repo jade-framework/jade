@@ -15,6 +15,7 @@ const createBuckets = async (bucketName) => {
       }),
     );
     await putBucketWebsite(`${bucketName}-stage`);
+    await putBucketWebsite(`${bucketName}-prod`);
     jadeLog('All S3 buckets created and configured.');
   } catch (error) {
     jadeErr(error);

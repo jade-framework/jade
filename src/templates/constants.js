@@ -1,4 +1,7 @@
+const { getRegion } = require('../server/getRegion');
+
 const cwd = process.cwd();
+const region = getRegion();
 
 const instanceType = 't2.micro';
 const keyPair = 'keyPair';
@@ -27,7 +30,7 @@ const projectNameLength = 24;
 const bucketSuffixes = ['prod', 'builds', 'lambda', 'stage']; // production/live is always first, builds/history is always second
 const cloudFrontOriginId = (name) => `S3-${name}`;
 const cloudFrontOriginDomain = (name) =>
-  `${name}-${bucketSuffixes[0]}.s3.amazonaws.com`;
+  `${name}-${bucketSuffixes[0]}.s3-website-${region}.amazonaws.com`;
 const appsTableName = 'JadeProjects';
 const versionsTableName = 'JadeProjectsVersions';
 
