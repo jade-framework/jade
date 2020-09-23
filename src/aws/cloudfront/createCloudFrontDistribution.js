@@ -39,7 +39,7 @@ const createCloudFrontDistribution = async (bucketName) => {
           Enabled: false,
           Quantity: 0,
         },
-        ViewerProtocolPolicy: 'allow-all',
+        ViewerProtocolPolicy: 'redirect-to-https',
         AllowedMethods: {
           Items: ['GET', 'HEAD'],
           Quantity: 2,
